@@ -1,60 +1,51 @@
-
 import React from 'react';
 import { format, parseISO, eachDayOfInterval, startOfWeek, endOfWeek, isSameDay, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-
-interface Event {
-  id: string;
-  title: string;
-  start: string;
-  end: string;
-  category: 'reunion' | 'animation' | 'atelier' | 'permanence' | 'autre';
-  location?: string;
-}
+import { CalendarEvent } from './AgendaCalendar';
 
 interface AgendaWeekViewProps {
   selectedDate: Date;
-  events: Event[];
-  onEventClick: (event: Event) => void;
+  events: CalendarEvent[];
+  onEventClick: (event: CalendarEvent) => void;
 }
 
 const AgendaWeekView: React.FC<AgendaWeekViewProps> = ({ selectedDate, events, onEventClick }) => {
-  // Get the week interval
-  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-  
-  // Get all days in the week
+  // Get all days of the selected week
+  const weekStart = startOfWeek(selectedDate, { locale: fr });
+  const weekEnd = endOfWeek(selectedDate, { locale: fr });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+  // Time slots for the week view (8h-20h)
+  const timeSlots = Array.from({ length: 13 }, (_, i) => i + 8);
   
-  // Hours for the week view (simplified to 8h-20h)
-  const hours = Array.from({ length: 13 }, (_, i) => 8 + i);
-  
-  // Get events for a specific day and hour
-  const getEventsForHourAndDay = (day: Date, hour: number): Event[] => {
+  // Function to get events for a specific day and time slot
+  const getEventsForSlot = (day: Date, hour: number): CalendarEvent[] => {
     return events.filter(event => {
       const eventStart = parseISO(event.start);
       const eventEnd = parseISO(event.end);
       
-      return isSameDay(eventStart, day) && 
-             eventStart.getHours() <= hour && 
-             eventEnd.getHours() > hour;
+      return (
+        isSameDay(eventStart, day) && 
+        eventStart.getHours() <= hour && 
+        eventEnd.getHours() > hour
+      );
     });
   };
   
   return (
     <div className="overflow-x-auto">
       <Table className="border">
-        <TableHeader className="bg-muted/60">
+        <TableHeader>
           <TableRow>
-            <TableHead className="w-16">Heure</TableHead>
+            <TableHead className="w-20">Heure</TableHead>
             {days.map((day, idx) => (
-              <TableHead key={idx} className="min-w-[120px] text-center">
-                <div className="font-medium">{format(day, 'EEEE', { locale: fr })}</div>
+              <TableHead key={idx} className="text-center min-w-[120px]">
+                <div className="font-medium">{format(day, 'EEE', { locale: fr })}</div>
                 <div className={cn(
-                  "text-sm",
-                  isSameDay(day, new Date()) && "text-primary font-bold"
+                  "text-sm font-normal",
+                  isSameDay(day, new Date()) && "text-primary font-medium"
                 )}>
                   {format(day, 'd MMM', { locale: fr })}
                 </div>
@@ -63,31 +54,43 @@ const AgendaWeekView: React.FC<AgendaWeekViewProps> = ({ selectedDate, events, o
           </TableRow>
         </TableHeader>
         <TableBody>
-          {hours.map((hour) => (
+          {timeSlots.map(hour => (
             <TableRow key={hour}>
-              <TableCell className="font-medium text-muted-foreground text-xs">
+              <TableCell className="text-muted-foreground text-sm">
                 {hour}:00
               </TableCell>
               
               {days.map((day, dayIdx) => {
-                const hourEvents = getEventsForHourAndDay(day, hour);
+                const slotEvents = getEventsForSlot(day, hour);
                 
                 return (
-                  <TableCell key={dayIdx} className="p-1 h-12 align-top">
-                    {hourEvents.map((event) => (
+                  <TableCell 
+                    key={dayIdx} 
+                    className={cn(
+                      "h-16 align-top p-1 border",
+                      hour % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                    )}
+                  >
+                    {slotEvents.map(event => (
                       <div
                         key={event.id}
                         onClick={() => onEventClick(event)}
                         className={cn(
-                          "px-1 py-0.5 text-xs mb-1 rounded cursor-pointer text-white truncate",
+                          "px-2 py-1 text-xs rounded cursor-pointer text-white mb-1 truncate",
                           event.category === 'reunion' && "bg-blue-500",
                           event.category === 'animation' && "bg-amber-500",
                           event.category === 'atelier' && "bg-emerald-500",
                           event.category === 'permanence' && "bg-purple-500",
-                          event.category === 'autre' && "bg-slate-500",
+                          event.category === 'autre' && "bg-slate-500"
                         )}
                       >
-                        {format(parseISO(event.start), 'HH:mm')} {event.title}
+                        {/* If event starts at this hour, show the time */}
+                        {parseISO(event.start).getHours() === hour && (
+                          <span className="font-medium">
+                            {format(parseISO(event.start), 'HH:mm')} - {' '}
+                          </span>
+                        )}
+                        {event.title}
                       </div>
                     ))}
                   </TableCell>

@@ -34,9 +34,9 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 | Phase | Objectif | Durée estimée | Statut |
 |-------|----------|---------------|--------|
-| **Phase 1: MVP** | Version minimale utilisable avec les fonctions essentielles | 2-3 mois | 🏗️ En cours |
-| **Phase 2: Extension** | Ajout de modules complémentaires et enrichissement | 2-3 mois | 🔄 À faire |
-| **Phase 3: Optimisation** | Peaufinage, performance et expérience utilisateur | 1-2 mois | 🔄 À faire |
+| **Phase 1: MVP** | Version minimale utilisable avec les fonctions essentielles | 4 jours | 🏗️ En cours |
+| **Phase 2: Extension** | Ajout de modules complémentaires et enrichissement | 2 semaines | 🔄 À faire |
+| **Phase 3: Optimisation** | Peaufinage, performance et expérience utilisateur | 1 mois | 🔄 À faire |
 | **Phase 4: Maintenance** | Corrections, améliorations continues | Continu | 🔄 À faire |
 
 ## Phase 1: MVP (Minimum Viable Product)
@@ -113,7 +113,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 #### Tâches techniques
 - Création des tables `evs_events` ✅
 - Composants de calendrier (vue mois/semaine) ✅
-- Formulaires de création/édition d'événements 🏗️
+- Formulaires de création/édition d'événements ✅
 - Filtres par catégorie 🔄
 - Intégration date-fns pour gestion des dates ✅
 

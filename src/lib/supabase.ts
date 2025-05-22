@@ -5,19 +5,26 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fcwvcjtnfxyzojolpisd.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd3ZjanRuZnh5em9qb2xwaXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNDE0ODQsImV4cCI6MjA1NzYxNzQ4NH0.5nhfFiobBMagzjpChJQGZ7TNqAWce6J3Mq6geMKtiCM';
 
+// Suppression de la vérification qui lance une erreur car nous avons déjà des valeurs par défaut
+// if (!supabaseUrl || !supabaseAnonKey) {
+//   throw new Error('Clés Supabase manquantes dans les variables d\'environnement.');
+// }
+
+// Exporter le client Supabase
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Types pour les utilisateurs
 export type UserRole = 'member' | 'staff' | 'admin';
 
+// Interface pour le profil utilisateur
 export interface UserProfile {
   id: string;
-  email: string;
+  user_id: string;
   firstname: string;
   lastname: string;
+  email: string;
   avatar_url?: string;
-  phone?: string;
-  role: UserRole;
+  role: 'member' | 'staff' | 'admin';
   status: 'active' | 'inactive' | 'pending';
   created_at: string;
   updated_at: string;
@@ -25,6 +32,54 @@ export interface UserProfile {
 
 // Service d'authentification
 export const authService = {
+  // Obtenir l'utilisateur actuellement connecté
+  async getCurrentUser() {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+      return null;
+    }
+    return data.user;
+  },
+
+  // Obtenir le profil de l'utilisateur
+  async getUserProfile(userId: string) {
+    const { data, error } = await supabase
+      .from('evs_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error('Erreur lors de la récupération du profil:', error);
+      return null;
+    }
+
+    return data as UserProfile;
+  },
+
+  // Vérifier si l'utilisateur a un certain rôle
+  async hasRole(role: 'member' | 'staff' | 'admin') {
+    const user = await this.getCurrentUser();
+    if (!user) return false;
+
+    const profile = await this.getUserProfile(user.id);
+    if (!profile) return false;
+
+    if (role === 'member') {
+      // Tout utilisateur avec un profil est au moins membre
+      return true;
+    } else if (role === 'staff') {
+      // Staff et admin ont le rôle staff
+      return profile.role === 'staff' || profile.role === 'admin';
+    } else if (role === 'admin') {
+      // Seuls les admins ont le rôle admin
+      return profile.role === 'admin';
+    }
+
+    return false;
+  },
+
   // Connexion avec email/mot de passe
   async signIn(email: string, password: string) {
     return await supabase.auth.signInWithPassword({
@@ -83,14 +138,8 @@ export const authService = {
     });
   },
 
-  // Récupération de l'utilisateur courant
-  async getCurrentUser() {
-    const { data } = await supabase.auth.getUser();
-    return data?.user || null;
-  },
-
   // Récupération du profil utilisateur
-  async getUserProfile(userId: string) {
+  async getUserProfileById(userId: string) {
     const { data, error } = await supabase
       .from('evs_profiles')
       .select('*')

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addDays, startOfWeek, endOfWeek, getDay, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -10,7 +9,7 @@ import AgendaDayView from './AgendaDayView';
 import AgendaWeekView from './AgendaWeekView';
 import AgendaListView from './AgendaListView';
 
-interface Event {
+export interface CalendarEvent {
   id: string;
   title: string;
   start: string;
@@ -23,48 +22,25 @@ interface AgendaCalendarProps {
   view: 'month' | 'week' | 'day' | 'list';
   selectedDate: Date;
   isMobile: boolean;
+  events: CalendarEvent[];
+  onEventClick: (eventId: string) => void;
 }
 
-// Exemple d'événements pour la démo
-const MOCK_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Réunion du bureau',
-    start: '2025-05-22T10:00:00',
-    end: '2025-05-22T12:00:00',
-    category: 'reunion',
-    location: 'Salle principale'
-  },
-  {
-    id: '2',
-    title: 'Atelier couture',
-    start: '2025-05-24T14:00:00',
-    end: '2025-05-24T16:30:00',
-    category: 'atelier',
-    location: 'Salle d\'activités'
-  },
-  {
-    id: '3',
-    title: 'Animation enfants',
-    start: '2025-05-25T15:00:00',
-    end: '2025-05-25T17:00:00',
-    category: 'animation'
-  },
-  {
-    id: '4',
-    title: 'Permanence administrative',
-    start: '2025-05-26T09:00:00',
-    end: '2025-05-26T12:00:00',
-    category: 'permanence',
-    location: 'Bureau d\'accueil'
-  }
-];
-
-const AgendaCalendar: React.FC<AgendaCalendarProps> = ({ view, selectedDate, isMobile }) => {
+const AgendaCalendar: React.FC<AgendaCalendarProps> = ({ 
+  view, 
+  selectedDate, 
+  isMobile,
+  events = [],
+  onEventClick
+}) => {
   const { toast } = useToast();
 
-  // Function to handle event click
-  const handleEventClick = (event: Event) => {
+  // Function to handle event click with details
+  const handleEventClick = (event: CalendarEvent) => {
+    // Appeler la fonction onEventClick passée par le parent
+    onEventClick(event.id);
+    
+    // Afficher un toast avec les détails
     toast({
       title: event.title,
       description: `${format(parseISO(event.start), 'PPp', { locale: fr })} - ${event.location || 'Aucun lieu spécifié'}`,
@@ -73,9 +49,9 @@ const AgendaCalendar: React.FC<AgendaCalendarProps> = ({ view, selectedDate, isM
   };
 
   // Function to get events for a specific day
-  const getEventsForDay = (day: Date): Event[] => {
+  const getEventsForDay = (day: Date): CalendarEvent[] => {
     const dayStr = format(day, 'yyyy-MM-dd');
-    return MOCK_EVENTS.filter(event => {
+    return events.filter(event => {
       const eventDate = format(parseISO(event.start), 'yyyy-MM-dd');
       return eventDate === dayStr;
     });
@@ -159,15 +135,15 @@ const AgendaCalendar: React.FC<AgendaCalendarProps> = ({ view, selectedDate, isM
 
   // Render the appropriate view
   if (view === 'day') {
-    return <AgendaDayView selectedDate={selectedDate} events={MOCK_EVENTS} onEventClick={handleEventClick} />;
+    return <AgendaDayView selectedDate={selectedDate} events={events} onEventClick={handleEventClick} />;
   }
   
   if (view === 'week') {
-    return <AgendaWeekView selectedDate={selectedDate} events={MOCK_EVENTS} onEventClick={handleEventClick} />;
+    return <AgendaWeekView selectedDate={selectedDate} events={events} onEventClick={handleEventClick} />;
   }
   
   if (view === 'list') {
-    return <AgendaListView selectedDate={selectedDate} events={MOCK_EVENTS} onEventClick={handleEventClick} />;
+    return <AgendaListView selectedDate={selectedDate} events={events} onEventClick={handleEventClick} />;
   }
   
   // Default to month view
