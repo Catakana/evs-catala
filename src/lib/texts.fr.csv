@@ -3,7 +3,7 @@ app.name,EVS-catala,Nom de l'application
 app.association,Espace de Vie Sociale CATALA,Nom complet de l'association
 app.association_short,CATALA,Nom court de l'association
 app.slogan,Le portail communautaire de CATALA,Slogan affiché sur la page d'accueil
-app.footer,© 2024 Espace de Vie Sociale CATALA - Tous droits réservés,Texte de bas de page
+app.footer,© 2025 Studio Miyukini - Tous droits réservés,Texte de bas de page
 
 # Navigation
 nav.home,Accueil,Navigation principale
@@ -31,6 +31,8 @@ actions.add,Ajouter,Bouton d'action
 actions.upload,Téléverser,Bouton d'action
 actions.download,Télécharger,Bouton d'action
 actions.share,Partager,Bouton d'action
+common.processing,Traitement en cours...,Message de chargement
+common.loading,Chargement...,Message de chargement
 
 # Messages d'erreur
 errors.required,Ce champ est requis,Message d'erreur formulaire
@@ -57,6 +59,32 @@ auth.logoutSuccess,Déconnexion réussie,Message de confirmation
 auth.registerSuccess,Inscription réussie,Message de confirmation
 auth.resetSuccess,Mot de passe réinitialisé avec succès,Message de confirmation
 auth.resetInstructions,Vérifiez votre email pour réinitialiser votre mot de passe,Message d'information
+auth.sendResetLink,Envoyer le lien de réinitialisation,Bouton
+auth.resetEmailSent,Un email de réinitialisation a été envoyé à votre adresse,Message de confirmation
+auth.backToLogin,Retour à la page de connexion,Lien
+auth.enterNewPassword,Entrez votre nouveau mot de passe,Instruction
+auth.passwordMinLength,Le mot de passe doit contenir au moins 8 caractères,Message d'erreur
+auth.passwordsDoNotMatch,Les mots de passe ne correspondent pas,Message d'erreur
+auth.createAccount,Créez votre compte pour rejoindre la communauté,Description page inscription
+auth.alreadyHaveAccount,Vous avez déjà un compte ?,Message lien connexion
+auth.noAccountYet,Vous n'avez pas encore de compte ?,Message lien inscription
+auth.accountValidationPending,Votre compte est en attente de validation par un administrateur,Message information
+
+# Profil utilisateur
+profile.title,Mon profil,Titre de page
+profile.personalInfo,Informations personnelles,Onglet
+profile.security,Sécurité,Onglet
+profile.preferences,Préférences,Onglet
+profile.updatePersonalInfo,Mettez à jour vos informations personnelles,Description section
+profile.securitySettings,Gérez vos paramètres de sécurité,Description section
+profile.preferencesSettings,Configurez vos préférences d'affichage et de notification,Description section
+profile.changeAvatar,Changer la photo,Bouton
+profile.saveChanges,Enregistrer les modifications,Bouton
+profile.phone,Téléphone,Champ formulaire
+profile.changePassword,Changer de mot de passe,Bouton
+profile.updateSuccess,Profil mis à jour,Titre toast
+profile.updateSuccessMessage,Vos informations ont été mises à jour avec succès,Message toast
+profile.preferencesComingSoon,Les préférences seront disponibles prochainement,Message d'information
 
 # Agenda
 agenda.title,Agenda des événements,Titre de page

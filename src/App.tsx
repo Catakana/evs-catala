@@ -14,6 +14,11 @@ import VotesPage from './pages/VotesPage';
 import ProjectsPage from './pages/ProjectsPage';
 import MessagesPage from './pages/MessagesPage';
 import InfosPage from './pages/InfosPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import ProfilePage from './pages/ProfilePage';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +38,14 @@ const App = () => (
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/infos" element={<InfosPage />} />
+          
+          {/* Routes d'authentification */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

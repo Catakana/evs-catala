@@ -49,11 +49,11 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 > **Note**: Ce module est la priorité absolue pour permettre les tests utilisateurs dès que possible, même sans toutes les fonctionnalités. Il doit être implémenté en premier.
 
 #### Scope détaillé
-- Système d'inscription par email/mot de passe 🏗️
-- Validation des comptes par email 🔄
-- Profils de base avec nom, prénom, photo 🏗️
-- Gestion des rôles (membre, staff, admin) 🏗️
-- Réinitialisation de mot de passe 🔄
+- Système d'inscription par email/mot de passe ✅
+- Validation des comptes par email 🏗️
+- Profils de base avec nom, prénom, photo ✅
+- Gestion des rôles (membre, staff, admin) ✅
+- Réinitialisation de mot de passe ✅
 - Pages de connexion/déconnexion sécurisées ✅
 - Système de persistance de session (cookies) ✅
 - Comptes de démonstration préconfigurés pour tests 🔄
@@ -63,16 +63,16 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Configuration de Supabase Auth avec OAuth (Google) 🏗️
 - Création de la table `evs_profiles` et `evs_user_settings` ✅
 - Formulaires d'inscription et de connexion ✅
-- Protection des routes privées 🏗️
+- Protection des routes privées ✅
 - Gestion des tokens de session ✅
-- Page de modification de profil utilisateur 🔄
+- Page de modification de profil utilisateur ✅
 - Environnement de test isolé 🔄
 - Scripts de provisionnement des comptes de test 🔄
 - Tests automatisés des flux d'authentification 🔄
 
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
-- **Semaine 2**: Gestion de profil et récupération de mot de passe 🏗️
+- **Semaine 2**: Gestion de profil et récupération de mot de passe ✅
 
 ### 1.2 UI Kit et TextBank
 **Priorité**: Haute ⚠️  
@@ -82,18 +82,18 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 #### Scope détaillé
 - Création d'un système de design cohérent ✅
 - Définition des composants UI réutilisables ✅
-- Mise en place d'une banque de textes centralisée 🔄
-- Gestion des textes variables et des noms provisoires (app, association) 🔄
+- Mise en place d'une banque de textes centralisée ✅
+- Gestion des textes variables et des noms provisoires (app, association) ✅
 - Documentation des composants et guides d'usage 🔄
 - Palette de couleurs et typographie standardisées ✅
 
 #### Tâches techniques
 - Développement des composants UI atomiques avec Shadcn/UI ✅
-- Création du fichier `texts.fr.csv` pour centraliser tous les textes 🔄
-- Mise en place d'un système de substitution de variables 🔄
-- Fonction `getText(id, vars)` pour l'affichage dynamique 🔄
+- Création du fichier `texts.fr.csv` pour centraliser tous les textes ✅
+- Mise en place d'un système de substitution de variables ✅
+- Fonction `getText(id, vars)` pour l'affichage dynamique ✅
 - Catalogue de composants avec états et variantes ✅
-- Système pour gérer les éléments à noms variables (app, association) 🔄
+- Système pour gérer les éléments à noms variables (app, association) ✅
 
 ### 1.3 Module Agenda (base)
 **Priorité**: Haute  
@@ -489,6 +489,29 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
   - Compléter la gestion des profils utilisateurs
   - Terminer les formulaires d'événements pour l'agenda
   - Mettre en place la TextBank pour centraliser les textes
+
+### Rapport au 25/05/2024
+- **Phase 1 (MVP)**: ~60% complétée
+  - Structure globale et navigation: 100% terminé
+  - UI Kit de base: 100% terminé
+  - TextBank: 100% terminé
+  - Authentification: 90% terminé
+  - Module Agenda (base): 50% en cours
+  - Module Trombinoscope (base): 40% en cours
+  - Module Annonces (base): 50% en cours
+  - Module Infos générales: 60% en cours
+
+- **Réalisations clés**:
+  - Système d'authentification complet (connexion, inscription, profil, réinitialisation de mot de passe)
+  - TextBank fonctionnelle avec gestion des variables et des traductions
+  - Intégration de Supabase pour l'authentification et le stockage de données
+  - Interface utilisateur responsive et cohérente
+
+- **Prochaines étapes prioritaires**:
+  - Finaliser les formulaires d'événements pour l'agenda
+  - Développer les fonctionnalités du trombinoscope
+  - Améliorer les annonces avec système de notification
+  - Implémenter les permanences
 
 ## Estimation des ressources
 
