@@ -1,26 +1,26 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Bell, FileText } from 'lucide-react';
+import { MessageSquare, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 
-const AnnouncementModuleCard: React.FC = () => {
+const MessageryModuleCard: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <Card className="flex flex-col h-full shadow-md hover:shadow-lg transition-shadow cursor-pointer">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold">Annonces</CardTitle>
-          <Bell className="h-6 w-6 text-primary" />
+          <CardTitle className="text-xl font-bold">Messagerie</CardTitle>
+          <MessageSquare className="h-6 w-6 text-primary" />
         </div>
-        <CardDescription>Consultez les dernières annonces</CardDescription>
+        <CardDescription>Communiquez avec les membres</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow pb-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Nouvelles et informations</p>
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Conversations privées et groupes</p>
           </div>
         </div>
       </CardContent>
@@ -28,13 +28,13 @@ const AnnouncementModuleCard: React.FC = () => {
         <Button 
           variant="default" 
           className="w-full"
-          onClick={() => navigate('/announcements')}
+          onClick={() => navigate('/messages')}
         >
-          Voir les annonces
+          Accéder à la messagerie
         </Button>
       </div>
     </Card>
   );
 };
 
-export default AnnouncementModuleCard;
+export default MessageryModuleCard; 

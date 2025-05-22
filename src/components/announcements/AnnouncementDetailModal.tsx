@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Dialog, 
@@ -6,15 +5,15 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Paperclip, Download, FilePdf, FileImage, FileText } from 'lucide-react';
-import { Announcement } from '@/types/announcement';
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Calendar, Paperclip, Download, File, FileImage, FileText } from 'lucide-react';
+import { Announcement } from '../../types/announcement';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { cn } from '../../lib/utils';
+import { useToast } from '../../hooks/use-toast';
 
 interface AnnouncementDetailModalProps {
   announcement: Announcement;
@@ -34,7 +33,7 @@ const AnnouncementDetailModal: React.FC<AnnouncementDetailModalProps> = ({ annou
 
   const getFileIcon = (attachment: string) => {
     const ext = attachment.split('.').pop()?.toLowerCase();
-    if (ext === 'pdf') return <FilePdf className="h-5 w-5" />;
+    if (ext === 'pdf') return <File className="h-5 w-5" />;
     if (['jpg', 'jpeg', 'png', 'gif'].includes(ext || '')) return <FileImage className="h-5 w-5" />;
     return <FileText className="h-5 w-5" />;
   };

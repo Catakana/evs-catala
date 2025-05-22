@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +10,10 @@ import AgendaPage from "./pages/AgendaPage";
 import PermanencesPage from "./pages/PermanencesPage";
 import TrombinoscopePage from "./pages/TrombinoscopePage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
+import VotesPage from './pages/VotesPage';
+import ProjectsPage from './pages/ProjectsPage';
+import MessagesPage from './pages/MessagesPage';
+import InfosPage from './pages/InfosPage';
 
 const queryClient = new QueryClient();
 
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/permanences" element={<PermanencesPage />} />
           <Route path="/trombinoscope" element={<TrombinoscopePage />} />
           <Route path="/announcements" element={<AnnouncementsPage />} />
+          <Route path="/votes" element={<VotesPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/infos" element={<InfosPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

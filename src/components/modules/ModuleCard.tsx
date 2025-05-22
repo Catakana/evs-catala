@@ -1,39 +1,45 @@
-
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface ModuleCardProps {
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
   color?: string;
   disabled?: boolean;
   onClick?: () => void;
   connections?: string[];
+  href?: string;
+  bgColor?: string;
+  iconColor?: string;
 }
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
   title,
   description,
-  icon: Icon,
-  color = "text-evs-blue",
+  icon,
+  color = "text-primary",
   disabled = false,
   onClick,
-  connections
+  connections,
+  href,
+  bgColor,
+  iconColor
 }) => {
   return (
     <Card className={cn(
       "module-card flex flex-col h-full transition-all duration-300",
-      disabled && "opacity-60 cursor-not-allowed"
+      disabled && "opacity-60 cursor-not-allowed",
+      bgColor
     )}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className={cn("p-2 rounded-full bg-muted", color)}>
-            <Icon className="h-6 w-6 module-icon transition-colors" />
+          <div className={cn("p-2 rounded-full bg-muted", color, iconColor)}>
+            {icon}
           </div>
           <CardTitle className="text-xl">{title}</CardTitle>
         </div>
@@ -62,9 +68,19 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
           disabled={disabled}
           variant="ghost"
           className="w-full justify-between hover:bg-muted"
+          asChild={!!href}
         >
-          <span>Accéder</span>
-          <ArrowRight className="h-4 w-4" />
+          {href ? (
+            <a href={href}>
+              <span>Accéder</span>
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          ) : (
+            <>
+              <span>Accéder</span>
+              <ArrowRight className="h-4 w-4" />
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>

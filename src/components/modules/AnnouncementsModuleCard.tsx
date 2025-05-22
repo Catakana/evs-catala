@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Bell, FileText } from 'lucide-react';
+import { Megaphone, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 
-const AnnouncementModuleCard: React.FC = () => {
+const AnnouncementsModuleCard: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -12,15 +12,15 @@ const AnnouncementModuleCard: React.FC = () => {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold">Annonces</CardTitle>
-          <Bell className="h-6 w-6 text-primary" />
+          <Megaphone className="h-6 w-6 text-primary" />
         </div>
         <CardDescription>Consultez les dernières annonces</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow pb-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Nouvelles et informations</p>
+            <Bell className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Informations et communications</p>
           </div>
         </div>
       </CardContent>
@@ -37,4 +37,4 @@ const AnnouncementModuleCard: React.FC = () => {
   );
 };
 
-export default AnnouncementModuleCard;
+export default AnnouncementsModuleCard; 

@@ -1,26 +1,26 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Bell, FileText } from 'lucide-react';
+import { Calendar, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 
-const AnnouncementModuleCard: React.FC = () => {
+const AgendaModuleCard: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <Card className="flex flex-col h-full shadow-md hover:shadow-lg transition-shadow cursor-pointer">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold">Annonces</CardTitle>
-          <Bell className="h-6 w-6 text-primary" />
+          <CardTitle className="text-xl font-bold">Agenda</CardTitle>
+          <CalendarDays className="h-6 w-6 text-primary" />
         </div>
-        <CardDescription>Consultez les dernières annonces</CardDescription>
+        <CardDescription>Consultez les événements à venir</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow pb-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Nouvelles et informations</p>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Prochaines réunions et événements</p>
           </div>
         </div>
       </CardContent>
@@ -28,13 +28,13 @@ const AnnouncementModuleCard: React.FC = () => {
         <Button 
           variant="default" 
           className="w-full"
-          onClick={() => navigate('/announcements')}
+          onClick={() => navigate('/agenda')}
         >
-          Voir les annonces
+          Accéder à l'agenda
         </Button>
       </div>
     </Card>
   );
 };
 
-export default AnnouncementModuleCard;
+export default AgendaModuleCard; 
