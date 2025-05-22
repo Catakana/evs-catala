@@ -1,0 +1,173 @@
+id,text,description
+app.name,EVS-catala,Nom de l'application
+app.association,Espace de Vie Sociale CATALA,Nom complet de l'association
+app.association_short,CATALA,Nom court de l'association
+app.slogan,Le portail communautaire de CATALA,Slogan affiché sur la page d'accueil
+app.footer,© 2025 Studio Miyukini - Tous droits réservés,Texte de bas de page
+
+# Navigation
+nav.home,Accueil,Navigation principale
+nav.agenda,Agenda,Navigation principale
+nav.announcements,Annonces,Navigation principale
+nav.trombinoscope,Trombinoscope,Navigation principale
+nav.permanences,Permanences,Navigation principale
+nav.votes,Votes,Navigation principale
+nav.projects,Projets,Navigation principale
+nav.messages,Messagerie,Navigation principale
+nav.infos,Infos générales,Navigation principale
+
+# Actions communes
+actions.save,Enregistrer,Bouton d'action
+actions.cancel,Annuler,Bouton d'action
+actions.delete,Supprimer,Bouton d'action
+actions.edit,Modifier,Bouton d'action
+actions.view,Voir,Bouton d'action
+actions.back,Retour,Bouton d'action
+actions.next,Suivant,Bouton d'action
+actions.previous,Précédent,Bouton d'action
+actions.confirm,Confirmer,Bouton d'action
+actions.search,Rechercher,Bouton d'action
+actions.add,Ajouter,Bouton d'action
+actions.upload,Téléverser,Bouton d'action
+actions.download,Télécharger,Bouton d'action
+actions.share,Partager,Bouton d'action
+common.processing,Traitement en cours...,Message de chargement
+common.loading,Chargement...,Message de chargement
+
+# Messages d'erreur
+errors.required,Ce champ est requis,Message d'erreur formulaire
+errors.invalid,Ce champ est invalide,Message d'erreur formulaire
+errors.generic,Une erreur est survenue,Message d'erreur générique
+errors.notFound,Page non trouvée,Page 404
+errors.unauthorized,Accès non autorisé,Page 403
+errors.serverError,Erreur serveur,Page 500
+
+# Authentification
+auth.login,Connexion,Titre de page
+auth.logout,Déconnexion,Bouton
+auth.register,Inscription,Titre de page
+auth.forgotPassword,Mot de passe oublié,Lien
+auth.resetPassword,Réinitialiser le mot de passe,Titre de page
+auth.email,Adresse email,Champ formulaire
+auth.password,Mot de passe,Champ formulaire
+auth.confirmPassword,Confirmer le mot de passe,Champ formulaire
+auth.firstname,Prénom,Champ formulaire
+auth.lastname,Nom,Champ formulaire
+auth.welcome,Bienvenue sur {{APP_NAME}},Message d'accueil
+auth.loginSuccess,Connexion réussie,Message de confirmation
+auth.logoutSuccess,Déconnexion réussie,Message de confirmation
+auth.registerSuccess,Inscription réussie,Message de confirmation
+auth.resetSuccess,Mot de passe réinitialisé avec succès,Message de confirmation
+auth.resetInstructions,Vérifiez votre email pour réinitialiser votre mot de passe,Message d'information
+auth.sendResetLink,Envoyer le lien de réinitialisation,Bouton
+auth.resetEmailSent,Un email de réinitialisation a été envoyé à votre adresse,Message de confirmation
+auth.backToLogin,Retour à la page de connexion,Lien
+auth.enterNewPassword,Entrez votre nouveau mot de passe,Instruction
+auth.passwordMinLength,Le mot de passe doit contenir au moins 8 caractères,Message d'erreur
+auth.passwordsDoNotMatch,Les mots de passe ne correspondent pas,Message d'erreur
+auth.createAccount,Créez votre compte pour rejoindre la communauté,Description page inscription
+auth.alreadyHaveAccount,Vous avez déjà un compte ?,Message lien connexion
+auth.noAccountYet,Vous n'avez pas encore de compte ?,Message lien inscription
+auth.accountValidationPending,Votre compte est en attente de validation par un administrateur,Message information
+
+# Profil utilisateur
+profile.title,Mon profil,Titre de page
+profile.personalInfo,Informations personnelles,Onglet
+profile.security,Sécurité,Onglet
+profile.preferences,Préférences,Onglet
+profile.updatePersonalInfo,Mettez à jour vos informations personnelles,Description section
+profile.securitySettings,Gérez vos paramètres de sécurité,Description section
+profile.preferencesSettings,Configurez vos préférences d'affichage et de notification,Description section
+profile.changeAvatar,Changer la photo,Bouton
+profile.saveChanges,Enregistrer les modifications,Bouton
+profile.phone,Téléphone,Champ formulaire
+profile.changePassword,Changer de mot de passe,Bouton
+profile.updateSuccess,Profil mis à jour,Titre toast
+profile.updateSuccessMessage,Vos informations ont été mises à jour avec succès,Message toast
+profile.preferencesComingSoon,Les préférences seront disponibles prochainement,Message d'information
+
+# Agenda
+agenda.title,Agenda des événements,Titre de page
+agenda.empty,Aucun événement,Message vide
+agenda.create,Créer un événement,Bouton
+agenda.event_details,Détails de l'événement,Titre modal
+agenda.start_date,Date de début,Champ formulaire
+agenda.end_date,Date de fin,Champ formulaire
+agenda.location,Lieu,Champ formulaire
+agenda.description,Description,Champ formulaire
+agenda.category,Catégorie,Champ formulaire
+agenda.day_view,Vue jour,Onglet
+agenda.week_view,Vue semaine,Onglet
+agenda.month_view,Vue mois,Onglet
+agenda.list_view,Vue liste,Onglet
+
+# Annonces
+announcements.title,Annonces,Titre de page
+announcements.empty,Aucune annonce,Message vide
+announcements.create,Créer une annonce,Bouton
+announcements.details,Détails de l'annonce,Titre modal
+announcements.publish_date,Date de publication,Champ formulaire
+announcements.expiry_date,Date d'expiration,Champ formulaire
+announcements.category,Catégorie,Champ formulaire
+announcements.archive,Archiver,Bouton
+announcements.unread,Non lu,Badge
+
+# Trombinoscope
+trombinoscope.title,Trombinoscope,Titre de page
+trombinoscope.empty,Aucun membre,Message vide
+trombinoscope.filter_role,Filtrer par rôle,Label filtre
+trombinoscope.filter_group,Filtrer par groupe,Label filtre
+trombinoscope.member_details,Détails du membre,Titre modal
+trombinoscope.contact_info,Coordonnées,Section
+trombinoscope.export,Exporter la liste,Bouton
+
+# Permanences
+permanences.title,Permanences,Titre de page
+permanences.empty,Aucune permanence,Message vide
+permanences.create,Créer une permanence,Bouton
+permanences.register,S'inscrire,Bouton
+permanences.unregister,Se désinscrire,Bouton
+permanences.details,Détails de la permanence,Titre modal
+permanences.participants,Participants,Section
+permanences.min_required,Minimum requis,Label information
+permanences.max_allowed,Maximum autorisé,Label information
+
+# Votes
+votes.title,Votes et sondages,Titre de page
+votes.empty,Aucun vote,Message vide
+votes.create,Créer un vote,Bouton
+votes.details,Détails du vote,Titre modal
+votes.results,Résultats,Onglet
+votes.active,En cours,Filtre
+votes.closed,Terminés,Filtre
+votes.vote_button,Voter,Bouton
+votes.already_voted,Déjà voté,Badge
+
+# Projets
+projects.title,Projets,Titre de page
+projects.empty,Aucun projet,Message vide
+projects.create,Créer un projet,Bouton
+projects.details,Détails du projet,Titre modal
+projects.tasks,Tâches,Onglet
+projects.team,Équipe,Onglet
+projects.budget,Budget,Onglet
+projects.docs,Documents,Onglet
+projects.comms,Communication,Onglet
+
+# Messagerie
+messages.title,Messagerie,Titre de page
+messages.empty,Aucune conversation,Message vide
+messages.new_message,Nouveau message,Bouton
+messages.new_group,Nouveau groupe,Bouton
+messages.select_conv,Sélectionnez une conversation,Message d'information
+messages.send,Envoyer,Bouton
+messages.attach,Joindre un fichier,Bouton
+
+# Infos générales
+infos.title,Informations générales,Titre de page
+infos.about,À propos,Onglet
+infos.documents,Documents,Onglet
+infos.links,Liens utiles,Onglet
+infos.about_title,L'Espace de Vie Sociale CATALA,Titre section
+infos.mission_title,Notre mission,Titre section
+infos.values_title,Nos valeurs,Titre section 

@@ -8,7 +8,7 @@
  * - Construire un objet structuré pour l'utilisation dans TextBank
  */
 
-import { APP_VARIABLES, TextCategory, TEXTS } from './textBank';
+import { APP_VARIABLES, TextCategory, TEXTS, updateTextCache } from './textBank';
 
 interface CSVTextEntry {
   id: string;
@@ -16,57 +16,89 @@ interface CSVTextEntry {
   description?: string;
 }
 
+// Variable globale pour stocker les textes chargés et éviter les chargements multiples
+let loadedTextCache: Record<TextCategory, CSVTextEntry[]> | null = null;
+
 /**
  * Charge et analyse le fichier CSV contenant les textes
  * @returns Un objet avec les textes organisés par catégorie
  */
 export async function loadTextsFromCSV(): Promise<Record<TextCategory, CSVTextEntry[]>> {
+  // Si les textes sont déjà en cache, les retourner directement
+  if (loadedTextCache) {
+    return loadedTextCache;
+  }
+
   try {
-    // Charger le fichier CSV
-    const response = await fetch('/src/lib/texts.fr.csv');
+    // Charger le fichier CSV depuis le dossier public
+    const response = await fetch('/data/texts.fr.csv');
     if (!response.ok) {
-      throw new Error(`Failed to load texts.fr.csv: ${response.statusText}`);
+      console.warn(`Failed to load texts.fr.csv from /data: ${response.statusText}`);
+      
+      // Essayer le chemin de développement en fallback
+      const devResponse = await fetch('/src/lib/texts.fr.csv');
+      if (!devResponse.ok) {
+        throw new Error(`Failed to load texts.fr.csv: ${devResponse.statusText}`);
+      }
+      
+      const csvText = await devResponse.text();
+      return processCSVText(csvText);
     }
 
     const csvText = await response.text();
-    const entries = parseCSV(csvText);
-    
-    // Organiser les textes par catégorie
-    const result: Partial<Record<TextCategory, CSVTextEntry[]>> = {};
-    
-    for (const entry of entries) {
-      const [category] = entry.id.split('.');
-      
-      if (!category) continue;
-      
-      const validCategory = category as TextCategory;
-      if (!result[validCategory]) {
-        result[validCategory] = [];
-      }
-      
-      result[validCategory]?.push(entry);
-    }
-    
-    // S'assurer que toutes les catégories sont présentes
-    const allCategories: TextCategory[] = [
-      'common', 'auth', 'agenda', 'trombinoscope', 'annonces', 
-      'permanences', 'votes', 'projects', 'messages', 'infos'
-    ];
-    
-    for (const category of allCategories) {
-      if (!result[category]) {
-        result[category] = [];
-      }
-    }
-    
-    return result as Record<TextCategory, CSVTextEntry[]>;
+    return processCSVText(csvText);
   } catch (error) {
     console.error('Error loading texts from CSV:', error);
-    return {
+    
+    // Valeurs par défaut en cas d'erreur
+    const defaultTexts = {
       common: [], auth: [], agenda: [], trombinoscope: [], annonces: [],
       permanences: [], votes: [], projects: [], messages: [], infos: []
     };
+    
+    // Stocker en cache même les valeurs par défaut pour éviter de refaire des requêtes inutiles
+    loadedTextCache = defaultTexts;
+    return defaultTexts;
   }
+}
+
+/**
+ * Traite le texte CSV et organise les entrées par catégorie
+ */
+function processCSVText(csvText: string): Record<TextCategory, CSVTextEntry[]> {
+  const entries = parseCSV(csvText);
+  
+  // Organiser les textes par catégorie
+  const result: Partial<Record<TextCategory, CSVTextEntry[]>> = {};
+  
+  for (const entry of entries) {
+    const [category] = entry.id.split('.');
+    
+    if (!category) continue;
+    
+    const validCategory = category as TextCategory;
+    if (!result[validCategory]) {
+      result[validCategory] = [];
+    }
+    
+    result[validCategory]?.push(entry);
+  }
+  
+  // S'assurer que toutes les catégories sont présentes
+  const allCategories: TextCategory[] = [
+    'common', 'auth', 'agenda', 'trombinoscope', 'annonces', 
+    'permanences', 'votes', 'projects', 'messages', 'infos'
+  ];
+  
+  for (const category of allCategories) {
+    if (!result[category]) {
+      result[category] = [];
+    }
+  }
+  
+  // Mettre en cache les textes traités
+  loadedTextCache = result as Record<TextCategory, CSVTextEntry[]>;
+  return loadedTextCache;
 }
 
 /**
@@ -165,6 +197,9 @@ export async function initializeTexts(): Promise<void> {
         TEXTS[catKey] = loadedTexts[catKey];
       }
     });
+    
+    // Mettre à jour le cache des textes après le chargement
+    updateTextCache();
     
     console.log('Texts loaded successfully from CSV');
   } catch (error) {

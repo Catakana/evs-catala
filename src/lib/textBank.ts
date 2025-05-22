@@ -40,33 +40,34 @@ interface TextEntry {
 
 // Textes communs utilisés dans toute l'application
 const commonTexts: TextEntry[] = [
-  { id: 'app.name', text: APP_VARIABLES.APP_NAME },
-  { id: 'app.association', text: APP_VARIABLES.ASSOCIATION_NAME },
-  { id: 'app.slogan', text: 'Le portail communautaire de {{ASSOCIATION_SHORT_NAME}}' },
-  { id: 'app.footer', text: '© {{CURRENT_YEAR}} {{ASSOCIATION_NAME}} - Tous droits réservés' },
-  { id: 'nav.home', text: 'Accueil' },
-  { id: 'nav.agenda', text: 'Agenda' },
-  { id: 'nav.announcements', text: 'Annonces' },
-  { id: 'nav.trombinoscope', text: 'Trombinoscope' },
-  { id: 'nav.permanences', text: 'Permanences' },
-  { id: 'nav.votes', text: 'Votes' },
-  { id: 'nav.projects', text: 'Projets' },
-  { id: 'nav.messages', text: 'Messagerie' },
-  { id: 'nav.infos', text: 'Infos générales' },
-  { id: 'actions.save', text: 'Enregistrer' },
-  { id: 'actions.cancel', text: 'Annuler' },
-  { id: 'actions.delete', text: 'Supprimer' },
-  { id: 'actions.edit', text: 'Modifier' },
-  { id: 'actions.view', text: 'Voir' },
-  { id: 'actions.back', text: 'Retour' },
-  { id: 'actions.next', text: 'Suivant' },
-  { id: 'actions.previous', text: 'Précédent' },
-  { id: 'actions.confirm', text: 'Confirmer' },
-  { id: 'errors.required', text: 'Ce champ est requis' },
-  { id: 'errors.invalid', text: 'Ce champ est invalide' },
-  { id: 'errors.generic', text: 'Une erreur est survenue' },
-  { id: 'errors.notFound', text: 'Page non trouvée' },
-  { id: 'errors.unauthorized', text: 'Accès non autorisé' },
+  { id: 'common.app.name', text: APP_VARIABLES.APP_NAME },
+  { id: 'common.app.association', text: APP_VARIABLES.ASSOCIATION_NAME },
+  { id: 'common.app.slogan', text: 'Le portail communautaire de {{ASSOCIATION_SHORT_NAME}}' },
+  { id: 'common.app.footer', text: '© {{CURRENT_YEAR}} {{ASSOCIATION_NAME}} - Tous droits réservés' },
+  { id: 'common.nav.home', text: 'Accueil' },
+  { id: 'common.nav.agenda', text: 'Agenda' },
+  { id: 'common.nav.announcements', text: 'Annonces' },
+  { id: 'common.nav.trombinoscope', text: 'Trombinoscope' },
+  { id: 'common.nav.permanences', text: 'Permanences' },
+  { id: 'common.nav.votes', text: 'Votes' },
+  { id: 'common.nav.projects', text: 'Projets' },
+  { id: 'common.nav.messages', text: 'Messagerie' },
+  { id: 'common.nav.infos', text: 'Infos générales' },
+  { id: 'common.actions.save', text: 'Enregistrer' },
+  { id: 'common.actions.cancel', text: 'Annuler' },
+  { id: 'common.actions.delete', text: 'Supprimer' },
+  { id: 'common.actions.edit', text: 'Modifier' },
+  { id: 'common.actions.view', text: 'Voir' },
+  { id: 'common.actions.back', text: 'Retour' },
+  { id: 'common.actions.next', text: 'Suivant' },
+  { id: 'common.actions.previous', text: 'Précédent' },
+  { id: 'common.actions.confirm', text: 'Confirmer' },
+  { id: 'common.errors.required', text: 'Ce champ est requis' },
+  { id: 'common.errors.invalid', text: 'Ce champ est invalide' },
+  { id: 'common.errors.generic', text: 'Une erreur est survenue' },
+  { id: 'common.errors.notFound', text: 'Page non trouvée' },
+  { id: 'common.errors.unauthorized', text: 'Accès non autorisé' },
+  { id: 'common.processing', text: 'Traitement en cours...' },
 ];
 
 // Textes pour l'authentification
@@ -87,6 +88,11 @@ const authTexts: TextEntry[] = [
   { id: 'auth.registerSuccess', text: 'Inscription réussie' },
   { id: 'auth.resetSuccess', text: 'Mot de passe réinitialisé avec succès' },
   { id: 'auth.resetInstructions', text: 'Vérifiez votre email pour réinitialiser votre mot de passe' },
+  { id: 'auth.noAccountYet', text: 'Vous n\'avez pas encore de compte ?' },
+  { id: 'auth.passwordMinLength', text: 'Le mot de passe doit contenir au moins 8 caractères' },
+  { id: 'auth.passwordsDoNotMatch', text: 'Les mots de passe ne correspondent pas' },
+  { id: 'auth.createAccount', text: 'Créez votre compte pour rejoindre la communauté' },
+  { id: 'auth.alreadyHaveAccount', text: 'Vous avez déjà un compte ?' },
 ];
 
 // Centralization de tous les textes par catégorie
@@ -103,6 +109,66 @@ export const TEXTS: Record<TextCategory, TextEntry[]> = {
   infos: [], // À compléter
 };
 
+// Dictionnaire des textes pour un accès rapide avec recherche O(1)
+let textCache: Record<string, string> = {};
+
+// Dictionnaire des textes de secours pour les messages d'erreur courants
+const fallbackTexts: Record<string, string> = {
+  // Messages d'erreur de formulaire
+  'errors.required': 'Ce champ est requis',
+  'errors.invalid': 'Ce champ est invalide',
+  'errors.email': 'Adresse email invalide',
+  'errors.min': 'Valeur trop petite',
+  'errors.max': 'Valeur trop grande',
+  'errors.minLength': 'Texte trop court',
+  'errors.maxLength': 'Texte trop long',
+  'errors.pattern': 'Format invalide',
+  
+  // Authentification
+  'auth.login': 'Connexion',
+  'auth.register': 'Inscription',
+  'auth.logout': 'Déconnexion',
+  'auth.forgotPassword': 'Mot de passe oublié',
+  'auth.resetPassword': 'Réinitialiser le mot de passe',
+  'auth.email': 'Adresse email',
+  'auth.password': 'Mot de passe',
+  'auth.confirmPassword': 'Confirmer le mot de passe',
+  'auth.firstname': 'Prénom',
+  'auth.lastname': 'Nom',
+  'auth.passwordMinLength': 'Le mot de passe doit contenir au moins 8 caractères',
+  'auth.passwordsDoNotMatch': 'Les mots de passe ne correspondent pas',
+  'auth.noAccountYet': 'Vous n\'avez pas encore de compte ?',
+  'auth.createAccount': 'Créez votre compte',
+  'auth.alreadyHaveAccount': 'Vous avez déjà un compte ?',
+  
+  // Messages génériques
+  'common.processing': 'Traitement en cours...',
+  'common.loading': 'Chargement...',
+  'common.success': 'Opération réussie',
+  'common.error': 'Une erreur est survenue',
+  'common.submit': 'Envoyer',
+  'common.save': 'Enregistrer',
+  'common.cancel': 'Annuler',
+  'common.delete': 'Supprimer',
+  'common.edit': 'Modifier',
+  'common.view': 'Voir',
+  'common.back': 'Retour',
+  'common.confirmation': 'Êtes-vous sûr ?'
+};
+
+// Remplir le cache des textes
+function buildTextCache() {
+  textCache = {};
+  Object.values(TEXTS).forEach(categoryTexts => {
+    categoryTexts.forEach(entry => {
+      textCache[entry.id] = entry.text;
+    });
+  });
+}
+
+// Initialiser le cache au démarrage
+buildTextCache();
+
 /**
  * Récupère un texte par son ID et remplace les variables
  * @param textId Identifiant du texte (format: "category.id")
@@ -110,23 +176,39 @@ export const TEXTS: Record<TextCategory, TextEntry[]> = {
  * @returns Le texte avec les variables remplacées ou une clé d'erreur si non trouvé
  */
 export function getText(textId: string, variables?: Record<string, string>): string {
-  const [category, id] = textId.split('.');
-  
-  if (!category || !id || !Object.keys(TEXTS).includes(category as TextCategory)) {
+  // Vérifier si l'ID est au format correct
+  if (!textId || !textId.includes('.')) {
     console.warn(`TextBank: Invalid text ID format or category (${textId})`);
-    return `[Missing text: ${textId}]`;
+    return textId || 'Invalid ID';
   }
   
-  const categoryTexts = TEXTS[category as TextCategory];
-  const textEntry = categoryTexts.find(entry => entry.id === textId);
+  // Recherche directe dans le cache
+  const text = textCache[textId];
   
-  if (!textEntry) {
+  // Si non trouvé dans le cache principal, rechercher dans les textes de secours
+  if (!text) {
+    const fallbackText = fallbackTexts[textId];
+    
+    if (fallbackText) {
+      return processFinalText(fallbackText, variables);
+    }
+    
+    // Log discret en dev, plus visible en production
     console.warn(`TextBank: Text not found (${textId})`);
-    return `[Missing text: ${textId}]`;
+    
+    // Retourner au moins l'ID sans le préfixe de catégorie
+    return textId.split('.').pop() || textId;
   }
   
-  // Remplacer les variables
-  let finalText = textEntry.text;
+  return processFinalText(text, variables);
+}
+
+/**
+ * Remplace les variables dans un texte
+ */
+function processFinalText(text: string, variables?: Record<string, string>): string {
+  // Commencer avec le texte original
+  let finalText = text;
   
   // D'abord les variables globales de l'application
   Object.entries(APP_VARIABLES).forEach(([key, value]) => {
@@ -141,6 +223,11 @@ export function getText(textId: string, variables?: Record<string, string>): str
   }
   
   return finalText;
+}
+
+// Mise à jour du cache des textes après chargement depuis CSV
+export function updateTextCache() {
+  buildTextCache();
 }
 
 // Alias plus court pour getText
