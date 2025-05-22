@@ -1,12 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Créer un client Supabase à partir des variables d'environnement
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Clés Supabase manquantes dans les variables d\'environnement.');
-}
+// Utiliser les valeurs en dur si les variables d'environnement ne sont pas disponibles
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fcwvcjtnfxyzojolpisd.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd3ZjanRuZnh5em9qb2xwaXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNDE0ODQsImV4cCI6MjA1NzYxNzQ4NH0.5nhfFiobBMagzjpChJQGZ7TNqAWce6J3Mq6geMKtiCM';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

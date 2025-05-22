@@ -43,7 +43,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 1.1 Authentification et gestion des utilisateurs
 **Priorité**: URGENTE ⚠️⚠️  
-**Délai**: 1-2 semaines  
+**Délai**: 1-2 jours  
 **Statut**: 🏗️ En cours
 
 > **Note**: Ce module est la priorité absolue pour permettre les tests utilisateurs dès que possible, même sans toutes les fonctionnalités. Il doit être implémenté en premier.
@@ -60,7 +60,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Mode invité pour consultation limitée 🔄
 
 #### Tâches techniques
-- Configuration de Supabase Auth avec OAuth (Google) 🏗️
+- Configuration de Supabase Auth avec OAuth (Google) ✅
 - Création de la table `evs_profiles` et `evs_user_settings` ✅
 - Formulaires d'inscription et de connexion ✅
 - Protection des routes privées ✅
