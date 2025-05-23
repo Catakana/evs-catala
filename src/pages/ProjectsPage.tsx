@@ -1,72 +1,120 @@
-import React from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react';
+import ProjectsList from '@/components/projects/ProjectsList';
+import ProjectForm from '@/components/projects/ProjectForm';
+import ProjectDetails from '@/components/projects/ProjectDetails';
+import { Project } from '@/types/project';
+import { useAuth } from '@/hooks/useAuth';
 
-const ProjectsPage: React.FC = () => {
+enum ViewMode {
+  LIST = 'list',
+  CREATE = 'create',
+  EDIT = 'edit',
+  DETAILS = 'details',
+}
+
+export default function ProjectsPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  const handleProjectSelect = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setViewMode(ViewMode.DETAILS);
+  };
+
+  const handleCreateProject = () => {
+    setSelectedProjectId(null);
+    setViewMode(ViewMode.CREATE);
+  };
+
+  const handleEditProject = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setViewMode(ViewMode.EDIT);
+  };
+
+  const handleFormCancel = () => {
+    // Si on était en mode édition, retourner aux détails
+    if (viewMode === ViewMode.EDIT && selectedProjectId) {
+      setViewMode(ViewMode.DETAILS);
+    } else {
+      // Sinon, retourner à la liste
+      setViewMode(ViewMode.LIST);
+    }
+  };
+
+  const handleFormSuccess = (project: Project) => {
+    setSelectedProjectId(project.id);
+    setViewMode(ViewMode.DETAILS);
+  };
+
+  const handleBackToList = () => {
+    setViewMode(ViewMode.LIST);
+    setSelectedProjectId(null);
+  };
+
+  const renderContent = () => {
+    if (!user) {
+      return (
+        <div className="text-center py-12">
+          <h2 className="text-xl font-semibold mb-2">Veuillez vous connecter</h2>
+          <p className="text-muted-foreground">
+            Vous devez être connecté pour accéder à la gestion des projets.
+          </p>
+        </div>
+      );
+    }
+
+    switch (viewMode) {
+      case ViewMode.LIST:
+        return (
+          <ProjectsList
+            onProjectSelect={handleProjectSelect}
+            onCreateProject={handleCreateProject}
+            userId={user.id}
+          />
+        );
+      case ViewMode.CREATE:
+        return (
+          <ProjectForm
+            userId={user.id}
+            onSuccess={handleFormSuccess}
+            onCancel={handleFormCancel}
+          />
+        );
+      case ViewMode.EDIT:
+        return (
+          <ProjectForm
+            projectId={selectedProjectId || undefined}
+            userId={user.id}
+            onSuccess={handleFormSuccess}
+            onCancel={handleFormCancel}
+          />
+        );
+      case ViewMode.DETAILS:
+        return (
+          <ProjectDetails
+            projectId={selectedProjectId!}
+            onBack={handleBackToList}
+            onEdit={handleEditProject}
+            userId={user.id}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="container flex-1 py-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Projets</h1>
-          
-          <div className="flex items-center gap-2 mt-4 sm:mt-0">
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher un projet..." className="pl-8 w-[200px]" />
-            </div>
-            
-            <Button className="gap-1">
-              <Plus className="h-4 w-4" />
-              Nouveau projet
-            </Button>
-          </div>
+    <div className="container py-6 max-w-7xl">
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">Projets</h1>
         </div>
         
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="active">En cours</TabsTrigger>
-            <TabsTrigger value="planning">En préparation</TabsTrigger>
-            <TabsTrigger value="completed">Terminés</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="active" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Contenu des projets actifs à créer */}
-              <div className="p-12 border rounded-lg flex items-center justify-center text-muted-foreground">
-                Aucun projet en cours
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="planning" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Contenu des projets en préparation à créer */}
-              <div className="p-12 border rounded-lg flex items-center justify-center text-muted-foreground">
-                Aucun projet en préparation
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="completed" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Contenu des projets terminés à créer */}
-              <div className="p-12 border rounded-lg flex items-center justify-center text-muted-foreground">
-                Aucun projet terminé
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-      
-      <Footer />
+        <div>
+          {renderContent()}
+        </div>
+      </div>
     </div>
   );
-};
-
-export default ProjectsPage; 
+} 
