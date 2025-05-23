@@ -138,9 +138,7 @@ const BottomNav: React.FC = () => {
         // Défilement vers le haut
         setIsScrollingUp(true);
       } else if (currentScrollY > lastScrollY + 5) {
-        // Défilement vers le bas (avec seuil pour éviter les petits mouvements)
-        setIsScrollingUp(false);
-        // Fermer les sous-menus au défilement vers le bas
+        // Fermer les sous-menus au défilement vers le bas sans cacher la barre
         setActiveCategory(null);
       }
       
@@ -249,12 +247,9 @@ const BottomNav: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Barre de navigation inférieure */}
+      {/* Barre de navigation inférieure - suppression de l'animation de slide-down */}
       <motion.nav
         className="fixed bottom-0 left-0 right-0 flex justify-around items-center bg-background/90 backdrop-blur-md border-t border-border z-50 shadow-md"
-        initial={{ y: 0 }}
-        animate={{ y: isScrollingUp ? 0 : 100 }}
-        transition={{ duration: 0.3 }}
       >
         {navCategories.map((category) => (
           <div key={category.id} className="relative">
@@ -277,7 +272,18 @@ const BottomNav: React.FC = () => {
                     transition={{ duration: 0.3 }}
                   />
                 )}
-                {category.icon}
+                {/* Animation légère des icônes */}
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 15 
+                  }}
+                >
+                  {category.icon}
+                </motion.div>
                 
                 {activeCategory === category.id && (
                   <motion.div
