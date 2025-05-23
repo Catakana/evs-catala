@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:clean": "rimraf dist && vite build",
+    "build:full-clean": "rimraf dist node_modules/.vite && npm ci && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

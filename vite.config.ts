@@ -32,47 +32,61 @@ export default defineConfig(({ mode }) => {
     define: {
       __DEV__: mode === 'development',
     },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-router-dom'],
+      force: true
+    },
     build: {
       // Augmenter la limite d'avertissement pour les chunks (en KB)
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 1200,
       rollupOptions: {
         output: {
-          // Configuration améliorée du chunking pour éviter les problèmes de référence
+          // Nouvelle configuration de chunking simplifiée
           manualChunks: (id) => {
-            // Mettre React et toutes ses dépendances essentielles dans un seul chunk
+            // Tout ce qui est lié à React dans un seul chunk monolithique
             if (id.includes('node_modules/react') || 
                 id.includes('node_modules/react-dom') || 
-                id.includes('node_modules/scheduler')) {
-              return 'vendor-react-core';
-            }
-            
-            // Regrouper toutes les dépendances React UI
-            if (id.includes('node_modules/@radix-ui/react') ||
+                id.includes('node_modules/scheduler') ||
+                id.includes('node_modules/@radix-ui/react') ||
                 id.includes('node_modules/prop-types') ||
                 id.includes('node_modules/object-assign') ||
                 id.includes('node_modules/js-tokens') ||
                 id.includes('node_modules/loose-envify')) {
-              return 'vendor-react-ui';
+              return 'react-vendor';
             }
             
             // Regrouper d'autres UI components
             if (id.includes('node_modules/framer-motion') || 
                 id.includes('node_modules/lucide-react') ||
                 id.includes('node_modules/class-variance-authority')) {
-              return 'vendor-ui';
+              return 'ui-vendor';
             }
             
             // Regrouper toutes les autres dépendances
             if (id.includes('node_modules')) {
-              return 'vendor-other';
+              return 'deps-vendor';
             }
           },
-          // Assurer que les chunks sont compatibles avec ESM et le systême d'imports
+          // Assurer que les chunks sont compatibles avec ESM
           format: 'es',
-          // S'assurer que tous les morceaux externes sont correctement traités
+          // Utiliser des noms de fichiers cohérents
+          entryFileNames: 'assets/[name]-[hash].js',
           chunkFileNames: 'assets/[name]-[hash].js',
-        }
-      }
+          assetFileNames: 'assets/[name]-[hash].[ext]'
+        },
+        // S'assurer que React et ReactDOM sont externalisés correctement
+        external: []
+      },
+      // S'assurer que les modules sont correctement évalués
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
+      // Générer des sourcemaps pour le débogage en production
+      sourcemap: mode === 'development',
+      // Assurer que les modules sont correctement préservés
+      target: 'esnext',
+      // Désactivation de la minification pour le débogage si nécessaire
+      minify: mode !== 'development',
     }
   };
 });
