@@ -14,6 +14,8 @@ import NewConversationModal, { ProfileSummary } from '@/components/messages/NewC
 import { supabase } from '@/lib/supabase';
 import { Conversation, Message, ConversationType } from '@/types/message';
 import messageService from '@/lib/messageService';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useMessagesSubscription, useConversationsSubscription } from '@/hooks/useMessagesSubscription';
 
 const MessagesPage: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -33,7 +35,14 @@ const MessagesPage: React.FC = () => {
     lastName: string;
     avatar?: string;
   }>>({});
+  
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  // Utiliser le hook de souscription aux nouveaux messages
+  const newMessage = useMessagesSubscription(selectedConversationId, currentUserId);
+  const { shouldRefresh, resetRefresh } = useConversationsSubscription(currentUserId);
+  
   // Récupérer l'utilisateur connecté et les conversations au chargement
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -47,6 +56,36 @@ const MessagesPage: React.FC = () => {
     
     fetchCurrentUser();
   }, []);
+  
+  // Vérifier si une conversation est spécifiée dans l'URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const conversationId = queryParams.get('conversation');
+    
+    if (conversationId && conversationId !== selectedConversationId) {
+      // Sélectionner la conversation si elle existe
+      if (conversations.some(conv => conv.id === conversationId)) {
+        setSelectedConversationId(conversationId);
+        fetchMessages(conversationId);
+      } else if (!isLoadingConversations) {
+        // Vérifier si la conversation existe dans Supabase
+        messageService.getConversationById(conversationId)
+          .then(conversation => {
+            // Ajouter la conversation à la liste si elle n'y est pas déjà
+            if (!conversations.some(conv => conv.id === conversation.id)) {
+              setConversations(prev => [conversation, ...prev]);
+            }
+            setSelectedConversationId(conversationId);
+            fetchMessages(conversationId);
+          })
+          .catch(error => {
+            console.error('Conversation non trouvée:', error);
+            // Supprimer le paramètre d'URL invalide
+            navigate('/messages', { replace: true });
+          });
+      }
+    }
+  }, [location.search, conversations, isLoadingConversations]);
 
   // Récupérer les conversations
   const fetchConversations = async () => {
@@ -55,8 +94,16 @@ const MessagesPage: React.FC = () => {
       const conversationsList = await messageService.getUserConversations();
       setConversations(conversationsList);
       
-      // Sélectionner automatiquement la première conversation si aucune n'est sélectionnée
-      if (conversationsList.length > 0 && !selectedConversationId) {
+      // Vérifier si une conversation est spécifiée dans l'URL
+      const queryParams = new URLSearchParams(location.search);
+      const conversationId = queryParams.get('conversation');
+      
+      if (conversationId && conversationsList.some(conv => conv.id === conversationId)) {
+        setSelectedConversationId(conversationId);
+        fetchMessages(conversationId);
+      }
+      // Sinon, sélectionner automatiquement la première conversation
+      else if (conversationsList.length > 0 && !selectedConversationId) {
         setSelectedConversationId(conversationsList[0].id);
         fetchMessages(conversationsList[0].id);
       }
@@ -73,6 +120,11 @@ const MessagesPage: React.FC = () => {
       setIsLoadingMessages(true);
       const messagesList = await messageService.getConversationMessages(conversationId);
       setMessages(messagesList);
+      
+      // Mettre à jour l'URL pour refléter la conversation active
+      if (conversationId !== new URLSearchParams(location.search).get('conversation')) {
+        navigate(`/messages?conversation=${conversationId}`, { replace: true });
+      }
     } catch (error) {
       console.error(`Erreur lors de la récupération des messages de la conversation ${conversationId}:`, error);
     } finally {
@@ -229,6 +281,24 @@ const MessagesPage: React.FC = () => {
         });
       })
     : conversations;
+
+  // Ajouter le nouveau message à la liste quand il est reçu
+  useEffect(() => {
+    if (newMessage) {
+      // Ajouter le message uniquement s'il n'est pas déjà dans la liste
+      if (!messages.some(msg => msg.id === newMessage.id)) {
+        setMessages(prev => [newMessage, ...prev]);
+      }
+    }
+  }, [newMessage]);
+  
+  // Rafraîchir la liste des conversations quand nécessaire
+  useEffect(() => {
+    if (shouldRefresh && currentUserId) {
+      fetchConversations();
+      resetRefresh();
+    }
+  }, [shouldRefresh, currentUserId]);
 
   return (
     <div className="min-h-screen flex flex-col">

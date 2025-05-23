@@ -7,7 +7,7 @@ L'application EVS-catala est un portail communautaire complet développé pour f
 ## Architecture technique
 
 ### Stack technologique
-- **Frontend**: React avec Vite, TypeScript, TailwindCSS, Shadcn/UI
+- **Frontend**: React avec Vite, TypeScript, TailwindCSS, Shadcn/UI, Framer Motion
 - **Backend**: Supabase (PostgreSQL, Auth, Storage)
 - **Déploiement**: GitHub (versionning), Vercel (hébergement)
 
@@ -33,6 +33,34 @@ EVS-catala/
 ```
 
 ## Modules fonctionnels
+
+### 0. Navigation et structure de l'application
+
+**Objectif**: Offrir une navigation intuitive et cohérente dans l'ensemble de l'application.
+
+**Fonctionnalités principales**:
+- Barre de navigation inférieure (fixed bottom) présente sur toutes les pages
+- Organisation en catégories avec sous-menus intuitifs
+  - **Accueil**: Accès direct à la page d'accueil
+  - **Organisation**: Agenda, Permanences, Votes, Annonces
+  - **Infos**: Messages, Trombinoscope, Infos générales
+  - **Profil**: Compte utilisateur, Paramètres, Déconnexion
+- Animation fluide des transitions via Framer Motion
+- Comportement intelligent: disparition au défilement vers le bas, réapparition au défilement vers le haut
+- Design avec effet de flou (backdrop-blur) pour une interface moderne
+- Affichage de sous-menus contextuels centrés sur l'écran
+- Gestion automatique des routes actives et des indicateurs visuels
+
+**Implémentation technique**:
+- Composant AppLayout centralisant la structure globale
+- Injection de la barre de navigation dans toutes les routes hors authentification
+- Gestion d'état avec React Hooks (useState, useEffect, useLocation)
+- Animations avec Framer Motion (AnimatePresence, motion)
+- Intégration avec TailwindCSS pour le design responsive
+- Structure modulaire permettant l'extension future
+
+**Permissions**:
+La barre de navigation est accessible à tous les utilisateurs connectés, avec certaines fonctionnalités conditionnelles selon le rôle (membre, staff, admin).
 
 ### 1. Module Agenda
 **Objectif**: Permettre la visualisation et la gestion des événements de l'association.
@@ -288,6 +316,97 @@ Système basé sur Supabase Auth avec :
 - Système de rôles (membre, staff, admin)
 - Sessions sécurisées avec tokens JWT
 
+### Optimisation des performances
+
+L'application a été optimisée pour offrir des performances optimales sur tous les appareils :
+
+#### Stratégie de bundling
+- **Chunking intelligent** : Séparation des dépendances React et des autres bibliothèques
+- **Configuration Rollup** : Utilisation de `manualChunks` pour contrôler le découpage des bundles
+- **Lazy loading** : Chargement à la demande des composants rarement utilisés
+
+#### Métriques de performance
+- **First Contentful Paint (FCP)** : < 1.8s
+- **Largest Contentful Paint (LCP)** : < 2.5s
+- **First Input Delay (FID)** : < 100ms
+- **Cumulative Layout Shift (CLS)** : < 0.1
+
+#### Optimisations supplémentaires
+- **Minification** : Réduction de la taille des fichiers CSS et JavaScript
+- **Compression** : Utilisation de Gzip/Brotli pour la compression des assets
+- **Cache** : Stratégie de mise en cache adaptée par type de ressource
+- **Pré-chargement** : Préchargement des ressources critiques
+- **Optimisation des médias** : Redimensionnement automatique des images
+
+### Déploiement
+
+L'application est déployée sur Vercel avec les configurations suivantes:
+
+#### Variables d'environnement essentielles
+- `VITE_SUPABASE_URL` : URL de l'instance Supabase
+- `VITE_SUPABASE_ANON_KEY` : Clé anonyme Supabase
+- `VITE_APP_ENV` : Environnement ('development', 'staging', 'production')
+
+#### Optimisations de build
+- Pré-rendering des routes statiques
+- Optimisation des assets et minification du code
+- Cache optimisé pour les composants réutilisables
+- Configuration des redirections pour les routes dynamiques
+
+#### Monitoring et performances
+- Analyse des performances d'execution JavaScript
+- Métriques Web Vitals (LCP, FID, CLS)
+- Gestion des erreurs et notifications
+- Logs de déploiement et d'utilisation
+
+## Migration de la base de données Supabase
+
+### Configuration pour la nouvelle base de données
+
+La migration vers la nouvelle base de données Supabase implique plusieurs étapes :
+
+1. **Mise à jour des variables d'environnement**
+
+   Les nouvelles clés Supabase sont :
+   ```
+   V   ```
+
+   Mettez à jour vos fichiers `.env`, `.env.production` et `.env.example`.
+
+2. **Structure de la base de données**
+
+   La nouvelle convention de nommage utilise `evscatala_` comme préfixe pour toutes les tables.
+
+   Exécutez le script SQL de migration situé dans `scripts/migration.sql` dans l'interface SQL de Supabase.
+
+3. **Migration des données**
+
+   Pour migrer les données de l'ancienne base vers la nouvelle :
+
+   - Exportez les données avec le script `scripts/export_data.js` :
+     ```bash
+     node scripts/export_data.js
+     ```
+
+   - Importez les données avec le script `scripts/import_data.js` :
+     ```bash
+     node scripts/import_data.js
+     ```
+
+4. **Vérification de la migration**
+
+   Après la migration, vérifiez que :
+   - Les utilisateurs peuvent se connecter avec leurs identifiants existants
+   - Les événements de l'agenda sont correctement affichés
+   - Les annonces et autres données sont accessibles
+   - Les rôles et permissions fonctionnent comme prévu
+
+### Mise à jour du code
+
+Tous les fichiers qui interagissent avec Supabase ont été mis à jour pour utiliser les nouvelles tables préfixées `evscatala_`.
+
+Si vous créez de nouveaux services ou fonctionnalités, assurez-vous de respecter cette nouvelle convention de nommage.
+
 ## Roadmap et priorités de développement
 
 ### Phase 1 - MVP
@@ -326,6 +445,163 @@ Système basé sur Supabase Auth avec :
 - Composants accessibles (WCAG)
 - Thème cohérent avec l'identité visuelle de CATALA
 - Feedback utilisateur pour chaque action importante
+- Navigation inférieure centralisée avec accès à tous les modules de l'application
+- Organisation logique des fonctionnalités en catégories pour simplifier l'accès
+- Optimisation des animations (poids vs. impact UX)
+
+#### Composants UI et Design System
+
+L'application utilise un système de composants basé sur Shadcn/UI avec une personnalisation pour correspondre à l'identité visuelle de l'association :
+
+- **Hiérarchie de composants** : Utilisation du pattern Atomic Design (atomes, molécules, organismes)
+- **Système de thèmes** : Support des modes clair/sombre avec transitions fluides
+- **Personnalisation** : Extension des composants Shadcn avec des variantes personnalisées
+- **Accessibilité** : Contraste optimisé, support des lecteurs d'écran, navigation au clavier
+- **États interactifs** : Tous les éléments interactifs ont des états visibles (hover, focus, active, disabled)
+- **Iconographie** : Utilisation cohérente des icônes Lucide avec tailles et styles standardisés
+- **Typographie** : Échelle typographique harmonieuse et adaptée à toutes les tailles d'écran
+- **Animations** : Transitions subtiles pour améliorer l'expérience sans surcharger l'interface
+
+#### Système TextBank
+
+Le système TextBank permet une gestion centralisée de tous les textes de l'application, facilitant la maintenance et les futures traductions :
+
+```typescript
+// Exemple d'utilisation du TextBank
+import { getText } from '@/lib/textBank';
+
+function WelcomeMessage({ userName }) {
+  // Utilisation avec variable
+  return <h1>{getText('welcome.user', { userName })}</h1>;
+}
+
+// Dans texts.fr.csv
+// id,text,description
+// welcome.user,"Bienvenue {{userName}} !","Message d'accueil avec nom d'utilisateur"
+```
+
+**Avantages du système** :
+- Source unique de vérité pour tous les textes
+- Support des variables pour les textes dynamiques
+- Facilité de maintenance et de mise à jour
+- Structure permettant l'internationalisation future
+- Documentation contextuelle via le champ description
+
+#### Accessibilité et inclusion
+
+L'application EVS-catala est conçue pour être accessible à tous les utilisateurs, incluant ceux ayant des besoins spécifiques :
+
+**Conformité WCAG** :
+- Objectif de conformité WCAG 2.1 niveau AA
+- Contraste des couleurs optimisé (ratio minimum 4.5:1 pour le texte)
+- Structure sémantique du HTML pour les lecteurs d'écran
+- Navigation au clavier complète avec indicateurs de focus visibles
+
+**Fonctionnalités d'accessibilité** :
+- Support des attributs ARIA pour les composants interactifs
+- Alternatives textuelles pour tous les éléments non-textuels
+- Messages d'erreur clairs et instructions pour les formulaires
+- Skip links pour accéder rapidement au contenu principal
+
+**Préférences utilisateur** :
+- Mode sombre/clair pour s'adapter aux préférences visuelles
+- Support de la préférence de réduction de mouvement
+- Possibilité d'augmenter la taille du texte sans perte de fonctionnalité
+- Options d'accessibilité configurables dans le profil utilisateur
+
+**Tests d'accessibilité** :
+- Audit régulier avec des outils automatisés (Lighthouse, axe)
+- Tests manuels avec technologies d'assistance (lecteurs d'écran)
+- Revue périodique des composants pour maintenir l'accessibilité
+- Processus d'amélioration continue basé sur les retours utilisateurs
+
+### Bonnes pratiques pour la navigation
+- Tous les liens vers des modules doivent être accessibles depuis la barre de navigation
+- Catégorisation logique des fonctionnalités (Organisation, Infos)
+- Utilisation du TextBank pour tous les textes d'interface
+- Maintenir la cohérence des animations et transitions
+- Les éléments actifs doivent être visuellement identifiables
+- Adapter la navigation au contexte de l'utilisateur (rôle, page actuelle)
+- Assurer que tous les éléments sont correctement espacés pour faciliter le toucher sur mobile
+
+### Guide de maintenance et d'extension de la navigation
+
+#### Structure de la navigation
+La barre de navigation est construite autour du concept de catégories et sous-menus :
+
+```typescript
+interface NavCategory {
+  id: string;         // Identifiant unique de la catégorie
+  label: string;      // Libellé affiché (via TextBank)
+  icon: React.ReactNode; // Icône Lucide
+  items: NavItem[];   // Sous-menus
+}
+
+interface NavItem {
+  path: string;       // Route de destination
+  label: string;      // Libellé du sous-menu
+  icon: React.ReactNode; // Icône du sous-menu
+}
+```
+
+#### Ajouter une nouvelle fonction à la navigation
+
+1. **Identifier la catégorie appropriée** :
+   - Accueil : Page principale
+   - Organisation : Fonctionnalités administratives et de coordination
+   - Infos : Communication et affichage d'informations
+   - Profil : Fonctionnalités liées à l'utilisateur
+
+2. **Ajouter le NavItem** dans la catégorie appropriée :
+   ```typescript
+   const navCategories: NavCategory[] = [
+     // ...
+     {
+       id: 'organisation',
+       label: 'Organisation',
+       icon: <Grid size={24} />,
+       items: [
+         // Ajouter votre nouvel item ici :
+         { 
+           path: '/nouvelle-route', 
+           label: t('nav.nouvelle_route'), 
+           icon: <IconeAdaptee size={20} /> 
+         },
+         // ... autres items existants
+       ]
+     },
+     // ...
+   ];
+   ```
+
+3. **Ajouter la clé de traduction** dans le système TextBank :
+   ```typescript
+   // Dans textBank.ts
+   const navTexts: TextEntry[] = [
+     // ... textes existants
+     { id: 'nav.nouvelle_route', text: 'Libellé de la nouvelle route' },
+   ];
+   ```
+
+4. **Créer la route correspondante** dans App.tsx :
+   ```tsx
+   <Route
+     path="/nouvelle-route"
+     element={
+       <AppLayout>
+         <NouvelleRoutePage />
+       </AppLayout>
+     }
+   />
+   ```
+
+#### Tests de la navigation
+Après toute modification, vérifiez :
+1. L'affichage correct sur mobile et desktop
+2. L'indicateur actif sur la route correspondante
+3. L'ouverture/fermeture correcte des sous-menus
+4. Le comportement au défilement
+5. Les animations fluides
 
 ## Annexes
 
@@ -346,9 +622,61 @@ cp .env.example .env
 npm run dev
 ```
 
+### Guide des commandes de build et déploiement
+
+```bash
+# Construction optimisée pour la production
+npm run build
+
+# Prévisualisation locale du build de production
+npm run preview
+
+# Construction et déploiement sur Vercel
+npm run deploy
+
+# Analyse de la taille des bundles
+npm run analyze
+```
+
+#### Configuration du build (vite.config.ts)
+
+La configuration de build a été optimisée pour améliorer les performances :
+
+```typescript
+// Configuration des chunks pour optimiser le chargement
+build: {
+  chunkSizeWarningLimit: 1000,
+  rollupOptions: {
+    output: {
+      manualChunks: (id) => {
+        // Regrouper les dépendances React
+        if (id.includes('node_modules/react') || 
+            id.includes('node_modules/react-dom') || 
+            id.includes('node_modules/scheduler')) {
+          return 'vendor-react';
+        }
+        
+        // Regrouper les autres dépendances importantes
+        if (id.includes('node_modules')) {
+          return 'vendor';
+        }
+      }
+    }
+  }
+}
+```
+
+Cette configuration permet de :
+- Séparer le code applicatif des bibliothèques externes
+- Isoler React et React DOM dans un chunk séparé pour un meilleur cache
+- Regrouper les autres dépendances dans un chunk vendor commun
+- Éviter les warnings pour les chunks de grande taille
+
 ### Glossaire
 - **EVS** : Espace de Vie Sociale
-- **CATALA** : Nom de l'association communautaire
+- **CATALA** : Nom du lieu. Terme temporaire pour désigner l'association.
 - **Staff** : Membres avec des responsabilités spécifiques
 - **Permanence** : Période d'ouverture du local associatif
 - **Module** : Composant fonctionnel de l'application
+
+Les Tables qui ne comportent pas le préfixe "evs_" sont des tables appartenant à d'autres applications. Elles doivent être ignorées.

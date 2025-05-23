@@ -13,6 +13,7 @@ import {
 import { authService } from '@/lib/supabase';
 import { t } from '@/lib/textBank';
 import { UserProfile } from '@/lib/supabase';
+import MessageNotification from '@/components/messages/MessageNotification';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -73,6 +74,10 @@ const Header: React.FC = () => {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Menu</span>
           </Button>
+          
+          {!isLoading && currentUser && (
+            <MessageNotification userId={currentUser.id} />
+          )}
           
           {!isLoading && (
             currentUser ? (
