@@ -239,10 +239,14 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - [x] Intégration avec le système TextBank pour les labels
 - [x] Adaptation pour tous types d'écrans
 - [x] Écrans de chargement et gestion d'erreurs
+- [x] Correction du problème de double header sur certaines pages
+- [x] Amélioration du bouton de connexion/déconnexion dans le header
+- [x] Stabilisation de la navigation inférieure (désactivation du masquage au défilement)
 
 #### Livrables prioritaires
 - [x] **Semaine 1**: Structure principale de navigation et layout
 - [x] **Semaine 2**: Finalisation avec animations et comportement intelligent
+- [x] **Semaine 3**: Correction de bugs d'interface et d'accessibilité
 
 #### Intégration avec les autres modules
 - [x] Récupération du statut actif des routes pour les indicateurs visuels
@@ -304,6 +308,8 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - [✅] Amélioration du système d'authentification avec logs détaillés pour débogage
 - [✅] Création d'une page de diagnostic Supabase pour tester la connexion à la base de données
 - [✅] Script de migration pour s'assurer que la table evscatala_profiles existe
+- [✅] Correction du bouton de déconnexion dans la barre de navigation
+- [✅] Résolution du problème de création des profils utilisateurs après inscription
 
 ## Phase 2: Extension
 

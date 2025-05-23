@@ -134,7 +134,7 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="py-8">
+    <div className="py-8 container mx-auto px-4">
       <h1 className="text-2xl font-bold mb-6">{t('profile.title')}</h1>
       
       <div className="grid md:grid-cols-[1fr_3fr] gap-6">
