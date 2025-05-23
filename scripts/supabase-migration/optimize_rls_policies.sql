@@ -7,7 +7,7 @@ CREATE POLICY "Mise à jour d'événement par créateur, staff ou admin"
 ON public.evscatala_events
 FOR UPDATE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -22,7 +22,7 @@ CREATE POLICY "Suppression d'événement par créateur, staff ou admin"
 ON public.evscatala_events
 FOR DELETE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -60,7 +60,7 @@ CREATE POLICY "Mise à jour d'annonce par créateur, staff ou admin"
 ON public.evscatala_announcements
 FOR UPDATE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -69,7 +69,7 @@ CREATE POLICY "Suppression d'annonce par créateur, staff ou admin"
 ON public.evscatala_announcements
 FOR DELETE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -104,7 +104,7 @@ CREATE POLICY "Mise à jour de vote par créateur, staff ou admin"
 ON public.evscatala_votes
 FOR UPDATE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -113,7 +113,7 @@ CREATE POLICY "Suppression de vote par créateur, staff ou admin"
 ON public.evscatala_votes
 FOR DELETE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  user_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
