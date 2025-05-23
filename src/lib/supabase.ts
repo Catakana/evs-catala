@@ -1,14 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Créer un client Supabase à partir des variables d'environnement
-// Utiliser les valeurs en dur si les variables d'environnement ne sont pas disponibles
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fcwvcjtnfxyzojolpisd.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd3ZjanRuZnh5em9qb2xwaXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNDE0ODQsImV4cCI6MjA1NzYxNzQ4NH0.5nhfFiobBMagzjpChJQGZ7TNqAWce6J3Mq6geMKtiCM';
-
-// Suppression de la vérification qui lance une erreur car nous avons déjà des valeurs par défaut
-// if (!supabaseUrl || !supabaseAnonKey) {
-//   throw new Error('Clés Supabase manquantes dans les variables d\'environnement.');
-// }
+// Mettre à jour les clés Supabase avec les nouvelles valeurs
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oybpmjjtbmlesvhlgabn.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YnBtamp0Ym1sZXN2aGxnYWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDY4MDIsImV4cCI6MjA2MzUyMjgwMn0.0rhAdkCJSwAg8RDfgbX8A_jdRBwPaaXkpb8yXWPOxRI';
 
 // Exporter le client Supabase
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -24,6 +18,7 @@ export interface UserProfile {
   lastname: string;
   email: string;
   avatar_url?: string;
+  phone?: string | null;
   role: 'member' | 'staff' | 'admin';
   status: 'active' | 'inactive' | 'pending';
   created_at: string;
@@ -45,7 +40,7 @@ export const authService = {
   // Obtenir le profil de l'utilisateur
   async getUserProfile(userId: string) {
     const { data, error } = await supabase
-      .from('evs_profiles')
+      .from('evscatala_profiles')
       .select('*')
       .eq('user_id', userId)
       .single();
@@ -99,14 +94,15 @@ export const authService = {
           lastname: userData.lastname,
           role: 'member', // Rôle par défaut
           status: 'pending' // Statut par défaut (en attente de validation)
-        }
+        },
+        emailRedirectTo: `${window.location.origin}/verify-email` // URL de redirection après vérification de l'email
       }
     });
 
     if (!error && data.user) {
-      // Créer un profil utilisateur dans la table evs_profiles
-      await supabase.from('evs_profiles').insert({
-        id: data.user.id,
+      // Créer un profil utilisateur dans la table evscatala_profiles
+      await supabase.from('evscatala_profiles').insert({
+        user_id: data.user.id,
         email: email,
         firstname: userData.firstname,
         lastname: userData.lastname,
@@ -117,6 +113,47 @@ export const authService = {
     }
 
     return { data, error };
+  },
+
+  // Vérifier et activer un compte par email
+  async verifyAndActivateAccount(email: string) {
+    try {
+      // Récupérer le profil utilisateur par email
+      const { data: profile, error: profileError } = await supabase
+        .from('evscatala_profiles')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (profileError) {
+        throw new Error(`Profil non trouvé: ${profileError.message}`);
+      }
+
+      if (!profile) {
+        throw new Error('Utilisateur non trouvé');
+      }
+
+      // Mettre à jour le statut dans la table des profils
+      const { error: updateError } = await supabase
+        .from('evscatala_profiles')
+        .update({
+          status: 'active',
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', profile.user_id);
+
+      if (updateError) {
+        throw new Error(`Erreur lors de l'activation du compte: ${updateError.message}`);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Erreur lors de la vérification du compte:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erreur inconnue' 
+      };
+    }
   },
 
   // Déconnexion
@@ -138,10 +175,10 @@ export const authService = {
     });
   },
 
-  // Récupération du profil utilisateur
+  // Récupération du profil utilisateur par ID
   async getUserProfileById(userId: string) {
     const { data, error } = await supabase
-      .from('evs_profiles')
+      .from('evscatala_profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -153,7 +190,7 @@ export const authService = {
   // Mise à jour du profil utilisateur
   async updateUserProfile(userId: string, profileData: Partial<UserProfile>) {
     const { data, error } = await supabase
-      .from('evs_profiles')
+      .from('evscatala_profiles')
       .update({
         ...profileData,
         updated_at: new Date().toISOString()
