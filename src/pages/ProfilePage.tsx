@@ -17,9 +17,9 @@ import Footer from '@/components/layout/Footer';
 
 // Schéma de validation
 const profileSchema = z.object({
-  firstname: z.string().min(1, t('errors.required')),
-  lastname: z.string().min(1, t('errors.required')),
-  email: z.string().email(t('errors.invalid')).min(1, t('errors.required')),
+  firstname: z.string().min(1, t('common.errors.required')),
+  lastname: z.string().min(1, t('common.errors.required')),
+  email: z.string().email(t('common.errors.invalid')).min(1, t('common.errors.required')),
   phone: z.string().optional(),
 });
 
@@ -71,7 +71,7 @@ const ProfilePage: React.FC = () => {
           });
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : t('errors.generic'));
+        setError(err instanceof Error ? err.message : t('common.errors.generic'));
       } finally {
         setIsLoading(false);
       }
@@ -115,7 +115,7 @@ const ProfilePage: React.FC = () => {
         };
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
+      setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {
       setIsSaving(false);
     }

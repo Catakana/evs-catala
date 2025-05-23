@@ -14,8 +14,8 @@ import { t } from '@/lib/textBank';
 
 // Schéma de validation
 const loginSchema = z.object({
-  email: z.string().email(t('errors.invalid')).min(1, t('errors.required')),
-  password: z.string().min(1, t('errors.required')),
+  email: z.string().email(t('common.errors.invalid')).min(1, t('common.errors.required')),
+  password: z.string().min(1, t('common.errors.required')),
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;
@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
       // Redirection vers la page d'accueil
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
+      setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {
       setIsSubmitting(false);
     }

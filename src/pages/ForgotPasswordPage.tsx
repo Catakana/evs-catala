@@ -13,7 +13,7 @@ import { t } from '@/lib/textBank';
 
 // Schéma de validation
 const forgotPasswordSchema = z.object({
-  email: z.string().email(t('errors.invalid')).min(1, t('errors.required')),
+  email: z.string().email(t('common.errors.invalid')).min(1, t('common.errors.required')),
 });
 
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
@@ -43,7 +43,7 @@ const ForgotPasswordPage: React.FC = () => {
       
       setIsSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
+      setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {
       setIsSubmitting(false);
     }

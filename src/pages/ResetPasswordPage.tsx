@@ -14,7 +14,7 @@ import { t } from '@/lib/textBank';
 // Schéma de validation
 const resetPasswordSchema = z.object({
   password: z.string().min(8, t('auth.passwordMinLength')),
-  confirmPassword: z.string().min(1, t('errors.required')),
+  confirmPassword: z.string().min(1, t('common.errors.required')),
 }).refine((data) => data.password === data.confirmPassword, {
   message: t('auth.passwordsDoNotMatch'),
   path: ['confirmPassword'],
@@ -65,7 +65,7 @@ const ResetPasswordPage: React.FC = () => {
         navigate('/login');
       }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
+      setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {
       setIsSubmitting(false);
     }
