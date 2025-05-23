@@ -20,7 +20,7 @@ export const eventService = {
   // Récupérer tous les événements
   async getEvents() {
     const { data, error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .select('*')
       .order('start_datetime', { ascending: true });
 
@@ -35,7 +35,7 @@ export const eventService = {
   // Récupérer les événements pour une période donnée
   async getEventsByPeriod(startDate: string, endDate: string) {
     const { data, error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .select('*')
       .gte('start_datetime', `${startDate}T00:00:00`)
       .lte('start_datetime', `${endDate}T23:59:59`)
@@ -52,7 +52,7 @@ export const eventService = {
   // Récupérer un événement par ID
   async getEventById(id: string) {
     const { data, error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .select('*')
       .eq('id', id)
       .single();
@@ -72,7 +72,7 @@ export const eventService = {
     const endDateTime = `${eventData.end_date}T${eventData.end_time}:00`;
     
     const { data, error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .insert({
         title: eventData.title,
         description: eventData.description,
@@ -102,7 +102,7 @@ export const eventService = {
     const endDateTime = `${eventData.end_date}T${eventData.end_time}:00`;
     
     const { data, error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .update({
         title: eventData.title,
         description: eventData.description,
@@ -127,7 +127,7 @@ export const eventService = {
   // Supprimer un événement
   async deleteEvent(id: string) {
     const { error } = await supabase
-      .from('evs_events')
+      .from('evscatala_events')
       .delete()
       .eq('id', id);
 
