@@ -1,21 +1,22 @@
-
 import React from 'react';
-import { Separator } from '@/components/ui/separator';
+import { t } from '@/lib/textBank';
 
-const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear();
-  
+interface FooterProps {
+  className?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   return (
-    <footer className="w-full py-6 mt-auto">
-      <Separator className="mb-6" />
-      <div className="container flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-        <div className="mb-4 md:mb-0">
-          &copy; {currentYear} EVS CATALA. Tous droits réservés.
+    <footer className={`bg-muted py-6 border-t ${className}`}>
+      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+        <div className="text-sm text-muted-foreground mb-4 md:mb-0">
+          {t('app.footer')}
         </div>
-        <div className="flex gap-6">
-          <a href="#" className="hover:text-foreground transition-colors">Mentions légales</a>
-          <a href="#" className="hover:text-foreground transition-colors">Confidentialité</a>
-          <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+        
+        <div className="text-xs text-muted-foreground">
+          <a href="#" className="hover:underline mr-4">Mentions légales</a>
+          <a href="#" className="hover:underline mr-4">Politique de confidentialité</a>
+          <a href="#" className="hover:underline">Contact</a>
         </div>
       </div>
     </footer>
