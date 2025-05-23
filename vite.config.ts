@@ -32,5 +32,27 @@ export default defineConfig(({ mode }) => {
     define: {
       __DEV__: mode === 'development',
     },
+    build: {
+      // Augmenter la limite d'avertissement pour les chunks (en KB)
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          // Configuration simple du chunking pour réduire la taille des bundles
+          manualChunks: (id) => {
+            // Regrouper les dépendances React
+            if (id.includes('node_modules/react') || 
+                id.includes('node_modules/react-dom') || 
+                id.includes('node_modules/scheduler')) {
+              return 'vendor-react';
+            }
+            
+            // Regrouper les autres dépendances importantes
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+          }
+        }
+      }
+    }
   };
 });

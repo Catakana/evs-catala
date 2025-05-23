@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import PermanencesWeekView from './PermanencesWeekView';
 import PermanencesMonthView from './PermanencesMonthView';
@@ -9,61 +8,21 @@ interface PermanencesCalendarProps {
   view: 'week' | 'month';
   selectedDate: Date;
   isMobile: boolean;
+  permanences: Permanence[];
+  onRegister: (permanenceId: string) => Promise<void>;
+  onUnregister: (permanenceId: string) => Promise<void>;
+  currentUserId?: string;
 }
 
 const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
   view,
   selectedDate,
-  isMobile
+  isMobile,
+  permanences,
+  onRegister,
+  onUnregister,
+  currentUserId
 }) => {
-  // Mock data for permanences
-  const [permanences, setPermanences] = useState<Permanence[]>([
-    {
-      id: '1',
-      title: 'Permanence du matin',
-      startDate: new Date(new Date().setHours(9, 0, 0, 0)),
-      endDate: new Date(new Date().setHours(12, 0, 0, 0)),
-      location: 'EVS Catala - Salle principale',
-      status: 'confirmed',
-      type: 'public',
-      minMembers: 2,
-      maxMembers: 4,
-      participants: [
-        { id: '1', name: 'Jean Dupont', status: 'confirmed' },
-        { id: '2', name: 'Marie Martin', status: 'confirmed' }
-      ],
-      notes: 'Accueil du public et aide administrative',
-    },
-    {
-      id: '2',
-      title: 'Permanence de l\'après-midi',
-      startDate: new Date(new Date().setHours(14, 0, 0, 0)),
-      endDate: new Date(new Date().setHours(17, 0, 0, 0)),
-      location: 'EVS Catala - Salle principale',
-      status: 'pending',
-      type: 'public',
-      minMembers: 2,
-      maxMembers: 4,
-      participants: [
-        { id: '1', name: 'Jean Dupont', status: 'confirmed' }
-      ],
-      notes: 'Besoin d\'une personne supplémentaire',
-    },
-    {
-      id: '3',
-      title: 'Maintenance informatique',
-      startDate: new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(10, 0, 0, 0)),
-      endDate: new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0)),
-      location: 'EVS Catala - Bureau',
-      status: 'canceled',
-      type: 'internal',
-      minMembers: 1,
-      maxMembers: 2,
-      participants: [],
-      notes: 'Maintenance annulée, reportée à la semaine prochaine',
-    }
-  ]);
-
   const [selectedPermanence, setSelectedPermanence] = useState<Permanence | null>(null);
 
   const handlePermanenceClick = (permanence: Permanence) => {
@@ -71,6 +30,26 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
   };
 
   const handleCloseModal = () => {
+    setSelectedPermanence(null);
+  };
+
+  // Vérifier si l'utilisateur actuel est inscrit à une permanence
+  const isUserRegistered = (permanence: Permanence): boolean => {
+    if (!currentUserId) return false;
+    return permanence.participants.some(p => p.id === currentUserId);
+  };
+
+  // Gérer l'inscription à une permanence
+  const handleRegister = async (permanenceId: string) => {
+    await onRegister(permanenceId);
+    // Fermer la modal après l'inscription
+    setSelectedPermanence(null);
+  };
+
+  // Gérer la désinscription d'une permanence
+  const handleUnregister = async (permanenceId: string) => {
+    await onUnregister(permanenceId);
+    // Fermer la modal après la désinscription
     setSelectedPermanence(null);
   };
 
@@ -95,6 +74,11 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
         <PermanenceModal
           permanence={selectedPermanence}
           onClose={handleCloseModal}
+          onRegister={() => handleRegister(selectedPermanence.id)}
+          onUnregister={() => handleUnregister(selectedPermanence.id)}
+          isUserRegistered={isUserRegistered(selectedPermanence)}
+          canRegister={currentUserId !== undefined && 
+            selectedPermanence.participants.length < selectedPermanence.maxMembers}
         />
       )}
     </div>

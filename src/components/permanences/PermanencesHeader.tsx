@@ -1,108 +1,84 @@
-
 import React from 'react';
-import { format, addWeeks, subWeeks, addMonths, subMonths } from 'date-fns';
+import { format, addMonths, subMonths, addWeeks, subWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PermanencesHeaderProps {
-  view: 'week' | 'month';
-  setView: (view: 'week' | 'month') => void;
   selectedDate: Date;
-  setSelectedDate: (date: Date) => void;
+  view: 'week' | 'month';
+  onPrevious: () => void;
+  onNext: () => void;
+  onViewChange: (view: 'week' | 'month') => void;
 }
 
 const PermanencesHeader: React.FC<PermanencesHeaderProps> = ({
-  view,
-  setView,
   selectedDate,
-  setSelectedDate
+  view,
+  onPrevious,
+  onNext,
+  onViewChange
 }) => {
-  const handlePrevious = () => {
+  // Formatage de la date selon la vue
+  const getFormattedDate = () => {
     if (view === 'week') {
-      setSelectedDate(subWeeks(selectedDate, 1));
+      // Obtenir le premier jour de la semaine (dimanche)
+      const firstDay = new Date(selectedDate);
+      firstDay.setDate(selectedDate.getDate() - selectedDate.getDay());
+      
+      // Obtenir le dernier jour de la semaine (samedi)
+      const lastDay = new Date(firstDay);
+      lastDay.setDate(firstDay.getDate() + 6);
+      
+      // Format: "Semaine du 1 au 7 janvier 2023"
+      return `Semaine du ${format(firstDay, 'd', { locale: fr })} au ${format(lastDay, 'd MMMM yyyy', { locale: fr })}`;
     } else {
-      setSelectedDate(subMonths(selectedDate, 1));
+      // Format: "Janvier 2023"
+      return format(selectedDate, 'MMMM yyyy', { locale: fr });
     }
-  };
-
-  const handleNext = () => {
-    if (view === 'week') {
-      setSelectedDate(addWeeks(selectedDate, 1));
-    } else {
-      setSelectedDate(addMonths(selectedDate, 1));
-    }
-  };
-
-  const handleToday = () => {
-    setSelectedDate(new Date());
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5" />
-          <span>
-            {view === 'week' 
-              ? `Semaine du ${format(selectedDate, 'dd MMMM yyyy', { locale: fr })}`
-              : format(selectedDate, 'MMMM yyyy', { locale: fr })}
-          </span>
-        </h2>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <div className="flex rounded-md overflow-hidden border">
-          <Button
-            variant="outline"
-            size="sm"
-            className={`rounded-none ${view === 'week' ? 'bg-primary text-primary-foreground' : ''}`}
-            onClick={() => setView('week')}
-          >
-            Semaine
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className={`rounded-none ${view === 'month' ? 'bg-primary text-primary-foreground' : ''}`}
-            onClick={() => setView('month')}
-          >
-            Mois
-          </Button>
-        </div>
-
-        <div className="flex rounded-md overflow-hidden">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-r-none"
-            onClick={handlePrevious}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">{getFormattedDate()}</h2>
+        
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={onPrevious}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
+          
           <Button
             variant="outline"
-            size="sm"
-            className="rounded-none"
-            onClick={handleToday}
-          >
-            Aujourd'hui
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-l-none"
-            onClick={handleNext}
+            size="icon"
+            onClick={onNext}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-
-        <Button variant="default" size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Ajouter
-        </Button>
       </div>
+      
+      <Tabs 
+        defaultValue={view}
+        onValueChange={(value) => onViewChange(value as 'week' | 'month')}
+        className="w-full"
+      >
+        <TabsList className="grid w-40 grid-cols-2">
+          <TabsTrigger value="week">
+            <List className="h-4 w-4 mr-2" />
+            Semaine
+          </TabsTrigger>
+          <TabsTrigger value="month">
+            <CalendarIcon className="h-4 w-4 mr-2" />
+            Mois
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
     </div>
   );
 };
