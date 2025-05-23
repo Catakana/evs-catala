@@ -37,18 +37,26 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          // Configuration simple du chunking pour réduire la taille des bundles
+          // Configuration améliorée du chunking pour éviter les problèmes de référence
           manualChunks: (id) => {
-            // Regrouper les dépendances React
+            // Conserver React, ReactDOM et les dépendances directes ensemble
             if (id.includes('node_modules/react') || 
                 id.includes('node_modules/react-dom') || 
-                id.includes('node_modules/scheduler')) {
-              return 'vendor-react';
+                id.includes('node_modules/scheduler') ||
+                id.includes('node_modules/@radix-ui')) {
+              return 'vendor-react-core';
             }
             
-            // Regrouper les autres dépendances importantes
+            // Regrouper d'autres UI components
+            if (id.includes('node_modules/framer-motion') || 
+                id.includes('node_modules/lucide-react') ||
+                id.includes('node_modules/class-variance-authority')) {
+              return 'vendor-ui';
+            }
+            
+            // Regrouper toutes les autres dépendances
             if (id.includes('node_modules')) {
-              return 'vendor';
+              return 'vendor-deps';
             }
           }
         }

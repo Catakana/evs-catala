@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List } from 'lucide-react';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Permanence } from '@/types/permanence';
@@ -9,7 +8,7 @@ import { permanenceService } from '@/lib/permanenceService';
 import PermanencesHeader from '@/components/permanences/PermanencesHeader';
 import PermanencesCalendar from '@/components/permanences/PermanencesCalendar';
 import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 export default function PermanencesPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -17,8 +16,26 @@ export default function PermanencesPage() {
   const [permanences, setPermanences] = useState<Permanence[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [user, setUser] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+    
+    getCurrentUser();
+  }, []);
 
   useEffect(() => {
     fetchPermanences();
@@ -27,31 +44,25 @@ export default function PermanencesPage() {
   const fetchPermanences = async () => {
     try {
       setLoading(true);
-      // Définir la période en fonction de la vue
       let startDate: string;
       let endDate: string;
       
       if (view === 'week') {
-        // Premier jour de la semaine
         const firstDay = new Date(selectedDate);
         firstDay.setDate(selectedDate.getDate() - selectedDate.getDay());
-        // Dernier jour de la semaine
         const lastDay = new Date(firstDay);
         lastDay.setDate(firstDay.getDate() + 6);
         
         startDate = firstDay.toISOString().split('T')[0];
         endDate = lastDay.toISOString().split('T')[0];
       } else {
-        // Premier jour du mois
         const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        // Dernier jour du mois
         const lastDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
         
         startDate = firstDay.toISOString().split('T')[0];
         endDate = lastDay.toISOString().split('T')[0];
       }
       
-      // Appel au service pour récupérer les permanences
       const data = await permanenceService.getPermanencesByPeriod(startDate, endDate);
       setPermanences(data);
     } catch (error) {
@@ -95,7 +106,6 @@ export default function PermanencesPage() {
         description: "Vous êtes inscrit à la permanence.",
         variant: "default"
       });
-      // Rafraîchir les données
       fetchPermanences();
     } catch (error) {
       console.error('Erreur lors de l\'inscription à la permanence:', error);
@@ -117,7 +127,6 @@ export default function PermanencesPage() {
         description: "Vous êtes désinscrit de la permanence.",
         variant: "default"
       });
-      // Rafraîchir les données
       fetchPermanences();
     } catch (error) {
       console.error('Erreur lors de la désinscription de la permanence:', error);
