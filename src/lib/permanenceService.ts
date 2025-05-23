@@ -14,7 +14,7 @@ export const permanenceService = {
       const { data, error } = await supabase
         .from('evscatala_permanences')
         .select('*')
-        .order('date', { ascending: true });
+        .order('start_date', { ascending: true });
 
       if (error) throw error;
       return data as Permanence[];
@@ -38,12 +38,13 @@ export const permanenceService = {
           *,
           participants:evscatala_permanence_participants(
             user_id,
+            status,
             user:evscatala_profiles(id, firstname, lastname, avatar_url)
           )
         `)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: true });
+        .gte('start_date', `${startDate}T00:00:00`)
+        .lte('start_date', `${endDate}T23:59:59`)
+        .order('start_date', { ascending: true });
 
       if (error) throw error;
       return data as unknown as Permanence[];
@@ -55,15 +56,27 @@ export const permanenceService = {
 
   /**
    * Créer une nouvelle permanence
-   * @param permanence Données de la permanence
+   * @param permanenceData Données de la permanence
    * @returns La permanence créée
    */
   async createPermanence(permanenceData: Omit<Permanence, 'id' | 'created_at' | 'updated_at'>): Promise<Permanence | null> {
     try {
+      // Conversion des dates et heures en timestamps
+      const formattedData = {
+        ...permanenceData,
+        start_date: new Date(`${permanenceData.date}T${permanenceData.start_time}`).toISOString(),
+        end_date: new Date(`${permanenceData.date}T${permanenceData.end_time}`).toISOString(),
+      };
+      
+      // Suppression des champs individuels qui ne sont plus nécessaires
+      delete formattedData.date;
+      delete formattedData.start_time;
+      delete formattedData.end_time;
+
       // Les champs created_at et updated_at seront automatiquement remplis par Supabase
       const { data, error } = await supabase
         .from('evscatala_permanences')
-        .insert([permanenceData])
+        .insert([formattedData])
         .select()
         .single();
 
@@ -83,9 +96,26 @@ export const permanenceService = {
    */
   async updatePermanence(id: string, updates: Partial<Permanence>): Promise<Permanence | null> {
     try {
+      const formattedUpdates = { ...updates };
+      
+      // Si des champs de date/heure sont fournis, les convertir en timestamps
+      if (updates.date && (updates.start_time || updates.end_time)) {
+        if (updates.start_time) {
+          formattedUpdates.start_date = new Date(`${updates.date}T${updates.start_time}`).toISOString();
+          delete formattedUpdates.start_time;
+        }
+        
+        if (updates.end_time) {
+          formattedUpdates.end_date = new Date(`${updates.date}T${updates.end_time}`).toISOString();
+          delete formattedUpdates.end_time;
+        }
+        
+        delete formattedUpdates.date;
+      }
+      
       const { data, error } = await supabase
         .from('evscatala_permanences')
-        .update(updates)
+        .update(formattedUpdates)
         .eq('id', id)
         .select()
         .single();

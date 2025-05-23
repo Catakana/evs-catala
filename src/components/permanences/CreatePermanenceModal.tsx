@@ -27,19 +27,56 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   
+  // Déterminer les valeurs initiales pour le formulaire
+  const getInitialFormData = () => {
+    if (permanence) {
+      // En mode édition, essayer d'extraire date et heures depuis start_date/end_date
+      let extractedDate = format(new Date(), 'yyyy-MM-dd');
+      let extractedStartTime = '14:00';
+      let extractedEndTime = '18:00';
+      
+      try {
+        const startDate = new Date(permanence.start_date);
+        const endDate = new Date(permanence.end_date);
+        
+        extractedDate = format(startDate, 'yyyy-MM-dd');
+        extractedStartTime = format(startDate, 'HH:mm');
+        extractedEndTime = format(endDate, 'HH:mm');
+      } catch (e) {
+        console.error('Erreur lors de l\'extraction des dates:', e);
+      }
+      
+      return {
+        title: permanence.title || 'Permanence',
+        description: permanence.description || '',
+        date: extractedDate,
+        start_time: extractedStartTime,
+        end_time: extractedEndTime,
+        location: permanence.location || 'Local associatif',
+        required_volunteers: permanence.required_volunteers || 2,
+        max_volunteers: permanence.max_volunteers || 4,
+        min_volunteers: permanence.min_volunteers || 1,
+        notes: permanence.notes || ''
+      };
+    }
+    
+    // En mode création, utiliser des valeurs par défaut
+    return {
+      title: 'Permanence',
+      description: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      start_time: '14:00',
+      end_time: '18:00',
+      location: 'Local associatif',
+      required_volunteers: 2,
+      max_volunteers: 4,
+      min_volunteers: 1,
+      notes: ''
+    };
+  };
+  
   // État du formulaire
-  const [formData, setFormData] = useState({
-    title: permanence?.title || 'Permanence',
-    description: permanence?.description || '',
-    date: permanence?.date || format(new Date(), 'yyyy-MM-dd'),
-    start_time: permanence?.start_time?.slice(0, 5) || '14:00',
-    end_time: permanence?.end_time?.slice(0, 5) || '18:00',
-    location: permanence?.location || 'Local associatif',
-    required_volunteers: permanence?.required_volunteers || 2,
-    max_volunteers: permanence?.max_volunteers || 4,
-    min_volunteers: permanence?.min_volunteers || 1,
-    notes: permanence?.notes || ''
-  });
+  const [formData, setFormData] = useState(getInitialFormData());
 
   // Récupérer l'utilisateur courant
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -96,6 +133,7 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
     try {
       setLoading(true);
       
+      // L'API s'occupe de convertir date + times en start_date/end_date
       const permanenceData = {
         ...formData,
         status: PermanenceStatus.OPEN,

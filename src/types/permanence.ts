@@ -43,9 +43,16 @@ export interface Permanence {
   id: string;
   title: string;
   description?: string;
-  date: string;
-  start_time: string;
-  end_time: string;
+  
+  // Champs pour le formulaire et la compatibilité
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  
+  // Nouveaux champs correspondant à la base de données
+  start_date: string;
+  end_date: string;
+  
   location: string;
   required_volunteers: number;
   max_volunteers?: number;

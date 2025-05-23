@@ -1,5 +1,5 @@
 import React from 'react';
-import { format, parse } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { X, MapPin, Calendar, Clock, Users, Info, Check, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,10 +25,12 @@ export const PermanenceModal: React.FC<PermanenceModalProps> = ({
   canRegister = true
 }) => {
   // Formatage des dates
-  const fullDate = parse(`${permanence.date}`, 'yyyy-MM-dd', new Date());
-  const dateStr = format(fullDate, 'EEEE d MMMM yyyy', { locale: fr });
-  const startTimeStr = permanence.start_time.slice(0, 5); // Format HH:MM
-  const endTimeStr = permanence.end_time.slice(0, 5); // Format HH:MM
+  const startDate = parseISO(permanence.start_date);
+  const endDate = parseISO(permanence.end_date);
+  
+  const dateStr = format(startDate, 'EEEE d MMMM yyyy', { locale: fr });
+  const startTimeStr = format(startDate, 'HH:mm', { locale: fr });
+  const endTimeStr = format(endDate, 'HH:mm', { locale: fr });
 
   // Obtenir le statut de la permanence
   const getStatusBadge = (status: PermanenceStatus) => {

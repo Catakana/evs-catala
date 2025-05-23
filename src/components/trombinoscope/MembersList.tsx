@@ -1,14 +1,19 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { MemberCard } from './MemberCard';
 import { MemberListItem } from './MemberListItem';
 import { useMemberData } from '@/hooks/useMemberData';
 
-const MembersList: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState('all');
-  
+interface MembersListProps {
+  viewMode?: 'grid' | 'list';
+  searchQuery?: string;
+  filter?: string;
+}
+
+const MembersList: React.FC<MembersListProps> = ({
+  viewMode = 'grid',
+  searchQuery = '',
+  filter = 'all'
+}) => {
   // Get member data from our custom hook
   const { members, isLoading } = useMemberData();
   
@@ -25,21 +30,6 @@ const MembersList: React.FC = () => {
       return matchesSearch && matchesFilter;
     });
   }, [members, searchQuery, filter]);
-
-  // Handle view mode changes from header
-  const handleViewChange = (mode: 'grid' | 'list') => {
-    setViewMode(mode);
-  };
-
-  // Handle search changes from header
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  // Handle filter changes from header
-  const handleFilterChange = (selectedFilter: string) => {
-    setFilter(selectedFilter);
-  };
 
   if (isLoading) {
     return (
@@ -58,15 +48,7 @@ const MembersList: React.FC = () => {
   }
 
   return (
-    <div>
-      {/* Pass the handlers to the TrombinoscopeHeader */}
-      <div style={{ display: 'none' }}>
-        {/* This is for demonstration, these props would normally go to TrombinoscopeHeader */}
-        <button onClick={() => handleViewChange('grid')}>Grid</button>
-        <button onClick={() => handleSearchChange('search')}>Search</button>
-        <button onClick={() => handleFilterChange('filter')}>Filter</button>
-      </div>
-      
+    <div>      
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredMembers.map((member) => (

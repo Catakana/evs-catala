@@ -88,3 +88,21 @@ En cas de problème, vous pouvez revenir à l'ancienne base de données en :
 ## Support
 
 En cas de problème lors de la migration, contactez l'administrateur système. 
+
+## Supprimer d'abord les tables dépendantes
+DROP TABLE IF EXISTS evscatala_permanence_participants;
+-- Puis la table principale
+DROP TABLE IF EXISTS evscatala_permanences; 
+
+-- Exemple d'ajout de colonnes manquantes (à adapter selon ce qui existe déjà)
+ALTER TABLE evscatala_permanences 
+ADD COLUMN IF NOT EXISTS title VARCHAR(255),
+ADD COLUMN IF NOT EXISTS description TEXT,
+ADD COLUMN IF NOT EXISTS start_date TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS end_date TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS location VARCHAR(255),
+ADD COLUMN IF NOT EXISTS required_volunteers INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS max_volunteers INTEGER DEFAULT 5,
+ADD COLUMN IF NOT EXISTS min_volunteers INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'open',
+ADD COLUMN IF NOT EXISTS notes TEXT; 

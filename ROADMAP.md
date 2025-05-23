@@ -55,6 +55,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - [x] Gestion des comptes de démonstration
 - [x] Autorisations et permissions des utilisateurs
 - [x] Protections des routes privées
+- [x] Trombinoscope synchronisé avec les données de profils utilisateurs
 
 #### Tâches techniques
 - Configuration de Supabase Auth avec OAuth (Google) ✅

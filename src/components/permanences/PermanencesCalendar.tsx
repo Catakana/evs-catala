@@ -78,7 +78,8 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
           onUnregister={() => handleUnregister(selectedPermanence.id)}
           isUserRegistered={isUserRegistered(selectedPermanence)}
           canRegister={currentUserId !== undefined && 
-            selectedPermanence.participants.length < selectedPermanence.required_volunteers}
+            selectedPermanence.status === PermanenceStatus.OPEN &&
+            (selectedPermanence.participants || []).length < (selectedPermanence.max_volunteers || selectedPermanence.required_volunteers)}
         />
       )}
     </div>
