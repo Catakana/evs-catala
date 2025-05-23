@@ -3,7 +3,7 @@ app.name,EVS-catala,Nom de l'application
 app.association,Espace de Vie Sociale CATALA,Nom complet de l'association
 app.association_short,CATALA,Nom court de l'association
 app.slogan,Le portail communautaire de CATALA,Slogan affiché sur la page d'accueil
-app.footer,© 2025 Studio Miyukini - Tous droits réservés,Texte de bas de page
+app.footer,© Propulsé par le Studio Miyukini depuis 2025 - Tous droits réservés,Texte de bas de page
 
 # Navigation
 nav.home,Accueil,Navigation principale

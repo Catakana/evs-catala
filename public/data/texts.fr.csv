@@ -15,6 +15,7 @@ nav.votes,Votes,Navigation principale
 nav.projects,Projets,Navigation principale
 nav.messages,Messagerie,Navigation principale
 nav.infos,Infos générales,Navigation principale
+nav.components,Composants UI,Navigation test
 
 # Actions communes
 actions.save,Enregistrer,Bouton d'action
@@ -31,6 +32,7 @@ actions.add,Ajouter,Bouton d'action
 actions.upload,Téléverser,Bouton d'action
 actions.download,Télécharger,Bouton d'action
 actions.share,Partager,Bouton d'action
+actions.copy,Copier,Bouton d'action
 common.processing,Traitement en cours...,Message de chargement
 common.loading,Chargement...,Message de chargement
 
@@ -142,6 +144,74 @@ votes.active,En cours,Filtre
 votes.closed,Terminés,Filtre
 votes.vote_button,Voter,Bouton
 votes.already_voted,Déjà voté,Badge
+votes.filter.label,Filtrer par statut,Label filtre
+votes.filter.all,Tous les votes,Option filtre
+votes.filter.active,Votes actifs,Option filtre
+votes.filter.closed,Votes fermés,Option filtre
+votes.tabs.official,Votes officiels,Onglet
+votes.tabs.surveys,Sondages,Onglet
+votes.page.title,Votes et sondages,Titre de page
+votes.page_title,Votes et sondages,Titre de page
+votes.delete.title,Supprimer le vote,Titre confirmation
+votes.delete.description,Êtes-vous sûr de vouloir supprimer ce vote ? Cette action est irréversible.,Description confirmation
+votes.delete.confirm,Oui, supprimer,Bouton confirmation
+votes.actions.create,Créer un vote,Bouton
+votes.actions.back_to_votes,Retourner à la liste des votes,Bouton
+votes.errors.fetch_error,Erreur lors de la récupération des votes,Message d'erreur
+votes.errors.not_found,Vote non trouvé,Message d'erreur
+votes.errors.title_required,Le titre est requis,Message d'erreur
+votes.errors.description_required,La description est requise,Message d'erreur
+votes.errors.options_required,Toutes les options doivent être remplies,Message d'erreur
+votes.errors.start_date_required,La date de début est requise,Message d'erreur
+votes.errors.end_date_required,La date de fin est requise,Message d'erreur
+votes.errors.end_date_after_start,La date de fin doit être postérieure à la date de début,Message d'erreur
+votes.errors.submit_error,Erreur lors de la soumission du vote,Message d'erreur
+votes.no_votes_found,Aucun vote trouvé,Message vide
+votes.create_new,Créer un nouveau vote,Bouton
+votes.view_results,Voir les résultats,Bouton
+votes.status.active,Actif,Statut
+votes.status.closed,Terminé,Statut
+votes.status.draft,Brouillon,Statut
+votes.period.ended,Terminé {date},Période
+votes.period.starts,Commence {date},Période
+votes.period.ends,Se termine {date},Période
+votes.participants,participants,Label
+votes.create_title,Créer un nouveau vote,Titre
+votes.edit_title,Modifier le vote,Titre
+votes.create_description,Remplissez le formulaire pour créer un nouveau vote,Description
+votes.edit_description,Modifiez les informations du vote,Description
+votes.form.title,Titre,Label
+votes.form.title_placeholder,Entrez le titre du vote,Placeholder
+votes.form.description,Description,Label
+votes.form.description_placeholder,Entrez la description du vote,Placeholder
+votes.form.type,Type de vote,Label
+votes.form.period,Période du vote,Label
+votes.form.start_date,Date de début,Label
+votes.form.end_date,Date de fin,Label
+votes.type.binary,Vote binaire (Oui/Non),Option
+votes.type.multiple,Choix multiples,Option
+votes.type.survey,Sondage,Option
+votes.type.binary_description,Un simple vote Oui/Non,Tooltip
+votes.type.multiple_description,Vote avec plusieurs options possibles,Tooltip
+votes.type.survey_description,Sondage d'opinion non officiel,Tooltip
+votes.option.yes,Oui,Texte d'option
+votes.option.no,Non,Texte d'option
+votes.toast.created_title,Vote créé,Toast
+votes.toast.created_description,Le vote a été créé avec succès,Toast
+votes.toast.updated_title,Vote mis à jour,Toast
+votes.toast.updated_description,Le vote a été mis à jour avec succès,Toast
+votes.toast.deleted_title,Vote supprimé,Toast
+votes.toast.deleted_description,Le vote a été supprimé avec succès,Toast
+votes.toast.error_title,Erreur,Toast
+votes.toast.delete_error_description,Erreur lors de la suppression du vote,Toast
+votes.toast.vote_success,Vote enregistré,Toast
+votes.toast.vote_success_description,Votre vote a été enregistré avec succès,Toast
+votes.toast.vote_error,Erreur lors de l'enregistrement du vote,Toast
+votes.toast.activated_title,Vote activé,Toast
+votes.toast.activated_description,Le vote a été activé avec succès,Toast
+votes.toast.closed_title,Vote clôturé,Toast
+votes.toast.closed_description,Le vote a été clôturé avec succès,Toast
+votes.toast.status_error,Erreur lors de la mise à jour du statut,Toast
 
 # Projets
 projects.title,Projets,Titre de page
@@ -170,4 +240,17 @@ infos.documents,Documents,Onglet
 infos.links,Liens utiles,Onglet
 infos.about_title,L'Espace de Vie Sociale CATALA,Titre section
 infos.mission_title,Notre mission,Titre section
-infos.values_title,Nos valeurs,Titre section 
+infos.values_title,Nos valeurs,Titre section
+
+# Composants UI
+ui.title,Catalogue des composants UI,Titre de page
+ui.description,Présentation des composants d'interface utilisateur disponibles,Description page
+ui.basic_components,Composants basiques,Onglet
+ui.form_components,Composants de formulaire,Onglet
+ui.layout_components,Composants de mise en page,Onglet
+ui.feedback_components,Composants de feedback,Onglet
+ui.code_copied,Code copié dans le presse-papier,Message toast
+ui.color_palette,Palette de couleurs,Titre section
+ui.typography,Typographie,Titre section
+ui.component_description,Description du composant,Label
+ui.component_code,Code d'exemple,Label 

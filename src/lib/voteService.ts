@@ -1,6 +1,11 @@
 import { supabase } from './supabase';
 import { Vote, VoteOption, VoteResponse, VoteType, VoteStatus, VoteVisibility, VoteResultVisibility } from '@/types/vote';
 
+// Constantes pour les noms de tables
+const VOTES_TABLE = 'evscatala_votes';
+const VOTE_OPTIONS_TABLE = 'evscatala_vote_options';
+const VOTE_RESPONSES_TABLE = 'evscatala_vote_responses';
+
 /**
  * Service de gestion des votes et sondages
  */
@@ -12,7 +17,7 @@ export const voteService = {
    */
   async getAllVotes(status?: VoteStatus): Promise<Vote[]> {
     let query = supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .select('*');
     
     if (status) {
@@ -59,7 +64,7 @@ export const voteService = {
    */
   async getVoteById(id: string): Promise<Vote | null> {
     const { data, error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .select('*')
       .eq('id', id)
       .single();
@@ -102,7 +107,7 @@ export const voteService = {
    */
   async getVoteOptions(voteId: string): Promise<VoteOption[]> {
     const { data, error } = await supabase
-      .from('evscatala_vote_options')
+      .from(VOTE_OPTIONS_TABLE)
       .select('*')
       .eq('vote_id', voteId)
       .order('created_at');
@@ -116,7 +121,7 @@ export const voteService = {
     const options = await Promise.all(
       (data || []).map(async (option) => {
         const { count } = await supabase
-          .from('evscatala_vote_responses')
+          .from(VOTE_RESPONSES_TABLE)
           .select('id', { count: 'exact' })
           .eq('option_id', option.id);
           
@@ -138,7 +143,7 @@ export const voteService = {
    */
   async getVoteResponses(voteId: string): Promise<VoteResponse[]> {
     const { data, error } = await supabase
-      .from('evscatala_vote_responses')
+      .from(VOTE_RESPONSES_TABLE)
       .select('*')
       .eq('vote_id', voteId);
       
@@ -164,7 +169,7 @@ export const voteService = {
    */
   async hasUserVoted(voteId: string, userId: string): Promise<boolean> {
     const { count } = await supabase
-      .from('evscatala_vote_responses')
+      .from(VOTE_RESPONSES_TABLE)
       .select('id', { count: 'exact' })
       .eq('vote_id', voteId)
       .eq('user_id', userId);
@@ -179,7 +184,7 @@ export const voteService = {
    */
   async createVote(vote: Omit<Vote, 'id' | 'createdAt' | 'updatedAt' | 'responses'>): Promise<Vote> {
     const { data, error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .insert({
         title: vote.title,
         description: vote.description,
@@ -231,7 +236,7 @@ export const voteService = {
    */
   async createVoteOption(voteId: string, text: string): Promise<VoteOption> {
     const { data, error } = await supabase
-      .from('evscatala_vote_options')
+      .from(VOTE_OPTIONS_TABLE)
       .insert({
         vote_id: voteId,
         text: text
@@ -259,7 +264,7 @@ export const voteService = {
    */
   async updateVote(id: string, vote: Partial<Vote>): Promise<Vote | null> {
     const { data, error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .update({
         title: vote.title,
         description: vote.description,
@@ -284,7 +289,7 @@ export const voteService = {
     if (vote.options) {
       // Supprimer les options existantes
       await supabase
-        .from('evscatala_vote_options')
+        .from(VOTE_OPTIONS_TABLE)
         .delete()
         .eq('vote_id', id);
         
@@ -309,19 +314,19 @@ export const voteService = {
   async deleteVote(id: string): Promise<boolean> {
     // Supprimer d'abord les réponses au vote
     await supabase
-      .from('evscatala_vote_responses')
+      .from(VOTE_RESPONSES_TABLE)
       .delete()
       .eq('vote_id', id);
       
     // Supprimer les options du vote
     await supabase
-      .from('evscatala_vote_options')
+      .from(VOTE_OPTIONS_TABLE)
       .delete()
       .eq('vote_id', id);
       
     // Supprimer le vote
     const { error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .delete()
       .eq('id', id);
       
@@ -366,7 +371,7 @@ export const voteService = {
     
     // Soumettre la réponse
     const { data, error } = await supabase
-      .from('evscatala_vote_responses')
+      .from(VOTE_RESPONSES_TABLE)
       .insert({
         vote_id: voteId,
         option_id: optionId,
@@ -397,7 +402,7 @@ export const voteService = {
    */
   async updateVoteStatus(id: string, status: VoteStatus): Promise<boolean> {
     const { error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .update({
         status: status,
         updated_at: new Date().toISOString()
@@ -419,7 +424,7 @@ export const voteService = {
    */
   async getVotesByUser(userId: string): Promise<Vote[]> {
     const { data, error } = await supabase
-      .from('evscatala_votes')
+      .from(VOTES_TABLE)
       .select('*')
       .eq('created_by', userId)
       .order('created_at', { ascending: false });

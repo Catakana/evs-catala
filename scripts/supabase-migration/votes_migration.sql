@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS evscatala_votes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   result_visibility TEXT NOT NULL DEFAULT 'immediate' CHECK (result_visibility IN ('immediate', 'afterVote', 'afterClose')),
   start_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  end_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  end_date TIMESTAMP WITH TIME ZONE DEFAULT now() + INTERVAL '1 week',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 

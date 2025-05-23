@@ -101,7 +101,7 @@ export default defineConfig(({ mode }) => {
           // Forcer le préchargement des dépendances React dans tous les cas
           if (filename.includes('vendor')) {
             return deps;
-          }
+            }
           return [];
         }
       }
