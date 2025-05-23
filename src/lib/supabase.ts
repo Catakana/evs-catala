@@ -4,8 +4,31 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fcwvcjtnfxyzojolpisd.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd3ZjanRuZnh5em9qb2xwaXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNDE0ODQsImV4cCI6MjA1NzYxNzQ4NH0.5nhfFiobBMagzjpChJQGZ7TNqAWce6J3Mq6geMKtiCM';
 
+// Log des informations de configuration
+console.log('[SUPABASE] Initialisation de la connexion avec URL:', supabaseUrl);
+console.log('[SUPABASE] Utilisation des variables d\'environnement:', {
+  URL_DEFINIE: !!import.meta.env.VITE_SUPABASE_URL,
+  ANON_KEY_DEFINIE: !!import.meta.env.VITE_SUPABASE_ANON_KEY
+});
+
 // Exporter le client Supabase
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Vérifier la connexion
+(async () => {
+  try {
+    console.log('[SUPABASE] Test de connexion à la base de données...');
+    const { data, error } = await supabase.from('evscatala_profiles').select('count').limit(1);
+    
+    if (error) {
+      console.error('[SUPABASE] Erreur de connexion à la base de données:', error);
+    } else {
+      console.log('[SUPABASE] Connexion à la base de données réussie. Données de test:', data);
+    }
+  } catch (err) {
+    console.error('[SUPABASE] Exception lors du test de connexion:', err);
+  }
+})();
 
 // Types pour les utilisateurs
 export type UserRole = 'member' | 'staff' | 'admin';
@@ -85,6 +108,10 @@ export const authService = {
 
   // Inscription avec email/mot de passe
   async signUp(email: string, password: string, userData: { firstname: string; lastname: string }) {
+    // Utiliser l'URL correcte pour la redirection (localhost ou URL de production)
+    const redirectUrl = window.location.origin;
+    console.log('URL de redirection:', redirectUrl);
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -95,7 +122,7 @@ export const authService = {
           role: 'member', // Rôle par défaut
           status: 'pending' // Statut par défaut (en attente de validation)
         },
-        emailRedirectTo: `${window.location.origin}/verify-email` // URL de redirection après vérification de l'email
+        emailRedirectTo: `${redirectUrl}/verify-email` // URL de redirection après vérification de l'email
       }
     });
 

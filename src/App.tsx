@@ -31,6 +31,7 @@ import EventsMigrationTest from '@/pages/test/EventsMigrationTest';
 import ProfileMigrationTest from '@/pages/test/ProfileMigrationTest';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
+import SupabaseDebugTest from '@/pages/test/SupabaseDebugTest';
 
 const queryClient = new QueryClient();
 
@@ -155,6 +156,7 @@ const App = () => {
               <Route path="/test/migration" element={<MigrationTest />} />
               <Route path="/test/events-migration" element={<EventsMigrationTest />} />
               <Route path="/test/profiles-migration" element={<ProfileMigrationTest />} />
+              <Route path="/test/supabase" element={<SupabaseDebugTest />} />
               
               {/* Routes protégées (utilisateurs connectés) */}
               <Route element={<ProtectedRoute />}>

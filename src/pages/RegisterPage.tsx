@@ -47,10 +47,19 @@ const RegisterPage: React.FC = () => {
   });
 
   async function onSubmit(data: RegisterSchema) {
+    console.log('[REGISTER] Démarrage de la soumission du formulaire d\'inscription');
     setIsSubmitting(true);
     setError(null);
     
     try {
+      console.log('[REGISTER] Données du formulaire:', {
+        email: data.email,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        // Nous ne logons pas le mot de passe pour des raisons de sécurité
+      });
+      
+      console.log('[REGISTER] Appel de la fonction signUp du contexte d\'authentification');
       const { error: signUpError } = await signUp(
         data.email, 
         data.password, 
@@ -60,10 +69,17 @@ const RegisterPage: React.FC = () => {
         }
       );
       
+      console.log('[REGISTER] Résultat de l\'inscription:', { 
+        success: !signUpError, 
+        error: signUpError ? signUpError.message : null 
+      });
+      
       if (signUpError) {
+        console.error('[REGISTER] Erreur lors de l\'inscription:', signUpError);
         throw signUpError;
       }
       
+      console.log('[REGISTER] Inscription réussie, affichage du message de succès');
       setIsSuccess(true);
       setRegisteredEmail(data.email);
       
@@ -72,8 +88,10 @@ const RegisterPage: React.FC = () => {
       //   navigate('/login');
       // }, 3000);
     } catch (err) {
+      console.error('[REGISTER] Exception lors de l\'inscription:', err);
       setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {
+      console.log('[REGISTER] Fin du processus d\'inscription');
       setIsSubmitting(false);
     }
   }

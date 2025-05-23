@@ -291,6 +291,20 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Configuration des options d'optimisation des dépendances ✅
 - Documentation des bonnes pratiques pour le développement local ✅
 
+## 🔒 Authentification et utilisateurs
+
+- [x] Système d'authentification
+  - [x] Connexion
+  - [x] Inscription
+  - [x] Récupération de mot de passe
+  - [x] Déconnexion
+  - [x] Vérification du statut de connexion
+  - [x] Protection des routes
+  - [x] Gestion des profils utilisateurs dans evscatala_profiles
+- [✅] Amélioration du système d'authentification avec logs détaillés pour débogage
+- [✅] Création d'une page de diagnostic Supabase pour tester la connexion à la base de données
+- [✅] Script de migration pour s'assurer que la table evscatala_profiles existe
+
 ## Phase 2: Extension
 
 ### 2.1 Module Permanences (complet)
