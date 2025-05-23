@@ -131,8 +131,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Connexion
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error ? new Error(error.message) : null };
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        return { error: new Error(error.message) };
+      }
+      
+      // S'assurer que l'utilisateur a un profil
+      if (data?.user) {
+        console.log('[AUTH] Vérification du profil utilisateur après connexion...');
+        
+        // Vérifier si un profil existe déjà pour cet utilisateur
+        const { data: existingProfile, error: checkError } = await supabase
+          .from('evscatala_profiles')
+          .select('*')
+          .eq('user_id', data.user.id)
+          .single();
+        
+        if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = not found, which is expected
+          console.error('[AUTH] Erreur lors de la vérification du profil existant:', checkError);
+        } else if (!existingProfile) {
+          console.log('[AUTH] Aucun profil trouvé, création d\'un nouveau profil utilisateur');
+          
+          // Récupérer les métadonnées de l'utilisateur pour obtenir firstname et lastname
+          const userMetadata = data.user.user_metadata;
+          
+          const profileData = {
+            user_id: data.user.id,
+            email: data.user.email,
+            firstname: userMetadata?.firstname || email.split('@')[0],
+            lastname: userMetadata?.lastname || '',
+            role: userMetadata?.role || 'member',
+            status: 'active', // L'utilisateur est déjà actif puisqu'il peut se connecter
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          
+          console.log('[AUTH] Données du profil à insérer:', profileData);
+          
+          const { error: profileError, data: profileResult } = await supabase
+            .from('evscatala_profiles')
+            .insert(profileData)
+            .select();
+
+          if (profileError) {
+            console.error('[AUTH] Erreur lors de la création du profil après connexion:', profileError);
+            console.error('[AUTH] Détails de l\'erreur:', profileError.details);
+            console.error('[AUTH] Code d\'erreur:', profileError.code);
+          } else {
+            console.log('[AUTH] Profil créé avec succès après connexion:', profileResult);
+          }
+        } else {
+          console.log('[AUTH] Profil existant trouvé, utilisation du profil existant');
+        }
+      }
+      
+      return { error: null };
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       return { error: error instanceof Error ? error : new Error('Erreur de connexion') };
