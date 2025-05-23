@@ -9,9 +9,9 @@ export enum PermanenceStatus {
 }
 
 /**
- * Type de bénévole pour une permanence
+ * Type de participant pour une permanence
  */
-export interface PermanenceVolunteer {
+export interface PermanenceParticipant {
   id?: string;
   permanence_id: string;
   user_id: string;
@@ -40,5 +40,5 @@ export interface Permanence {
   created_by: string;
   created_at: string;
   updated_at?: string;
-  volunteers?: PermanenceVolunteer[];
+  participants?: PermanenceParticipant[];
 }

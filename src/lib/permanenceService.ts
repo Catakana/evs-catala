@@ -36,7 +36,7 @@ export const permanenceService = {
         .from('evscatala_permanences')
         .select(`
           *,
-          volunteers:evscatala_permanence_volunteers(
+          participants:evscatala_permanence_participants(
             user_id,
             user:evscatala_profiles(id, firstname, lastname, avatar_url)
           )
@@ -126,7 +126,7 @@ export const permanenceService = {
   async registerForPermanence(permanenceId: string, userId: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('evscatala_permanence_volunteers')
+        .from('evscatala_permanence_participants')
         .insert([
           { permanence_id: permanenceId, user_id: userId }
         ]);
@@ -141,12 +141,12 @@ export const permanenceService = {
         .single();
 
       if (permanence && permanence.status === PermanenceStatus.OPEN) {
-        const { data: volunteers } = await supabase
-          .from('evscatala_permanence_volunteers')
+        const { data: participants } = await supabase
+          .from('evscatala_permanence_participants')
           .select('*')
           .eq('permanence_id', permanenceId);
 
-        if (volunteers && volunteers.length >= permanence.required_volunteers) {
+        if (participants && participants.length >= permanence.required_volunteers) {
           await this.updatePermanence(permanenceId, { status: PermanenceStatus.FULL });
         }
       }
@@ -167,7 +167,7 @@ export const permanenceService = {
   async unregisterFromPermanence(permanenceId: string, userId: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('evscatala_permanence_volunteers')
+        .from('evscatala_permanence_participants')
         .delete()
         .eq('permanence_id', permanenceId)
         .eq('user_id', userId);
@@ -201,7 +201,7 @@ export const permanenceService = {
   async isUserRegistered(permanenceId: string, userId: string): Promise<boolean> {
     try {
       const { data, error } = await supabase
-        .from('evscatala_permanence_volunteers')
+        .from('evscatala_permanence_participants')
         .select('*')
         .eq('permanence_id', permanenceId)
         .eq('user_id', userId);

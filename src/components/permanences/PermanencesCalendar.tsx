@@ -36,7 +36,7 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
   // Vérifier si l'utilisateur actuel est inscrit à une permanence
   const isUserRegistered = (permanence: Permanence): boolean => {
     if (!currentUserId) return false;
-    return permanence.participants.some(p => p.id === currentUserId);
+    return permanence.participants?.some(p => p.user_id === currentUserId) || false;
   };
 
   // Gérer l'inscription à une permanence
@@ -78,7 +78,7 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
           onUnregister={() => handleUnregister(selectedPermanence.id)}
           isUserRegistered={isUserRegistered(selectedPermanence)}
           canRegister={currentUserId !== undefined && 
-            selectedPermanence.participants.length < selectedPermanence.maxMembers}
+            selectedPermanence.participants.length < selectedPermanence.required_volunteers}
         />
       )}
     </div>
