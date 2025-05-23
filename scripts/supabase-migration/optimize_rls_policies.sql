@@ -63,7 +63,7 @@ CREATE POLICY "Mise à jour d'annonce par créateur, staff ou admin"
 ON public.evscatala_announcements
 FOR UPDATE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  author_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 
@@ -72,7 +72,7 @@ CREATE POLICY "Suppression d'annonce par créateur, staff ou admin"
 ON public.evscatala_announcements
 FOR DELETE
 USING (
-  created_by = (SELECT auth.uid()) OR 
+  author_id = (SELECT auth.uid()) OR 
   (SELECT auth.role()) IN ('staff', 'admin')
 );
 

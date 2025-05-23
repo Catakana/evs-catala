@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addDays } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
 import { Permanence } from '@/types/permanence';
@@ -11,13 +10,19 @@ interface PermanencesWeekViewProps {
   permanences: Permanence[];
   onPermanenceClick: (permanence: Permanence) => void;
   isMobile: boolean;
+  onRegister?: (permanenceId: string) => Promise<void>;
+  onUnregister?: (permanenceId: string) => Promise<void>;
+  currentUserId?: string;
 }
 
 const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
   selectedDate,
   permanences,
   onPermanenceClick,
-  isMobile
+  isMobile,
+  onRegister,
+  onUnregister,
+  currentUserId
 }) => {
   const startDate = startOfWeek(selectedDate, { weekStartsOn: 1 });
   const endDate = endOfWeek(selectedDate, { weekStartsOn: 1 });
@@ -29,6 +34,12 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
     { start: 14, end: 17, label: '14h - 17h' },
     { start: 17, end: 20, label: '17h - 20h' },
   ];
+
+  // Vérifier si l'utilisateur actuel est inscrit à une permanence
+  const isUserRegistered = (permanence: Permanence): boolean => {
+    if (!currentUserId) return false;
+    return permanence.participants?.some(p => p.user_id === currentUserId) || false;
+  };
 
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -55,8 +66,8 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
           
           {daysOfWeek.map((day, dayIndex) => {
             const dayPermanences = permanences.filter(perm => {
-              const permStartHour = perm.startDate.getHours();
-              return isSameDay(perm.startDate, day) && 
+              const permStartHour = new Date(perm.start_date).getHours();
+              return isSameDay(new Date(perm.start_date), day) && 
                      permStartHour >= slot.start && 
                      permStartHour < slot.end;
             });
@@ -68,6 +79,10 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
                     key={permanence.id}
                     permanence={permanence}
                     onClick={() => onPermanenceClick(permanence)}
+                    isUserRegistered={isUserRegistered(permanence)}
+                    onRegister={onRegister}
+                    onUnregister={onUnregister}
+                    currentUserId={currentUserId}
                   />
                 ))}
               </div>

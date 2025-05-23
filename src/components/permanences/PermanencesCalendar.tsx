@@ -61,6 +61,9 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
           permanences={permanences}
           onPermanenceClick={handlePermanenceClick}
           isMobile={isMobile}
+          onRegister={onRegister}
+          onUnregister={onUnregister}
+          currentUserId={currentUserId}
         />
       ) : (
         <PermanencesMonthView 
