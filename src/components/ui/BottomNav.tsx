@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { t } from '@/lib/textBank';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Définition des catégories de navigation et leurs items
 interface NavItem {
@@ -41,9 +42,22 @@ interface NavCategory {
  */
 const BottomNav: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Fonction de déconnexion
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+      setActiveCategory(null);
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
 
   // Catégories et items de navigation
   const navCategories: NavCategory[] = [
@@ -84,7 +98,7 @@ const BottomNav: React.FC = () => {
       items: [
         { path: '/profile', label: t('profile.title'), icon: <User size={20} /> },
         { path: '/settings', label: 'Paramètres', icon: <Settings size={20} /> },
-        { path: '/logout', label: t('auth.logout'), icon: <LogOut size={20} /> }
+        { path: 'logout', label: t('auth.logout'), icon: <LogOut size={20} /> }
       ]
     }
   ];
@@ -163,6 +177,20 @@ const BottomNav: React.FC = () => {
     }
   };
 
+  // Gérer les clics sur les items du menu
+  const handleMenuItemClick = (item: NavItem) => {
+    setActiveCategory(null);
+    
+    // Cas spécial pour la déconnexion
+    if (item.path === 'logout') {
+      handleLogout();
+      return;
+    }
+    
+    // Navigation normale pour les autres items
+    navigate(item.path);
+  };
+
   return (
     <div className="relative">
       {/* Fond semi-transparent quand un sous-menu est ouvert */}
@@ -196,14 +224,13 @@ const BottomNav: React.FC = () => {
             
             <div className="py-2">
               {activeSubMenu.items.map((item) => (
-                <Link
+                <div
                   key={item.path}
-                  to={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 hover:bg-accent/60 transition-colors",
+                    "flex items-center gap-3 px-4 py-3 hover:bg-accent/60 transition-colors cursor-pointer",
                     location.pathname === item.path && "bg-accent/80 text-primary"
                   )}
-                  onClick={() => setActiveCategory(null)}
+                  onClick={() => handleMenuItemClick(item)}
                 >
                   <div className="w-9 h-9 flex items-center justify-center rounded-full bg-muted">
                     {item.icon}
@@ -215,7 +242,7 @@ const BottomNav: React.FC = () => {
                       layoutId={`indicator-${item.path}`}
                     />
                   )}
-                </Link>
+                </div>
               ))}
             </div>
           </motion.div>
