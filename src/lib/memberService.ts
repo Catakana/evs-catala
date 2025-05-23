@@ -8,7 +8,6 @@ interface SupabaseProfile {
   firstname: string;
   lastname: string;
   email?: string;
-  phone?: string;
   avatar_url?: string;
   role?: string;
   status?: string;
@@ -34,7 +33,6 @@ export const memberService = {
           firstname,
           lastname,
           email,
-          phone,
           avatar_url,
           role,
           status,
@@ -51,7 +49,7 @@ export const memberService = {
         firstName: profile.firstname || '',
         lastName: profile.lastname || '',
         email: profile.email || '',
-        phone: profile.phone || '',
+        phone: '', // Valeur vide par défaut car le champ n'existe pas en base
         avatarUrl: profile.avatar_url || '',
         role: profile.role || 'member',
         status: profile.status || 'active',
@@ -81,7 +79,6 @@ export const memberService = {
           firstname,
           lastname,
           email,
-          phone,
           avatar_url,
           role,
           status,
@@ -100,7 +97,7 @@ export const memberService = {
         firstName: profile.firstname || '',
         lastName: profile.lastname || '',
         email: profile.email || '',
-        phone: profile.phone || '',
+        phone: '', // Valeur vide par défaut car le champ n'existe pas en base
         avatarUrl: profile.avatar_url || '',
         role: profile.role || 'member',
         status: profile.status || 'active',
@@ -128,7 +125,6 @@ export const memberService = {
           firstname,
           lastname,
           email,
-          phone,
           avatar_url,
           role,
           status,
@@ -146,7 +142,7 @@ export const memberService = {
         firstName: profile.firstname || '',
         lastName: profile.lastname || '',
         email: profile.email || '',
-        phone: profile.phone || '',
+        phone: '', // Valeur vide par défaut car le champ n'existe pas en base
         avatarUrl: profile.avatar_url || '',
         role: profile.role || 'member',
         status: profile.status || 'active',
@@ -174,7 +170,7 @@ export const memberService = {
         firstname: updates.firstName,
         lastname: updates.lastName,
         email: updates.email,
-        phone: updates.phone,
+        // phone: updates.phone,  // Ce champ n'existe pas dans la base
         avatar_url: updates.avatarUrl,
         role: updates.role,
         status: updates.status
@@ -195,7 +191,7 @@ export const memberService = {
         firstName: profile.firstname || '',
         lastName: profile.lastname || '',
         email: profile.email || '',
-        phone: profile.phone || '',
+        phone: '', // Valeur vide par défaut car le champ n'existe pas en base
         avatarUrl: profile.avatar_url || '',
         role: profile.role || 'member',
         status: profile.status || 'active',
