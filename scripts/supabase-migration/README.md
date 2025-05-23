@@ -109,7 +109,30 @@ Ce dossier contient les scripts de migration pour la base de données Supabase.
 
 ### Optimisation des politiques RLS (Row Level Security)
 
-Le script `optimize_rls_policies.sql` corrige un problème de performance signalé par Supabase dans les politiques de sécurité au niveau des lignes (RLS). 
+Nous avons deux scripts pour optimiser les politiques RLS :
+
+1. `optimize_rls_policies.sql` - Version complète qui redéfinit toutes les politiques
+2. `optimize_rls_policies_safe.sql` - Version sécurisée qui ne modifie que les politiques existantes
+
+#### Approche recommandée
+
+Pour éviter les erreurs liées aux noms de colonnes inconnus, suivez ces étapes :
+
+1. **Examinez d'abord la structure de votre base de données** :
+   ```bash
+   # Exécutez ce script dans l'éditeur SQL de Supabase
+   scripts/supabase-migration/check_tables_structure.sql
+   ```
+   
+   Ce script affichera la liste de toutes les colonnes de vos tables et les politiques RLS existantes.
+
+2. **Utilisez la version sécurisée** :
+   ```bash
+   # Exécutez ce script dans l'éditeur SQL de Supabase
+   scripts/supabase-migration/optimize_rls_policies_safe.sql
+   ```
+   
+   Cette version n'essaie pas de créer de nouvelles politiques, elle optimise uniquement celles qui existent déjà, en remplaçant les appels directs à `auth.*()` par la syntaxe recommandée `(SELECT auth.*())`.
 
 #### Problème identifié
 
@@ -144,24 +167,6 @@ Cette modification garantit que les fonctions ne sont évaluées qu'une seule fo
 
 #### Tables concernées
 
-Le script met à jour les politiques RLS pour les tables suivantes :
-- evscatala_events
-- evscatala_profiles
-- evscatala_announcements
-- evscatala_announcement_reads
-- evscatala_votes
-- evscatala_permanences
-- evscatala_permanence_participants
-- evscatala_conversations
-- evscatala_conversation_participants
-- evscatala_messages
-
-#### Exécution du script
-
-Pour exécuter ce script, utilisez l'interface SQL de Supabase ou exécutez-le via l'API Supabase :
-
-```bash
-npm run supabase:migration -- optimize_rls_policies.sql
-```
+L'optimisation s'applique à toutes les tables dont le nom commence par `evscatala_`.
 
 ### Autres scripts de migration
