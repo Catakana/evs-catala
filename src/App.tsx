@@ -25,6 +25,8 @@ import EmailVerificationPage from '@/components/auth/EmailVerificationPage';
 import TestPage from '@/pages/TestPage';
 import ComponentsShowcasePage from '@/pages/test/ComponentsShowcasePage';
 import NavTestPage from '@/pages/test/NavTestPage';
+import MigrationTest from '@/pages/test/MigrationTest';
+import EventsMigrationTest from '@/pages/test/EventsMigrationTest';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
 
@@ -147,6 +149,8 @@ const App = () => {
             />
             <Route path="/test/components" element={<ComponentsShowcasePage />} />
             <Route path="/test/nav" element={<NavTestPage />} />
+            <Route path="/test/migration" element={<MigrationTest />} />
+            <Route path="/test/events-migration" element={<EventsMigrationTest />} />
             
             {/* Routes protégées (utilisateurs connectés) */}
             <Route element={<ProtectedRoute />}>

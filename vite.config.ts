@@ -12,6 +12,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port: 8080,
+      watch: {
+        // Ignorer certains fichiers pour éviter les boucles de redémarrage
+        ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/*.log'],
+        usePolling: false,
+      },
     },
     plugins: [
       react(),
