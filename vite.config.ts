@@ -39,16 +39,20 @@ export default defineConfig(({ mode }) => {
         output: {
           // Configuration améliorée du chunking pour éviter les problèmes de référence
           manualChunks: (id) => {
-            // Mettre React et toutes ses dépendances dans un seul chunk
+            // Mettre React et toutes ses dépendances essentielles dans un seul chunk
             if (id.includes('node_modules/react') || 
                 id.includes('node_modules/react-dom') || 
-                id.includes('node_modules/scheduler') ||
-                id.includes('node_modules/@radix-ui/react') ||
+                id.includes('node_modules/scheduler')) {
+              return 'vendor-react-core';
+            }
+            
+            // Regrouper toutes les dépendances React UI
+            if (id.includes('node_modules/@radix-ui/react') ||
                 id.includes('node_modules/prop-types') ||
                 id.includes('node_modules/object-assign') ||
                 id.includes('node_modules/js-tokens') ||
                 id.includes('node_modules/loose-envify')) {
-              return 'vendor-react';
+              return 'vendor-react-ui';
             }
             
             // Regrouper d'autres UI components
@@ -62,7 +66,11 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules')) {
               return 'vendor-other';
             }
-          }
+          },
+          // Assurer que les chunks sont compatibles avec ESM et le systême d'imports
+          format: 'es',
+          // S'assurer que tous les morceaux externes sont correctement traités
+          chunkFileNames: 'assets/[name]-[hash].js',
         }
       }
     }
