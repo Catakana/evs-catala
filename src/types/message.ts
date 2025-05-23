@@ -1,14 +1,26 @@
-export type MessageStatus = 'sent' | 'delivered' | 'read';
 export type ConversationType = 'private' | 'group';
+export type MessageStatus = 'sent' | 'delivered' | 'read';
+
+export interface Profile {
+  firstname: string;
+  lastname: string;
+  avatarUrl?: string;
+}
 
 export interface Attachment {
   id: string;
-  messageId: string;
   fileName: string;
-  fileUrl: string;
   fileType: string;
   fileSize: number;
-  uploadedAt: Date;
+  url: string;
+  createdAt: Date;
+}
+
+export interface MessagePreview {
+  id: string;
+  content: string;
+  senderId: string;
+  createdAt: Date;
 }
 
 export interface Message {
@@ -31,6 +43,7 @@ export interface ConversationParticipant {
   isAdmin?: boolean;
   joinedAt: Date;
   lastReadAt?: Date;
+  profile?: Profile;
 }
 
 export interface Conversation {
@@ -40,6 +53,7 @@ export interface Conversation {
   participants: ConversationParticipant[];
   lastMessageId?: string;
   lastMessageAt?: Date;
+  lastMessage?: MessagePreview; // Pour l'affichage dans la liste des conversations
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

@@ -35,7 +35,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 | Phase | Objectif | Durée estimée | Statut |
 |-------|----------|---------------|--------|
 | **Phase 1: MVP** | Version minimale utilisable avec les fonctions essentielles | 4 jours | 🏗️ En cours |
-| **Phase 2: Extension** | Ajout de modules complémentaires et enrichissement | 2 semaines | 🔄 À faire |
+| **Phase 2: Extension** | Ajout de modules complémentaires et enrichissement | 1 jour | 🔄 À faire |
 | **Phase 3: Optimisation** | Peaufinage, performance et expérience utilisateur | 1 mois | 🔄 À faire |
 | **Phase 4: Maintenance** | Corrections, améliorations continues | Continu | 🔄 À faire |
 
@@ -152,7 +152,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 1.4 Module Trombinoscope (base)
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🏗️ En cours
 
 #### Scope détaillé
@@ -171,7 +171,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 1.5 Module Annonces (base)
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🏗️ En cours
 
 #### Scope détaillé
@@ -208,7 +208,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 1.7 Structure globale et navigation
 **Priorité**: Haute  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: ✅ Terminé
 
 #### Scope détaillé
@@ -433,7 +433,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
    - Implémentation des opérations CRUD de base ✅
    - Interface de liste et formulaire de création/édition ✅
    
-2. **Phase 2 (2 semaines)**: Fonctionnalités détaillées ✅
+2. **Phase 2 (1 jour)**: Fonctionnalités détaillées ✅
    - Gestion des membres du projet ✅
    - Gestion des tâches ✅
    - Gestion du budget ✅
@@ -448,22 +448,41 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 ### 2.6 Module Messagerie
 **Priorité**: Moyenne  
 **Délai**: 1 jour  
-**Statut**: 🔄 À faire
+**Statut**: 🏗️ En cours
 
 #### Scope détaillé
-- Conversations privées ou par groupe 🔄
+- Conversations privées ou par groupe 🏗️
 - Notifications de nouveau message 🔄
-- Épingles / favoris 🔄
-- Option de signalement ou archivage 🔄
-- Partage de fichiers basique 🔄
-- Historique des conversations 🔄
+- Épingles / favoris 🏗️
+- Option de signalement ou archivage 🏗️
+- Partage de fichiers basique 🏗️
+- Historique des conversations 🏗️
 
 #### Tâches techniques
 - Création des tables `evs_conversations`, `evs_messages`, `evs_conversation_participants` ✅
-- Interface de messagerie 🔄
+- Interface de messagerie 🏗️
 - Système de notifications en temps réel 🔄
-- Upload de fichiers 🔄
-- Marquage et filtrage des messages 🔄
+- Upload de fichiers 🏗️
+- Marquage et filtrage des messages 🏗️
+
+#### Plan d'implémentation
+1. **Phase 1 (12h)**: Structure de base et interface 🏗️
+   - Création des migrations SQL pour les tables de messagerie ✅
+   - Développement du service messageService ✅
+   - Création de l'interface utilisateur avec les composants essentiels ✅
+   - Implémentation de la page MessagesPage ✅
+   
+2. **Phase 2 (8h)**: Fonctionnalités complètes 🔄
+   - Système d'envoi et réception de messages ✅
+   - Gestion des conversations privées et de groupe ✅
+   - Fonctionnalités d'épinglage et signalement 🏗️
+   - Upload et partage de fichiers 🏗️
+   
+3. **Phase 3 (4h)**: Intégration et polissage 🔄
+   - Intégration avec le système de notifications 🔄
+   - Tests fonctionnels complets 🔄
+   - Optimisations de performance 🔄
+   - Documentation utilisateur 🔄
 
 ## Phase 3: Optimisation
 
@@ -489,7 +508,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 3.2 Optimisation de la navigation
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -535,7 +554,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 3.3 Extension UI Kit et TextBank
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -617,7 +636,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 3.5 Accessibilité et inclusion
 **Priorité**: Haute  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -661,7 +680,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 4.1 Système de surveillance et monitoring
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé

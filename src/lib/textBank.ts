@@ -93,6 +93,241 @@ const authTexts: TextEntry[] = [
   { id: 'auth.passwordsDoNotMatch', text: 'Les mots de passe ne correspondent pas' },
   { id: 'auth.createAccount', text: 'Créez votre compte pour rejoindre la communauté' },
   { id: 'auth.alreadyHaveAccount', text: 'Vous avez déjà un compte ?' },
+  { id: 'auth.verifyEmailTitle', text: 'Vérification de votre email' },
+  { id: 'auth.verifyEmailDescription', text: 'Un email de confirmation a été envoyé à votre adresse' },
+  { id: 'auth.verifyEmailInstructions', text: 'Veuillez cliquer sur le lien dans cet email pour activer votre compte' },
+  { id: 'auth.checkInbox', text: 'Vérifiez votre boîte de réception' },
+  { id: 'auth.checkSpam', text: 'Pensez à vérifier vos spams si vous ne trouvez pas l\'email' },
+  { id: 'auth.accountVerified', text: 'Compte vérifié avec succès !' },
+  { id: 'auth.accountActivated', text: 'Votre compte a été activé. Vous pouvez maintenant vous connecter.' },
+  { id: 'auth.verificationFailed', text: 'Échec de la vérification' },
+  { id: 'auth.invalidLink', text: 'Lien de vérification invalide ou expiré' },
+  { id: 'auth.contactSupport', text: 'Besoin d\'aide ? Contactez-nous' },
+];
+
+// Textes de navigation
+const navTexts: TextEntry[] = [
+  { id: 'nav.home', text: 'Accueil' },
+  { id: 'nav.agenda', text: 'Agenda' },
+  { id: 'nav.announcements', text: 'Annonces' },
+  { id: 'nav.trombinoscope', text: 'Trombinoscope' },
+  { id: 'nav.permanences', text: 'Permanences' },
+  { id: 'nav.votes', text: 'Votes' },
+  { id: 'nav.messages', text: 'Messages' },
+  { id: 'nav.infos', text: 'Infos' },
+  { id: 'nav.organisation', text: 'Organisation' },
+];
+
+// Textes pour le profil
+const profileTexts: TextEntry[] = [
+  { id: 'profile.title', text: 'Profil' },
+  { id: 'profile.settings', text: 'Paramètres' },
+];
+
+// Textes pour l'application
+const appTexts: TextEntry[] = [
+  { id: 'app.footer', text: '© 2024 EVS CATALA. Tous droits réservés.' },
+];
+
+// Textes pour les votes et sondages
+const votesTexts: TextEntry[] = [
+  // Textes de la page principale
+  { id: 'votes.page_title', text: 'Votes et sondages' },
+  { id: 'votes.filter.label', text: 'Filtrer' },
+  { id: 'votes.filter.all', text: 'Tous' },
+  { id: 'votes.filter.active', text: 'En cours' },
+  { id: 'votes.filter.closed', text: 'Terminés' },
+  { id: 'votes.tabs.official', text: 'Votes officiels' },
+  { id: 'votes.tabs.surveys', text: 'Sondages' },
+  { id: 'votes.actions.create', text: 'Nouveau vote' },
+  { id: 'votes.actions.delete', text: 'Supprimer' },
+  { id: 'votes.actions.edit', text: 'Modifier' },
+  { id: 'votes.no_votes_found', text: 'Aucun vote trouvé' },
+  { id: 'votes.create_new', text: 'Créer un nouveau vote' },
+  { id: 'votes.participants', text: 'participants' },
+  { id: 'votes.view_results', text: 'Voir les résultats' },
+
+  // Formulaire de vote
+  { id: 'votes.create_title', text: 'Créer un nouveau vote' },
+  { id: 'votes.create_description', text: 'Configurez les paramètres de votre vote' },
+  { id: 'votes.edit_title', text: 'Modifier le vote' },
+  { id: 'votes.edit_description', text: 'Modifiez les paramètres du vote' },
+  { id: 'votes.form.title', text: 'Titre' },
+  { id: 'votes.form.title_placeholder', text: 'Entrez le titre du vote' },
+  { id: 'votes.form.description', text: 'Description' },
+  { id: 'votes.form.description_placeholder', text: 'Décrivez le contexte et l\'objectif du vote' },
+  { id: 'votes.form.type', text: 'Type de vote' },
+  { id: 'votes.form.options', text: 'Options de réponse' },
+  { id: 'votes.form.add_option', text: 'Ajouter une option' },
+  { id: 'votes.form.option', text: 'Option' },
+  { id: 'votes.form.period', text: 'Période de vote' },
+  { id: 'votes.form.start_date', text: 'Date de début' },
+  { id: 'votes.form.end_date', text: 'Date de fin' },
+  { id: 'votes.form.settings', text: 'Paramètres avancés' },
+  { id: 'votes.form.status', text: 'Statut' },
+  { id: 'votes.form.select_status', text: 'Choisir un statut' },
+  { id: 'votes.form.visibility', text: 'Visibilité' },
+  { id: 'votes.form.select_visibility', text: 'Choisir la visibilité' },
+  { id: 'votes.form.result_visibility', text: 'Affichage des résultats' },
+  { id: 'votes.form.select_result_visibility', text: 'Quand afficher les résultats' },
+  { id: 'votes.form.create', text: 'Créer le vote' },
+  { id: 'votes.form.update', text: 'Mettre à jour le vote' },
+
+  // Types de vote
+  { id: 'votes.type.binary', text: 'Vote Oui/Non' },
+  { id: 'votes.type.binary_description', text: 'Un simple vote avec deux options : Oui ou Non.' },
+  { id: 'votes.type.multiple', text: 'Choix multiples' },
+  { id: 'votes.type.multiple_description', text: 'Permet de voter pour une option parmi plusieurs choix proposés.' },
+  { id: 'votes.type.survey', text: 'Sondage' },
+  { id: 'votes.type.survey_description', text: 'Permet de recueillir des opinions multiples sans caractère décisionnel.' },
+
+  // Options par défaut
+  { id: 'votes.option.yes', text: 'Oui' },
+  { id: 'votes.option.no', text: 'Non' },
+
+  // Statuts
+  { id: 'votes.status.draft', text: 'Brouillon' },
+  { id: 'votes.status.draft_description', text: 'Le vote est en préparation et n\'est pas encore visible.' },
+  { id: 'votes.status.active', text: 'En cours' },
+  { id: 'votes.status.closed', text: 'Terminé' },
+
+  // Visibilité
+  { id: 'votes.visibility.public', text: 'Public' },
+  { id: 'votes.visibility.private', text: 'Restreint' },
+  { id: 'votes.visibility.anonymous', text: 'Anonyme' },
+
+  // Visibilité des résultats
+  { id: 'votes.result_visibility.immediate', text: 'Immédiatement' },
+  { id: 'votes.result_visibility.after_vote', text: 'Après avoir voté' },
+  { id: 'votes.result_visibility.after_close', text: 'Après la clôture' },
+
+  // Périodes
+  { id: 'votes.period.ends', text: 'Se termine {{date}}' },
+  { id: 'votes.period.starts', text: 'Commence {{date}}' },
+  { id: 'votes.period.ended', text: 'Terminé {{date}}' },
+
+  // Résultats de vote
+  { id: 'votes.results.title', text: 'Résultats' },
+  { id: 'votes.results.no_votes_yet', text: 'Aucun vote n\'a encore été enregistré' },
+  { id: 'votes.results.hidden_title', text: 'Résultats masqués' },
+  { id: 'votes.results.visible_after_vote', text: 'Les résultats seront visibles après avoir voté' },
+  { id: 'votes.results.visible_after_close', text: 'Les résultats seront visibles après la clôture du vote' },
+  { id: 'votes.results.not_available', text: 'Les résultats ne sont pas disponibles pour le moment' },
+  { id: 'votes.results.vote_count', text: 'votes' },
+  { id: 'votes.results.winning_option', text: 'Option gagnante' },
+
+  // Messages d'erreur
+  { id: 'votes.errors.title_required', text: 'Le titre est requis' },
+  { id: 'votes.errors.description_required', text: 'La description est requise' },
+  { id: 'votes.errors.options_required', text: 'Toutes les options doivent être remplies' },
+  { id: 'votes.errors.start_date_required', text: 'La date de début est requise' },
+  { id: 'votes.errors.end_date_required', text: 'La date de fin est requise' },
+  { id: 'votes.errors.end_date_after_start', text: 'La date de fin doit être postérieure à la date de début' },
+  { id: 'votes.errors.submit_error', text: 'Erreur lors de la soumission du vote' },
+  { id: 'votes.errors.fetch_error', text: 'Erreur lors de la récupération des votes' },
+
+  // Dialogues de suppression
+  { id: 'votes.delete.title', text: 'Supprimer le vote' },
+  { id: 'votes.delete.description', text: 'Êtes-vous sûr de vouloir supprimer ce vote ? Cette action est irréversible.' },
+  { id: 'votes.delete.confirm', text: 'Oui, supprimer' },
+
+  // Notifications toast
+  { id: 'votes.toast.created_title', text: 'Vote créé' },
+  { id: 'votes.toast.created_description', text: 'Le vote a été créé avec succès.' },
+  { id: 'votes.toast.updated_title', text: 'Vote mis à jour' },
+  { id: 'votes.toast.updated_description', text: 'Le vote a été mis à jour avec succès.' },
+  { id: 'votes.toast.deleted_title', text: 'Vote supprimé' },
+  { id: 'votes.toast.deleted_description', text: 'Le vote a été supprimé avec succès.' },
+  { id: 'votes.toast.error_title', text: 'Erreur' },
+  { id: 'votes.toast.delete_error_description', text: 'Impossible de supprimer le vote.' },
+  { id: 'votes.toast.vote_success', text: 'Vote enregistré' },
+  { id: 'votes.toast.vote_error', text: 'Erreur lors de l\'enregistrement du vote' },
+
+  // Page de détail du vote
+  { id: 'votes.errors.not_found', text: 'Ce vote n\'a pas été trouvé' },
+  { id: 'votes.actions.back_to_votes', text: 'Retour à la liste des votes' },
+  { id: 'votes.actions.activate', text: 'Activer le vote' },
+  { id: 'votes.actions.close', text: 'Clôturer le vote' },
+  { id: 'votes.actions.submit_vote', text: 'Envoyer mon vote' },
+  
+  // Formulaire de vote sur la page de détail
+  { id: 'votes.vote_form.title', text: 'Votez maintenant' },
+  { id: 'votes.vote_form.description', text: 'Sélectionnez une option ci-dessous pour voter' },
+  
+  // États de vote (utilisateur déjà voté, vote non actif, etc.)
+  { id: 'votes.already_voted.title', text: 'Vous avez déjà voté' },
+  { id: 'votes.already_voted.description', text: 'Merci pour votre participation ! Vous pouvez consulter les résultats.' },
+  { id: 'votes.not_active.title', text: 'Vote en préparation' },
+  { id: 'votes.not_active.description', text: 'Ce vote n\'est pas encore actif. Veuillez patienter.' },
+  { id: 'votes.closed.title', text: 'Vote terminé' },
+  { id: 'votes.closed.description', text: 'Ce vote est maintenant clôturé. Vous pouvez consulter les résultats.' },
+  { id: 'votes.cannot_vote.title', text: 'Vote indisponible' },
+  { id: 'votes.cannot_vote.description', text: 'Vous ne pouvez pas participer à ce vote pour le moment.' },
+  
+  // Dialogues d'activation/clôture
+  { id: 'votes.activate.title', text: 'Activer le vote' },
+  { id: 'votes.activate.description', text: 'Une fois activé, le vote sera visible et accessible aux membres concernés.' },
+  { id: 'votes.activate.confirm', text: 'Activer' },
+  { id: 'votes.close.title', text: 'Clôturer le vote' },
+  { id: 'votes.close.description', text: 'Une fois clôturé, aucun nouveau vote ne sera accepté et les résultats seront visibles à tous.' },
+  { id: 'votes.close.confirm', text: 'Clôturer' },
+  
+  // Notifications toast pour les statuts
+  { id: 'votes.toast.activated_title', text: 'Vote activé' },
+  { id: 'votes.toast.activated_description', text: 'Le vote est maintenant actif et visible.' },
+  { id: 'votes.toast.closed_title', text: 'Vote clôturé' },
+  { id: 'votes.toast.closed_description', text: 'Le vote est maintenant clôturé.' },
+  { id: 'votes.toast.status_error', text: 'Erreur lors de la mise à jour du statut' },
+  { id: 'votes.toast.vote_success_description', text: 'Votre vote a été enregistré avec succès.' },
+];
+
+// Textes pour le module de Messagerie
+export const messagesTexts: TextEntry[] = [
+  { id: 'messages.title', text: 'Messagerie' },
+  { id: 'messages.new_message', text: 'Nouveau message' },
+  { id: 'messages.new_group', text: 'Nouveau groupe' },
+  { id: 'messages.search', text: 'Rechercher...' },
+  { id: 'messages.no_conversation', text: 'Aucune conversation' },
+  { id: 'messages.start_new', text: 'Commencez une nouvelle discussion en cliquant sur "Nouveau message"' },
+  { id: 'messages.select_conversation', text: 'Sélectionnez une conversation pour afficher les messages' },
+  { id: 'messages.loading', text: 'Chargement...' },
+  { id: 'messages.loading_conversations', text: 'Chargement des conversations...' },
+  { id: 'messages.loading_messages', text: 'Chargement des messages...' },
+  { id: 'messages.no_messages', text: 'Aucun message dans cette conversation' },
+  { id: 'messages.you', text: 'Vous' },
+  { id: 'messages.pin', text: 'Épingler' },
+  { id: 'messages.unpin', text: 'Désépingler' },
+  { id: 'messages.delete', text: 'Supprimer' },
+  { id: 'messages.report', text: 'Signaler' },
+  { id: 'messages.delete_confirm', text: 'Êtes-vous sûr de vouloir supprimer ce message ?' },
+  { id: 'messages.report_confirm', text: 'Signaler ce message ?' },
+  { id: 'messages.write', text: 'Écrivez votre message...' },
+  { id: 'messages.send', text: 'Envoyer' },
+  { id: 'messages.attach', text: 'Joindre des fichiers' },
+  { id: 'messages.private_chat', text: 'Conversation privée' },
+  { id: 'messages.group_chat', text: 'Groupe sans nom' },
+  { id: 'messages.no_more_attachments', text: 'Vous ne pouvez pas ajouter plus de {{count}} pièces jointes.' },
+  { id: 'messages.file_too_large', text: 'Certains fichiers dépassent la taille limite de 10 Mo: {{files}}' },
+  
+  // Modal de nouvelle conversation
+  { id: 'messages.new_conversation', text: 'Nouvelle conversation' },
+  { id: 'messages.new_conversation_description', text: 'Créez une nouvelle conversation privée ou de groupe.' },
+  { id: 'messages.private', text: 'Privée' },
+  { id: 'messages.group', text: 'Groupe' },
+  { id: 'messages.group_name', text: 'Nom du groupe' },
+  { id: 'messages.group_name_placeholder', text: 'Entrez un nom pour le groupe' },
+  { id: 'messages.participants', text: 'Participants ({{count}})' },
+  { id: 'messages.search_members', text: 'Rechercher des membres...' },
+  { id: 'messages.no_results', text: 'Aucun résultat' },
+  { id: 'messages.cancel', text: 'Annuler' },
+  { id: 'messages.create', text: 'Créer la conversation' },
+  { id: 'messages.creating', text: 'Création...' },
+  { id: 'messages.select_participant', text: 'Veuillez sélectionner au moins un participant.' },
+  { id: 'messages.enter_group_title', text: 'Veuillez donner un titre à votre conversation de groupe.' },
+  
+  // Formats de date
+  { id: 'messages.today', text: "Aujourd'hui" },
+  { id: 'messages.yesterday', text: 'Hier' },
 ];
 
 // Centralization de tous les textes par catégorie
@@ -103,9 +338,9 @@ export const TEXTS: Record<TextCategory, TextEntry[]> = {
   trombinoscope: [], // À compléter
   annonces: [], // À compléter
   permanences: [], // À compléter
-  votes: [], // À compléter
+  votes: votesTexts,
   projects: [], // À compléter
-  messages: [], // À compléter
+  messages: messagesTexts,
   infos: [], // À compléter
 };
 
@@ -140,6 +375,11 @@ const fallbackTexts: Record<string, string> = {
   'auth.noAccountYet': 'Vous n\'avez pas encore de compte ?',
   'auth.createAccount': 'Créez votre compte',
   'auth.alreadyHaveAccount': 'Vous avez déjà un compte ?',
+  'auth.verifyEmailTitle': 'Vérification de votre email',
+  'auth.verifyEmailDescription': 'Un email de confirmation a été envoyé',
+  'auth.checkInbox': 'Vérifiez votre boîte de réception',
+  'auth.accountVerified': 'Compte vérifié avec succès !',
+  'auth.invalidLink': 'Lien de vérification invalide',
   
   // Messages génériques
   'common.processing': 'Traitement en cours...',
@@ -153,16 +393,50 @@ const fallbackTexts: Record<string, string> = {
   'common.edit': 'Modifier',
   'common.view': 'Voir',
   'common.back': 'Retour',
-  'common.confirmation': 'Êtes-vous sûr ?'
+  'common.confirmation': 'Êtes-vous sûr ?',
+  
+  // Navigation
+  'nav.home': 'Accueil',
+  'nav.agenda': 'Agenda',
+  'nav.announcements': 'Annonces',
+  'nav.trombinoscope': 'Trombinoscope',
+  'nav.permanences': 'Permanences',
+  'nav.votes': 'Votes',
+  'nav.messages': 'Messages',
+  'nav.infos': 'Infos',
+  'nav.organisation': 'Organisation',
+  
+  // Profil
+  'profile.title': 'Profil',
+  'profile.settings': 'Paramètres',
+  
+  // App
+  'app.footer': '© 2024 EVS CATALA. Tous droits réservés.'
 };
 
 // Remplir le cache des textes
 function buildTextCache() {
   textCache = {};
+  // Ajouter les textes du système principal
   Object.values(TEXTS).forEach(categoryTexts => {
     categoryTexts.forEach(entry => {
       textCache[entry.id] = entry.text;
     });
+  });
+  
+  // Ajouter les textes de navigation
+  navTexts.forEach(entry => {
+    textCache[entry.id] = entry.text;
+  });
+  
+  // Ajouter les textes de profil
+  profileTexts.forEach(entry => {
+    textCache[entry.id] = entry.text;
+  });
+  
+  // Ajouter les textes d'application
+  appTexts.forEach(entry => {
+    textCache[entry.id] = entry.text;
   });
 }
 
