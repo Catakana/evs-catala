@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import AgendaCalendar from '@/components/agenda/AgendaCalendar';
 import AgendaHeader from '@/components/agenda/AgendaHeader';
 import { EventModal } from '@/components/agenda/EventModal';
@@ -95,45 +93,39 @@ const AgendaPage: React.FC = () => {
   const canAddEvents = userRole === 'staff' || userRole === 'admin';
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="container py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Agenda</h1>
+        {canAddEvents && (
+          <Button onClick={handleAddEvent}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Ajouter un événement
+          </Button>
+        )}
+      </div>
       
-      <main className="container flex-1 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Agenda</h1>
-          {canAddEvents && (
-            <Button onClick={handleAddEvent}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Ajouter un événement
-            </Button>
-          )}
-        </div>
-        
-        <AgendaHeader 
-          view={view}
-          setView={setView}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
-        
-        <div className="mt-6">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <AgendaCalendar 
-              view={view} 
-              selectedDate={selectedDate} 
-              isMobile={isMobile}
-              events={displayEvents}
-              onEventClick={handleEventClick}
-            />
-          )}
-        </div>
-      </main>
+      <AgendaHeader 
+        view={view}
+        setView={setView}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
       
-      <Footer />
+      <div className="mt-6">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <AgendaCalendar 
+            view={view} 
+            selectedDate={selectedDate} 
+            isMobile={isMobile}
+            events={displayEvents}
+            onEventClick={handleEventClick}
+          />
+        )}
+      </div>
       
       {/* Modal d'ajout/modification d'événement */}
       <EventModal

@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus, Filter } from 'lucide-react';
@@ -98,75 +96,69 @@ const VotesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="container flex-1 py-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">{t('votes.page_title')}</h1>
-          
-          <div className="flex items-center gap-2 mt-4 sm:mt-0">
-            <Select 
-              value={filter} 
-              onValueChange={(value) => setFilter(value as VoteStatus | 'all')}
-            >
-              <SelectTrigger className="w-[150px]">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder={t('votes.filter.label')} />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('votes.filter.all')}</SelectItem>
-                <SelectItem value="active">{t('votes.filter.active')}</SelectItem>
-                <SelectItem value="closed">{t('votes.filter.closed')}</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button 
-              className="gap-1"
-              onClick={() => handleOpenCreateDialog(activeTab === 'votes' ? 'binary' : 'survey')}
-            >
-              <Plus className="h-4 w-4" />
-              {t('votes.actions.create')}
-            </Button>
-          </div>
-        </div>
+    <div className="container py-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">{t('votes.page_title')}</h1>
         
-        <Tabs 
-          defaultValue="votes" 
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'votes' | 'surveys')}
-          className="w-full"
-        >
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="votes">{t('votes.tabs.official')}</TabsTrigger>
-            <TabsTrigger value="surveys">{t('votes.tabs.surveys')}</TabsTrigger>
-          </TabsList>
+        <div className="flex items-center gap-2 mt-4 sm:mt-0">
+          <Select 
+            value={filter} 
+            onValueChange={(value) => setFilter(value as VoteStatus | 'all')}
+          >
+            <SelectTrigger className="w-[150px]">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <SelectValue placeholder={t('votes.filter.label')} />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('votes.filter.all')}</SelectItem>
+              <SelectItem value="active">{t('votes.filter.active')}</SelectItem>
+              <SelectItem value="closed">{t('votes.filter.closed')}</SelectItem>
+            </SelectContent>
+          </Select>
           
-          <TabsContent value="votes" className="mt-6">
-            <VoteList 
-              filter={filter}
-              type="binary"
-              onCreateVote={() => handleOpenCreateDialog('binary')}
-              onEditVote={handleEditVote}
-              onDeleteVote={handleDeleteVote}
-            />
-          </TabsContent>
-          
-          <TabsContent value="surveys" className="mt-6">
-            <VoteList 
-              filter={filter}
-              type="survey"
-              onCreateVote={() => handleOpenCreateDialog('survey')}
-              onEditVote={handleEditVote}
-              onDeleteVote={handleDeleteVote}
-            />
-          </TabsContent>
-        </Tabs>
-      </main>
+          <Button 
+            className="gap-1"
+            onClick={() => handleOpenCreateDialog(activeTab === 'votes' ? 'binary' : 'survey')}
+          >
+            <Plus className="h-4 w-4" />
+            {t('votes.actions.create')}
+          </Button>
+        </div>
+      </div>
       
-      <Footer />
+      <Tabs 
+        defaultValue="votes" 
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as 'votes' | 'surveys')}
+        className="w-full"
+      >
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="votes">{t('votes.tabs.official')}</TabsTrigger>
+          <TabsTrigger value="surveys">{t('votes.tabs.surveys')}</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="votes" className="mt-6">
+          <VoteList 
+            filter={filter}
+            type="binary"
+            onCreateVote={() => handleOpenCreateDialog('binary')}
+            onEditVote={handleEditVote}
+            onDeleteVote={handleDeleteVote}
+          />
+        </TabsContent>
+        
+        <TabsContent value="surveys" className="mt-6">
+          <VoteList 
+            filter={filter}
+            type="survey"
+            onCreateVote={() => handleOpenCreateDialog('survey')}
+            onEditVote={handleEditVote}
+            onDeleteVote={handleDeleteVote}
+          />
+        </TabsContent>
+      </Tabs>
       
       {/* Dialogue de création de vote */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>

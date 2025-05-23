@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Users, Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -302,9 +300,7 @@ const MessagesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="container flex-1 py-6">
+      <div className="container flex-1 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Messagerie</h1>
           
@@ -420,9 +416,7 @@ const MessagesPage: React.FC = () => {
             )}
           </div>
         </div>
-      </main>
-      
-      <Footer />
+      </div>
       
       {/* Modal pour nouvelle conversation */}
       <NewConversationModal
