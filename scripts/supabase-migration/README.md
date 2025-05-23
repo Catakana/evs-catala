@@ -36,10 +36,6 @@ Ce dossier contient tous les scripts nécessaires pour migrer l'application EVS-
 
 ## Nouvelles informations de connexion
 
-```
-
-```
-
 ## Migration
 
 Le processus de migration se déroule en plusieurs étapes :
@@ -106,3 +102,66 @@ ADD COLUMN IF NOT EXISTS max_volunteers INTEGER DEFAULT 5,
 ADD COLUMN IF NOT EXISTS min_volunteers INTEGER DEFAULT 1,
 ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'open',
 ADD COLUMN IF NOT EXISTS notes TEXT; 
+
+## Scripts de migration
+
+Ce dossier contient les scripts de migration pour la base de données Supabase.
+
+### Optimisation des politiques RLS (Row Level Security)
+
+Le script `optimize_rls_policies.sql` corrige un problème de performance signalé par Supabase dans les politiques de sécurité au niveau des lignes (RLS). 
+
+#### Problème identifié
+
+Lorsque les politiques RLS utilisent directement des appels à `auth.<function>()` ou `current_setting()`, ces fonctions sont réévaluées pour chaque ligne lors de l'exécution des requêtes. Cette approche crée un problème de performance qui s'aggrave à mesure que le nombre de lignes dans la table augmente.
+
+Par exemple, une politique comme celle-ci:
+
+```sql
+CREATE POLICY "Mise à jour par créateur" 
+ON public.evscatala_events
+FOR UPDATE
+USING (created_by = auth.uid() OR auth.role() IN ('staff', 'admin'));
+```
+
+Évalue `auth.uid()` et `auth.role()` pour chaque ligne de la table lors de chaque requête.
+
+#### Solution appliquée
+
+Le script remplace tous ces appels par la syntaxe recommandée utilisant des sous-requêtes :
+
+```sql
+CREATE POLICY "Mise à jour par créateur" 
+ON public.evscatala_events
+FOR UPDATE
+USING (
+  created_by = (SELECT auth.uid()) OR 
+  (SELECT auth.role()) IN ('staff', 'admin')
+);
+```
+
+Cette modification garantit que les fonctions ne sont évaluées qu'une seule fois par requête, plutôt que pour chaque ligne, ce qui améliore considérablement les performances, surtout lorsque les tables contiennent de nombreuses lignes.
+
+#### Tables concernées
+
+Le script met à jour les politiques RLS pour les tables suivantes :
+- evscatala_events
+- evscatala_profiles
+- evscatala_announcements
+- evscatala_announcement_reads
+- evscatala_votes
+- evscatala_permanences
+- evscatala_permanence_participants
+- evscatala_conversations
+- evscatala_conversation_participants
+- evscatala_messages
+
+#### Exécution du script
+
+Pour exécuter ce script, utilisez l'interface SQL de Supabase ou exécutez-le via l'API Supabase :
+
+```bash
+npm run supabase:migration -- optimize_rls_policies.sql
+```
+
+### Autres scripts de migration
