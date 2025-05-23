@@ -58,11 +58,12 @@ export const permanenceService = {
    * @param permanence Données de la permanence
    * @returns La permanence créée
    */
-  async createPermanence(permanence: Omit<Permanence, 'id'>): Promise<Permanence | null> {
+  async createPermanence(permanenceData: Omit<Permanence, 'id' | 'created_at' | 'updated_at'>): Promise<Permanence | null> {
     try {
+      // Les champs created_at et updated_at seront automatiquement remplis par Supabase
       const { data, error } = await supabase
         .from('evscatala_permanences')
-        .insert([permanence])
+        .insert([permanenceData])
         .select()
         .single();
 

@@ -9,12 +9,24 @@ export enum PermanenceStatus {
 }
 
 /**
+ * Types possibles pour le statut d'un participant
+ */
+export enum ParticipantStatus {
+  REGISTERED = 'registered',
+  PRESENT = 'present',
+  ABSENT = 'absent'
+}
+
+/**
  * Type de participant pour une permanence
  */
 export interface PermanenceParticipant {
   id?: string;
   permanence_id: string;
   user_id: string;
+  status?: ParticipantStatus | string;
+  checked_by?: string;
+  check_time?: string;
   user?: {
     id: string;
     firstname: string;
@@ -36,7 +48,10 @@ export interface Permanence {
   end_time: string;
   location: string;
   required_volunteers: number;
+  max_volunteers?: number;
+  min_volunteers?: number;
   status: PermanenceStatus;
+  notes?: string;
   created_by: string;
   created_at: string;
   updated_at?: string;
