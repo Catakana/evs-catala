@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
 
 // Schéma de validation
 const resetPasswordSchema = z.object({
@@ -25,6 +25,7 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { updatePassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -52,10 +53,10 @@ const ResetPasswordPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error: resetError } = await authService.updatePassword(data.password);
+      const { error: resetError } = await updatePassword(data.password);
       
       if (resetError) {
-        throw new Error(resetError.message);
+        throw resetError;
       }
       
       setIsSuccess(true);

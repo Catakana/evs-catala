@@ -9,9 +9,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
-import { Mail, Check, Info } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
+import { Mail, Info } from 'lucide-react';
 
 // Schéma de validation
 const registerSchema = z.object({
@@ -29,6 +29,7 @@ type RegisterSchema = z.infer<typeof registerSchema>;
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -50,7 +51,7 @@ const RegisterPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error: signUpError } = await authService.signUp(
+      const { error: signUpError } = await signUp(
         data.email, 
         data.password, 
         { 
@@ -60,7 +61,7 @@ const RegisterPage: React.FC = () => {
       );
       
       if (signUpError) {
-        throw new Error(signUpError.message);
+        throw signUpError;
       }
       
       setIsSuccess(true);

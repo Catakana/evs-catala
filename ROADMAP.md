@@ -66,10 +66,15 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Environnement de test isolé ✅
 - Scripts de provisionnement des comptes de test ✅
 - Tests automatisés des flux d'authentification ✅
+- Refactorisation vers une architecture Context pour l'authentification ✅
+- Amélioration de la gestion des erreurs d'authentification ✅
+- Synchronisation automatique des profils utilisateurs ✅
+- Gestion plus robuste des redirections après connexion ✅
 
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
 - **Semaine 2**: Gestion de profil et récupération de mot de passe ✅
+- **Semaine 3**: Architecture Context et gestion centralisée de l'authentification ✅
 
 ### 1.2 UI Kit et TextBank
 **Priorité**: Haute ⚠️  

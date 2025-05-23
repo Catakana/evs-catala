@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
 
 // Schéma de validation
 const loginSchema = z.object({
@@ -22,8 +22,13 @@ type LoginSchema = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Récupérer l'URL de redirection si elle existe
+  const from = location.state?.from?.pathname || '/';
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -38,14 +43,14 @@ const LoginPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error: signInError } = await authService.signIn(data.email, data.password);
+      const { error: signInError } = await signIn(data.email, data.password);
       
       if (signInError) {
-        throw new Error(signInError.message);
+        throw signInError;
       }
       
-      // Redirection vers la page d'accueil
-      navigate('/');
+      // Redirection vers la page d'origine ou la page d'accueil
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : t('common.errors.generic'));
     } finally {

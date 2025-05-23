@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, User, LogOut } from 'lucide-react';
@@ -10,43 +10,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
-import { UserProfile } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
 import MessageNotification from '@/components/messages/MessageNotification';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadUser() {
-      setIsLoading(true);
-      try {
-        const user = await authService.getCurrentUser();
-        setCurrentUser(user);
-        
-        if (user) {
-          const profile = await authService.getUserProfile(user.id);
-          setUserProfile(profile);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement de l\'utilisateur:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    loadUser();
-  }, []);
+  const { user, userProfile, signOut, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await authService.signOut();
-      setCurrentUser(null);
-      setUserProfile(null);
+      await signOut();
       navigate('/');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
@@ -75,12 +49,12 @@ const Header: React.FC = () => {
             <span className="sr-only">Menu</span>
           </Button>
           
-          {!isLoading && currentUser && (
-            <MessageNotification userId={currentUser.id} />
+          {!loading && user && (
+            <MessageNotification userId={user.id} />
           )}
           
-          {!isLoading && (
-            currentUser ? (
+          {!loading && (
+            user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
@@ -90,7 +64,7 @@ const Header: React.FC = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>
-                    {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : currentUser.email}
+                    {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : user.email}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/profile')}>

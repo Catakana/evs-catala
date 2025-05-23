@@ -1,31 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { authService } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 
 /**
  * Composant pour protéger les routes qui nécessitent une authentification
  */
 const ProtectedRoute: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { user, loading } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await authService.getCurrentUser();
-        setIsAuthenticated(!!user);
-      } catch (error) {
-        console.error('Erreur lors de la vérification de l\'authentification:', error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
   // Pendant la vérification de l'authentification, afficher un état de chargement
-  if (isAuthenticated === null) {
+  if (loading) {
     return (
       <AppLayout>
         <div className="flex justify-center items-center h-screen">
@@ -36,7 +22,7 @@ const ProtectedRoute: React.FC = () => {
   }
 
   // Si l'utilisateur n'est pas authentifié, rediriger vers la page de connexion
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

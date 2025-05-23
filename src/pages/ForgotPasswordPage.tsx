@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
 
 // Schéma de validation
 const forgotPasswordSchema = z.object({
@@ -19,6 +19,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPasswordPage: React.FC = () => {
+  const { resetPassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,10 +36,10 @@ const ForgotPasswordPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error: resetError } = await authService.resetPasswordRequest(data.email);
+      const { error: resetError } = await resetPassword(data.email);
       
       if (resetError) {
-        throw new Error(resetError.message);
+        throw resetError;
       }
       
       setIsSuccess(true);

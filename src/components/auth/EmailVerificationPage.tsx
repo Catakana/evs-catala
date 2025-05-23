@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Check, AlertCircle, Loader2 } from 'lucide-react';
-import { supabase, authService } from '@/lib/supabase';
-import { t } from '@/lib/textBank';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import { getText as t } from '@/lib/textBank';
 
 /**
  * Page de vérification d'email après inscription
@@ -15,9 +16,11 @@ import { t } from '@/lib/textBank';
 const EmailVerificationPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { refreshSession } = useAuth();
   const [isProcessing, setIsProcessing] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Récupérer les paramètres du lien de vérification
   const token = searchParams.get('token');
@@ -35,28 +38,42 @@ const EmailVerificationPage: React.FC = () => {
           throw new Error('Lien de vérification invalide ou incomplet');
         }
 
-        // Vérifier que le type est bien 'email_verification'
-        if (type !== 'signup') {
-          throw new Error('Ce lien n\'est pas un lien de vérification d\'email');
+        // Vérifier que le type est bien pour une inscription
+        if (type !== 'signup' && type !== 'email_change') {
+          throw new Error('Ce lien n\'est pas un lien de vérification d\'email valide');
         }
 
-        // Mettre à jour le statut du compte utilisateur
-        const user = await getUserByEmail(email);
-        if (!user) {
-          throw new Error('Utilisateur non trouvé');
-        }
+        // Actualiser la session pour que Supabase traite la vérification d'email
+        await refreshSession();
+        
+        // Stocker l'email pour l'affichage
+        setUserEmail(email);
 
         // Mettre à jour le statut dans la table des profils
-        const { error: updateError } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('evscatala_profiles')
-          .update({ 
-            status: 'active',
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id);
+          .select('*')
+          .eq('email', email)
+          .single();
 
-        if (updateError) {
-          throw new Error(`Erreur lors de la mise à jour du profil: ${updateError.message}`);
+        if (profileError) {
+          console.error('Erreur lors de la récupération du profil:', profileError);
+          // Ne pas échouer si le profil n'est pas trouvé, car il sera créé automatiquement
+        } 
+        else {
+          // Mettre à jour le statut dans la table des profils
+          const { error: updateError } = await supabase
+            .from('evscatala_profiles')
+            .update({ 
+              status: 'active',
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', profile.user_id);
+
+          if (updateError) {
+            console.error('Erreur lors de la mise à jour du profil:', updateError);
+            // Continuer malgré l'erreur de mise à jour du profil
+          }
         }
 
         setIsSuccess(true);
@@ -69,24 +86,8 @@ const EmailVerificationPage: React.FC = () => {
       }
     };
 
-    // Récupérer un utilisateur par son email
-    const getUserByEmail = async (email: string) => {
-      const { data, error } = await supabase
-        .from('evscatala_profiles')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      if (error) {
-        console.error('Erreur lors de la récupération du profil:', error);
-        return null;
-      }
-
-      return data;
-    };
-
     verifyEmail();
-  }, [token, type, email]);
+  }, [token, type, email, refreshSession]);
 
   // Rediriger vers la page de connexion
   const handleGoToLogin = () => {
@@ -124,6 +125,11 @@ const EmailVerificationPage: React.FC = () => {
             <div className="rounded-lg bg-green-50 p-6 flex flex-col items-center">
               <Check className="h-12 w-12 text-green-500 mb-4" />
               <h3 className="text-lg font-medium text-green-800 mb-2">Compte vérifié avec succès !</h3>
+              {userEmail && (
+                <p className="text-center text-green-700 mb-2">
+                  <span className="font-medium">{userEmail}</span>
+                </p>
+              )}
               <p className="text-center text-green-700 mb-4">
                 Votre compte a été activé. Vous pouvez maintenant vous connecter.
               </p>
