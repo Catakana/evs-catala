@@ -271,7 +271,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 2.1 Module Permanences (complet)
 **Priorité**: Haute  
-**Délai**: 3 semaines  
+**Délai**: 1 jour  
 **Statut**: ✅ Terminé
 
 #### Scope détaillé
@@ -319,7 +319,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 2.2 Système de Notifications
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -339,30 +339,49 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 2.3 Module Votes et Sondages
 **Priorité**: Moyenne  
-**Délai**: 3 semaines  
-**Statut**: 🔄 À faire
+**Délai**: 1 jour  
+**Statut**: 🏗️ En cours
 
 #### Scope détaillé
-- Création de votes Oui/Non et choix multiples 🔄
-- Sondages ou décisions officielles 🔄
-- Votes anonymes ou nominatifs 🔄
-- Paramétrage durée et visibilité des résultats 🔄
-- Résultats visibles en temps réel ou à la clôture 🔄
-- Période de vote configurable 🔄
-- Historique des décisions votées 🔄
+- Création de votes Oui/Non et choix multiples ✅
+- Sondages ou décisions officielles 🏗️
+- Votes anonymes ou nominatifs ✅
+- Paramétrage durée et visibilité des résultats ✅
+- Résultats visibles en temps réel ou à la clôture ✅
+- Période de vote configurable ✅
+- Historique des décisions votées 🏗️
 - Export des résultats (admin) 🔄
 
 #### Tâches techniques
 - Création des tables `evs_votes`, `evs_vote_options`, `evs_vote_responses` ✅
-- Formulaires de création de votes 🔄
-- Composants de visualisation des résultats 🔄
-- Protection contre les votes multiples 🔄
-- Système d'anonymisation des votes 🔄
+- Formulaires de création de votes ✅
+- Composants de visualisation des résultats ✅
+- Protection contre les votes multiples ✅
+- Système d'anonymisation des votes ✅
 - Système d'export CSV 🔄
+- Composant DatePicker pour la sélection des périodes de vote ✅
+
+#### Plan d'implémentation
+1. **Phase 1 (1 jour)**: Structure de base et interface ✅
+   - Création du composant VoteForm pour la création/édition des votes ✅
+   - Création du composant VoteList pour l'affichage de la liste des votes ✅
+   - Implémentation de la page principale des votes (VotesPage) ✅
+   
+2. **Phase 2 (1 jour)**: Fonctionnalités de vote détaillées ✅
+   - Création du composant VoteResults pour l'affichage des résultats ✅
+   - Implémentation de la page de détail d'un vote (VoteDetailPage) ✅
+   - Système de soumission et comptage des votes ✅
+   - Gestion des droits d'accès selon la visibilité ✅
+   
+3. **Phase 3 (1 jour)**: Améliorations et optimisations 🔄
+   - Ajout de statistiques avancées 🔄
+   - Export des résultats (PDF, CSV) 🔄
+   - Intégration avec le système de notifications 🔄
+   - Tests et optimisations de performance 🔄
 
 ### 2.4 Module Agenda (avancé)
 **Priorité**: Moyenne  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -384,7 +403,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 2.5 Module Projets
 **Priorité**: Haute  
-**Délai**: 4 semaines  
+**Délai**: 1 jour  
 **Statut**: 🏗️ En cours
 
 #### Scope détaillé
@@ -428,7 +447,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 2.6 Module Messagerie
 **Priorité**: Moyenne  
-**Délai**: 3 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -450,7 +469,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ### 3.1 Exports et Impressions
 **Priorité**: Basse  
-**Délai**: 2 semaines  
+**Délai**: 1 jour  
 **Statut**: 🔄 À faire
 
 #### Scope détaillé
@@ -558,35 +577,38 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - [x] Configuration du chunking pour optimiser les bundles JavaScript
 - [x] Séparation des dépendances principales (React) dans des chunks dédiés
 - [x] Augmentation de la limite d'avertissement des chunks pour éviter les alertes inutiles
-- [ ] Mise en place de stratégies de lazy loading pour les modules secondaires
-- [ ] Optimisation des images et assets statiques
-- [ ] Implémentation de la compression Brotli/Gzip
-- [ ] Configuration du cache optimal pour les assets
+- [x] Résolution des problèmes de référence entre chunks (erreur forwardRef)
+- [x] Mise en place de stratégies de lazy loading pour les modules secondaires
+- [x] Optimisation des images et assets statiques
+- [x] Implémentation de la compression Brotli/Gzip
+- [x] Configuration du cache optimal pour les assets
 
 #### Tâches techniques
 - [x] Configuration de Rollup via vite.config.ts pour le chunking manuel
 - [x] Ajustement des paramètres de build pour un meilleur équilibre taille/performance
 - [x] Séparation du code applicatif des dépendances externes
-- [ ] Mise en place d'un système de préchargement intelligent
-- [ ] Configuration des en-têtes de cache pour le déploiement
-- [ ] Optimisation des Web Vitals (LCP, FID, CLS)
-- [ ] Analyse des performances avec Lighthouse
+- [x] Correction de la répartition des chunks pour éviter les erreurs de référence
+- [x] Mise en place d'un système de préchargement intelligent
+- [x] Configuration des en-têtes de cache pour le déploiement
+- [x] Optimisation des Web Vitals (LCP, FID, CLS)
+- [x] Analyse des performances avec Lighthouse
 
 #### Plan d'implémentation
 1. **Phase 1 (1 jour)**: Configuration initiale du chunking ✅
    - Séparation des bundles React et autres dépendances ✅
    - Ajustement des limites d'avertissement ✅
    - Tests de build pour vérifier les tailles de bundles ✅
+   - Correction des erreurs de référence entre chunks ✅
 
-2. **Phase 2 (3 jours)**: Optimisation du chargement
-   - Implémentation du lazy loading pour les routes secondaires
-   - Préchargement des chunks critiques
-   - Intégration du code splitting basé sur les routes
+2. **Phase 2 (3 jours)**: Optimisation du chargement ✅
+   - Implémentation du lazy loading pour les routes secondaires ✅
+   - Préchargement des chunks critiques ✅
+   - Intégration du code splitting basé sur les routes ✅
 
-3. **Phase 3 (3 jours)**: Optimisation des assets et déploiement
-   - Configuration de la compression des assets
-   - Stratégies de cache adaptées
-   - Tests de performance post-déploiement
+3. **Phase 3 (3 jours)**: Optimisation des assets et déploiement ✅
+   - Configuration de la compression des assets ✅
+   - Stratégies de cache adaptées ✅
+   - Tests de performance post-déploiement ✅
 
 #### Intégration avec les autres modules
 - L'optimisation du build affecte positivement tous les modules en améliorant les temps de chargement

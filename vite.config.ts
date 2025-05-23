@@ -39,12 +39,16 @@ export default defineConfig(({ mode }) => {
         output: {
           // Configuration améliorée du chunking pour éviter les problèmes de référence
           manualChunks: (id) => {
-            // Conserver React, ReactDOM et les dépendances directes ensemble
+            // Mettre React et toutes ses dépendances dans un seul chunk
             if (id.includes('node_modules/react') || 
                 id.includes('node_modules/react-dom') || 
                 id.includes('node_modules/scheduler') ||
-                id.includes('node_modules/@radix-ui')) {
-              return 'vendor-react-core';
+                id.includes('node_modules/@radix-ui/react') ||
+                id.includes('node_modules/prop-types') ||
+                id.includes('node_modules/object-assign') ||
+                id.includes('node_modules/js-tokens') ||
+                id.includes('node_modules/loose-envify')) {
+              return 'vendor-react';
             }
             
             // Regrouper d'autres UI components
@@ -56,7 +60,7 @@ export default defineConfig(({ mode }) => {
             
             // Regrouper toutes les autres dépendances
             if (id.includes('node_modules')) {
-              return 'vendor-deps';
+              return 'vendor-other';
             }
           }
         }
