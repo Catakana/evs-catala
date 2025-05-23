@@ -5,7 +5,8 @@ import { memberService } from '@/lib/memberService';
 // Les données de mock ne sont plus utilisées, mais on les garde en commentaire pour référence
 // const MOCK_MEMBERS: Member[] = [...]
 
-export const useMemberData = () => {
+// Utiliser une fonction nommée pour éviter l'incompatibilité avec Fast Refresh
+function useMemberDataHook() {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -56,4 +57,7 @@ export const useMemberData = () => {
     getMembersByRole,
     getMemberById
   };
-};
+}
+
+// Exporter une constante pour être compatible avec le Fast Refresh de Vite
+export const useMemberData = useMemberDataHook;

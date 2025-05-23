@@ -19,28 +19,35 @@ export const permanenceService = {
           *,
           participants:evscatala_permanence_participants(*)
         `)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date')
-        .order('start_time');
+        .gte('start_date', `${startDate}T00:00:00`)
+        .lte('start_date', `${endDate}T23:59:59`)
+        .order('start_date')
+        .order('end_date');
 
       if (error) throw error;
 
-      return (data || []).map(permanence => ({
-        id: permanence.id,
-        title: permanence.title,
-        date: permanence.date,
-        startDate: new Date(`${permanence.date}T${permanence.start_time}`),
-        endDate: new Date(`${permanence.date}T${permanence.end_time}`),
-        location: permanence.location,
-        status: permanence.status,
-        minMembers: permanence.min_members,
-        maxMembers: permanence.max_members,
-        description: permanence.description,
-        participants: permanence.participants || [],
-        createdBy: permanence.created_by,
-        createdAt: new Date(permanence.created_at),
-      }));
+      return (data || []).map(permanence => {
+        // Extraire la date et l'heure à partir de start_date et end_date
+        const startDate = new Date(permanence.start_date);
+        const endDate = new Date(permanence.end_date);
+        
+        return {
+          id: permanence.id,
+          title: permanence.title,
+          // Pour la compatibilité, extraire la date de start_date
+          date: format(startDate, 'yyyy-MM-dd'),
+          startDate: startDate,
+          endDate: endDate,
+          location: permanence.location,
+          status: permanence.status,
+          minMembers: permanence.min_members || permanence.min_volunteers,
+          maxMembers: permanence.max_members || permanence.max_volunteers,
+          description: permanence.description,
+          participants: permanence.participants || [],
+          createdBy: permanence.created_by,
+          createdAt: new Date(permanence.created_at),
+        };
+      });
     } catch (error) {
       console.error('Erreur lors de la récupération des permanences:', error);
       throw error;
