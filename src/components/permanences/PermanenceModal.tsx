@@ -14,6 +14,7 @@ interface PermanenceModalProps {
   onUnregister?: () => Promise<void>;
   isUserRegistered?: boolean;
   canRegister?: boolean;
+  currentUserId?: string;
 }
 
 export const PermanenceModal: React.FC<PermanenceModalProps> = ({
@@ -22,7 +23,8 @@ export const PermanenceModal: React.FC<PermanenceModalProps> = ({
   onRegister,
   onUnregister,
   isUserRegistered = false,
-  canRegister = true
+  canRegister = true,
+  currentUserId
 }) => {
   // Formatage des dates
   const startDate = parseISO(permanence.start_date);

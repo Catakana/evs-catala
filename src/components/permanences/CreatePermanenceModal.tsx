@@ -16,12 +16,14 @@ interface CreatePermanenceModalProps {
   onClose: () => void;
   onCreated: () => void;
   permanence?: Permanence; // Si fourni, on est en mode édition
+  initialData?: any; // Données initiales pour le formulaire en mode création rapide
 }
 
 export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
   onClose,
   onCreated,
-  permanence
+  permanence,
+  initialData
 }) => {
   const isEditMode = !!permanence;
   const { toast } = useToast();
@@ -58,6 +60,11 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
         min_volunteers: permanence.min_volunteers || 1,
         notes: permanence.notes || ''
       };
+    }
+    
+    // Utiliser les données initiales si fournies
+    if (initialData) {
+      return initialData;
     }
     
     // En mode création, utiliser des valeurs par défaut

@@ -4,6 +4,8 @@ import { fr } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
 import { Permanence } from '@/types/permanence';
 import PermanenceItem from './PermanenceItem';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 interface PermanencesWeekViewProps {
   selectedDate: Date;
@@ -13,6 +15,7 @@ interface PermanencesWeekViewProps {
   onRegister?: (permanenceId: string) => Promise<void>;
   onUnregister?: (permanenceId: string) => Promise<void>;
   currentUserId?: string;
+  onCreateClick?: (date: Date, timeSlot: { start: number, end: number }) => void;
 }
 
 const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
@@ -22,7 +25,8 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
   isMobile,
   onRegister,
   onUnregister,
-  currentUserId
+  currentUserId,
+  onCreateClick
 }) => {
   const startDate = startOfWeek(selectedDate, { weekStartsOn: 1 });
   const endDate = endOfWeek(selectedDate, { weekStartsOn: 1 });
@@ -39,6 +43,21 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
   const isUserRegistered = (permanence: Permanence): boolean => {
     if (!currentUserId) return false;
     return permanence.participants?.some(p => p.user_id === currentUserId) || false;
+  };
+
+  console.log("PermanencesWeekView rendered with", {
+    permanences: permanences.length,
+    currentUserId
+  });
+
+  // Fonction pour ouvrir le formulaire de création de permanence
+  const handleCreateClick = (day: Date, timeSlot: { start: number, end: number }) => {
+    if (onCreateClick) {
+      // Créer une date avec la bonne heure pour le début du créneau
+      const startDateTime = new Date(day);
+      startDateTime.setHours(timeSlot.start, 0, 0);
+      onCreateClick(startDateTime, timeSlot);
+    }
   };
 
   return (
@@ -73,18 +92,35 @@ const PermanencesWeekView: React.FC<PermanencesWeekViewProps> = ({
             });
             
             return (
-              <div key={dayIndex} className="p-1 border-r last:border-r-0 min-h-24">
-                {dayPermanences.map((permanence) => (
-                  <PermanenceItem 
-                    key={permanence.id}
-                    permanence={permanence}
-                    onClick={() => onPermanenceClick(permanence)}
-                    isUserRegistered={isUserRegistered(permanence)}
-                    onRegister={onRegister}
-                    onUnregister={onUnregister}
-                    currentUserId={currentUserId}
-                  />
-                ))}
+              <div key={dayIndex} className="p-1 border-r last:border-r-0 min-h-24 relative">
+                {dayPermanences.length > 0 ? (
+                  // Afficher les permanences existantes
+                  dayPermanences.map((permanence) => (
+                    <PermanenceItem 
+                      key={permanence.id}
+                      permanence={permanence}
+                      onClick={() => onPermanenceClick(permanence)}
+                      isUserRegistered={isUserRegistered(permanence)}
+                      onRegister={onRegister}
+                      onUnregister={onUnregister}
+                      currentUserId={currentUserId}
+                    />
+                  ))
+                ) : (
+                  // Cellule vide avec bouton pour créer une permanence
+                  onCreateClick && (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 opacity-50 hover:opacity-100 transition-opacity"
+                        onClick={() => handleCreateClick(day, slot)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )
+                )}
               </div>
             );
           })}

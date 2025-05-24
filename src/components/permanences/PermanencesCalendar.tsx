@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Permanence } from '@/types/permanence';
 import PermanencesWeekView from './PermanencesWeekView';
 import PermanencesMonthView from './PermanencesMonthView';
-import { Permanence, PermanenceStatus } from '@/types/permanence';
 import { PermanenceModal } from './PermanenceModal';
 
 interface PermanencesCalendarProps {
@@ -9,21 +9,23 @@ interface PermanencesCalendarProps {
   selectedDate: Date;
   isMobile: boolean;
   permanences: Permanence[];
-  onRegister: (permanenceId: string) => Promise<void>;
-  onUnregister: (permanenceId: string) => Promise<void>;
+  onRegister?: (permanenceId: string) => Promise<void>;
+  onUnregister?: (permanenceId: string) => Promise<void>;
   currentUserId?: string;
+  onCreateClick?: (date: Date, timeSlot: { start: number, end: number }) => void;
 }
 
-const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
-  view,
-  selectedDate,
-  isMobile,
+const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({ 
+  view, 
+  selectedDate, 
   permanences,
+  isMobile,
   onRegister,
   onUnregister,
-  currentUserId
+  currentUserId,
+  onCreateClick
 }) => {
-  const [selectedPermanence, setSelectedPermanence] = useState<Permanence | null>(null);
+  const [selectedPermanence, setSelectedPermanence] = React.useState<Permanence | null>(null);
 
   const handlePermanenceClick = (permanence: Permanence) => {
     setSelectedPermanence(permanence);
@@ -41,14 +43,14 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
 
   // Gérer l'inscription à une permanence
   const handleRegister = async (permanenceId: string) => {
-    await onRegister(permanenceId);
+    await onRegister?.(permanenceId);
     // Fermer la modal après l'inscription
     setSelectedPermanence(null);
   };
 
   // Gérer la désinscription d'une permanence
   const handleUnregister = async (permanenceId: string) => {
-    await onUnregister(permanenceId);
+    await onUnregister?.(permanenceId);
     // Fermer la modal après la désinscription
     setSelectedPermanence(null);
   };
@@ -64,6 +66,7 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
           onRegister={onRegister}
           onUnregister={onUnregister}
           currentUserId={currentUserId}
+          onCreateClick={onCreateClick}
         />
       ) : (
         <PermanencesMonthView 
@@ -77,12 +80,21 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
         <PermanenceModal
           permanence={selectedPermanence}
           onClose={handleCloseModal}
-          onRegister={() => handleRegister(selectedPermanence.id)}
-          onUnregister={() => handleUnregister(selectedPermanence.id)}
-          isUserRegistered={isUserRegistered(selectedPermanence)}
-          canRegister={currentUserId !== undefined && 
-            selectedPermanence.status === PermanenceStatus.OPEN &&
-            (selectedPermanence.participants || []).length < (selectedPermanence.max_volunteers || selectedPermanence.required_volunteers)}
+          isUserRegistered={
+            !!currentUserId && 
+            selectedPermanence.participants?.some(p => p.user_id === currentUserId)
+          }
+          onRegister={
+            onRegister ? 
+            () => onRegister(selectedPermanence.id) : 
+            undefined
+          }
+          onUnregister={
+            onUnregister ? 
+            () => onUnregister(selectedPermanence.id) : 
+            undefined
+          }
+          currentUserId={currentUserId}
         />
       )}
     </div>
