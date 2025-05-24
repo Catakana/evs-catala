@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -194,6 +194,11 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Modifier la permanence' : 'Créer une nouvelle permanence'}</DialogTitle>
+          <DialogDescription>
+            {isEditMode 
+              ? 'Modifiez les informations de la permanence existante' 
+              : 'Renseignez les informations pour créer une nouvelle permanence'}
+          </DialogDescription>
           <Button
             variant="ghost"
             size="icon"

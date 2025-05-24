@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { X, MapPin, Calendar, Clock, Users, Info, Check, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Permanence, PermanenceStatus, ParticipantStatus } from '@/types/permanence';
 import { Badge } from '@/components/ui/badge';
 
@@ -84,6 +84,9 @@ export const PermanenceModal: React.FC<PermanenceModalProps> = ({
             <span>{permanence.title}</span>
             {getStatusBadge(permanence.status)}
           </DialogTitle>
+          <DialogDescription>
+            Détails de la permanence du {dateStr}
+          </DialogDescription>
           <Button
             variant="ghost"
             size="icon"

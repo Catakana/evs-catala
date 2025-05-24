@@ -61,11 +61,52 @@ export const permanenceService = {
    */
   async createPermanence(permanenceData: Omit<Permanence, 'id' | 'created_at' | 'updated_at'>): Promise<Permanence | null> {
     try {
-      // Conversion des dates et heures en timestamps
+      console.log("Données reçues pour création:", permanenceData);
+      
+      // Vérifier que les données date et time sont valides
+      if (!permanenceData.date || !permanenceData.start_time || !permanenceData.end_time) {
+        throw new Error("Date ou heure manquante");
+      }
+      
+      // S'assurer que date est au bon format (YYYY-MM-DD)
+      let dateStr = permanenceData.date;
+      if (typeof dateStr !== 'string' || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        console.error("Format de date invalide:", dateStr);
+        throw new Error("Format de date invalide");
+      }
+      
+      // S'assurer que les heures sont au bon format (HH:MM)
+      let startTimeStr = permanenceData.start_time;
+      let endTimeStr = permanenceData.end_time;
+      if (typeof startTimeStr !== 'string' || !startTimeStr.match(/^\d{1,2}:\d{2}$/)) {
+        console.error("Format d'heure de début invalide:", startTimeStr);
+        throw new Error("Format d'heure de début invalide");
+      }
+      if (typeof endTimeStr !== 'string' || !endTimeStr.match(/^\d{1,2}:\d{2}$/)) {
+        console.error("Format d'heure de fin invalide:", endTimeStr);
+        throw new Error("Format d'heure de fin invalide");
+      }
+      
+      // Conversion en objets Date valides
+      const startDateStr = `${dateStr}T${startTimeStr}:00`;
+      const endDateStr = `${dateStr}T${endTimeStr}:00`;
+      
+      console.log("Dates et heures formatées:", { startDateStr, endDateStr });
+      
+      const startDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+      
+      // Vérifier que les dates sont valides
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.error("Dates invalides après conversion:", { startDate, endDate });
+        throw new Error("Dates invalides après conversion");
+      }
+      
+      // Préparation des données formatées
       const formattedData = {
         ...permanenceData,
-        start_date: new Date(`${permanenceData.date}T${permanenceData.start_time}`).toISOString(),
-        end_date: new Date(`${permanenceData.date}T${permanenceData.end_time}`).toISOString(),
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
       };
       
       // Suppression des champs individuels qui ne sont plus nécessaires
@@ -73,6 +114,8 @@ export const permanenceService = {
       delete formattedData.start_time;
       delete formattedData.end_time;
 
+      console.log("Données formatées pour insertion:", formattedData);
+      
       // Les champs created_at et updated_at seront automatiquement remplis par Supabase
       const { data, error } = await supabase
         .from('evscatala_permanences')
