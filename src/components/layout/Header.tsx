@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { getText as t } from '@/lib/textBank';
 import MessageNotification from '@/components/messages/MessageNotification';
+import { QuickNoteNavButton } from '@/components/notes/QuickNoteButton';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +51,10 @@ const Header: React.FC = () => {
           </Button>
           
           {!loading && user && (
-            <MessageNotification userId={user.id} />
+            <>
+              <MessageNotification userId={user.id} />
+              <QuickNoteNavButton />
+            </>
           )}
           
           {!loading && (

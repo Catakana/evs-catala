@@ -15,7 +15,8 @@ import {
   Vote,
   Settings,
   LogOut,
-  Briefcase
+  Briefcase,
+  PenTool
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -76,6 +77,7 @@ const BottomNav: React.FC = () => {
       items: [
         { path: '/agenda', label: t('nav.agenda'), icon: <Calendar size={20} /> },
         { path: '/permanences', label: t('nav.permanences'), icon: <FileText size={20} /> },
+        { path: '/notes', label: 'Notes', icon: <PenTool size={20} /> },
         { path: '/projects', label: 'Projets', icon: <Briefcase size={20} /> },
         { path: '/votes', label: t('nav.votes'), icon: <Vote size={20} /> },
         { path: '/announcements', label: t('nav.announcements'), icon: <Bell size={20} /> }

@@ -17,6 +17,7 @@ import VoteDetailPage from './pages/VoteDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
 import MessagesPage from './pages/MessagesPage';
 import InfosPage from './pages/InfosPage';
+import NotesPage from './pages/NotesPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -125,6 +126,14 @@ const App = () => {
                 element={
                   <AppLayout>
                     <MessagesPage />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/notes"
+                element={
+                  <AppLayout>
+                    <NotesPage />
                   </AppLayout>
                 }
               />

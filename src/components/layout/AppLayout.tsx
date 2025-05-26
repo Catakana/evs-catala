@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import BottomNav from '@/components/ui/BottomNav';
+import { QuickNoteButton } from '@/components/notes/QuickNoteButton';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,6 +28,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       </main>
 
       <BottomNav />
+      
+      {/* Bouton flottant pour les notes rapides */}
+      <QuickNoteButton />
       
       {showFooter && <Footer className="mt-20" />}
     </div>
