@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut } from 'lucide-react';
+import { Menu, User, LogOut, PenTool } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +13,12 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { getText as t } from '@/lib/textBank';
 import MessageNotification from '@/components/messages/MessageNotification';
-import { QuickNoteNavButton } from '@/components/notes/QuickNoteButton';
+import { QuickNoteModal } from '@/components/notes/QuickNoteModal';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { user, userProfile, signOut, loading } = useAuth();
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -53,7 +54,16 @@ const Header: React.FC = () => {
           {!loading && user && (
             <>
               <MessageNotification userId={user.id} />
-              <QuickNoteNavButton />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsNoteModalOpen(true)}
+                title="Nouvelle note rapide"
+                className="hover:bg-blue-50 hover:text-blue-600"
+              >
+                <PenTool className="h-5 w-5" />
+                <span className="sr-only">Nouvelle note</span>
+              </Button>
             </>
           )}
           
@@ -89,6 +99,13 @@ const Header: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de création de note */}
+      <QuickNoteModal
+        isOpen={isNoteModalOpen}
+        onClose={() => setIsNoteModalOpen(false)}
+        onNoteSaved={() => setIsNoteModalOpen(false)}
+      />
     </header>
   );
 };
