@@ -99,7 +99,7 @@ export function EventModal({ isOpen, onClose, onEventSaved, eventId, initialDate
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? 'Modifier un événement' : 'Créer un nouvel événement'}
@@ -111,18 +111,20 @@ export function EventModal({ isOpen, onClose, onEventSaved, eventId, initialDate
           </DialogDescription>
         </DialogHeader>
         
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <EventForm 
-            initialData={initialData} 
-            onSubmit={handleSubmit} 
-            onCancel={onClose}
-            isEditMode={isEditMode}
-          />
-        )}
+        <div className="overflow-y-auto flex-1">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <EventForm 
+              initialData={initialData} 
+              onSubmit={handleSubmit} 
+              onCancel={onClose}
+              isEditMode={isEditMode}
+            />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
