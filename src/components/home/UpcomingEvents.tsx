@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format, parseISO, isToday, isTomorrow, isThisWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Calendar, Clock, MapPin, Users, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ChevronRight, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ const UpcomingEvents: React.FC = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadUpcomingEvents();
@@ -31,18 +32,31 @@ const UpcomingEvents: React.FC = () => {
   const loadUpcomingEvents = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
+      console.log('🔄 Chargement des événements...');
       const allEvents = await eventService.getEvents();
+      console.log('📅 Événements récupérés:', allEvents);
       
       // Filtrer les événements futurs et prendre les 6 prochains
       const now = new Date();
+      console.log('⏰ Date actuelle:', now.toISOString());
+      
       const upcomingEvents = allEvents
-        .filter(event => new Date(event.start_datetime) >= now)
+        .filter(event => {
+          const eventDate = new Date(event.start_datetime);
+          const isFuture = eventDate >= now;
+          console.log(`📊 Événement "${event.title}" (${event.start_datetime}): ${isFuture ? 'FUTUR' : 'PASSÉ'}`);
+          return isFuture;
+        })
         .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
         .slice(0, 6);
       
+      console.log('✅ Événements futurs filtrés:', upcomingEvents);
       setEvents(upcomingEvents);
     } catch (error) {
-      console.error('Erreur lors du chargement des événements:', error);
+      console.error('❌ Erreur lors du chargement des événements:', error);
+      setError(error instanceof Error ? error.message : 'Erreur inconnue');
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +110,33 @@ const UpcomingEvents: React.FC = () => {
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Prochains événements
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-red-600">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4" />
+            <p className="font-medium">Erreur lors du chargement</p>
+            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={loadUpcomingEvents}
+            >
+              Réessayer
+            </Button>
           </div>
         </CardContent>
       </Card>
