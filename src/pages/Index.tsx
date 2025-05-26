@@ -1,11 +1,13 @@
 import React from 'react';
 import Welcome from '@/components/home/Welcome';
+import UpcomingEvents from '@/components/home/UpcomingEvents';
 import ModuleSection from '@/components/home/ModuleSection';
 
 const Index = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <Welcome />
+      <UpcomingEvents />
       <ModuleSection />
     </div>
   );
