@@ -107,7 +107,7 @@ WITH CHECK (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Lecture des événements" ON evscatala_events;
 CREATE POLICY "Lecture des événements" 
 ON evscatala_events FOR SELECT 
-TO authenticated 
+TO anon, authenticated 
 USING (true);
 
 DROP POLICY IF EXISTS "Création d'événements" ON evscatala_events;
