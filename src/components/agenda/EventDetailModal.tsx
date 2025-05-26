@@ -206,6 +206,9 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               <DialogTitle className="text-xl font-bold mb-2">
                 {event.title}
               </DialogTitle>
+              <DialogDescription className="sr-only">
+                Détails de l'événement {event.title} - {format(startDate, 'dd/MM/yyyy', { locale: fr })}
+              </DialogDescription>
               <div className="flex items-center gap-2">
                 <Badge className={cn("text-white", getCategoryColor(event.category))}>
                   {getCategoryLabel(event.category)}

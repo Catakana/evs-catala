@@ -228,93 +228,137 @@ export const eventService = {
 
   // S'inscrire à un événement
   async registerToEvent(eventId: string, userId: string) {
-    const { data, error } = await supabase
-      .from('evscatala_event_participants')
-      .insert({
-        event_id: eventId,
-        user_id: userId,
-        status: 'registered',
-        registered_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_event_participants')
+        .insert({
+          event_id: eventId,
+          user_id: userId,
+          status: 'registered',
+          registered_at: new Date().toISOString()
+        })
+        .select()
+        .single();
 
-    if (error) {
+      if (error) {
+        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
+          throw new Error('La table des participants n\'existe pas encore. Veuillez exécuter le script de création de la base de données.');
+        }
+        console.error(`Erreur lors de l'inscription à l'événement ${eventId}:`, error);
+        throw error;
+      }
+
+      return data as EventParticipant;
+    } catch (error) {
       console.error(`Erreur lors de l'inscription à l'événement ${eventId}:`, error);
       throw error;
     }
-
-    return data as EventParticipant;
   },
 
   // Se désinscrire d'un événement
   async unregisterFromEvent(eventId: string, userId: string) {
-    const { error } = await supabase
-      .from('evscatala_event_participants')
-      .delete()
-      .eq('event_id', eventId)
-      .eq('user_id', userId);
+    try {
+      const { error } = await supabase
+        .from('evscatala_event_participants')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('user_id', userId);
 
-    if (error) {
+      if (error) {
+        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
+          throw new Error('La table des participants n\'existe pas encore. Veuillez exécuter le script de création de la base de données.');
+        }
+        console.error(`Erreur lors de la désinscription de l'événement ${eventId}:`, error);
+        throw error;
+      }
+
+      return true;
+    } catch (error) {
       console.error(`Erreur lors de la désinscription de l'événement ${eventId}:`, error);
       throw error;
     }
-
-    return true;
   },
 
   // Mettre à jour le statut de participation
   async updateParticipationStatus(eventId: string, userId: string, status: 'registered' | 'present' | 'absent' | 'maybe') {
-    const { data, error } = await supabase
-      .from('evscatala_event_participants')
-      .update({ status })
-      .eq('event_id', eventId)
-      .eq('user_id', userId)
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_event_participants')
+        .update({ status })
+        .eq('event_id', eventId)
+        .eq('user_id', userId)
+        .select()
+        .single();
 
-    if (error) {
+      if (error) {
+        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
+          throw new Error('La table des participants n\'existe pas encore. Veuillez exécuter le script de création de la base de données.');
+        }
+        console.error(`Erreur lors de la mise à jour du statut de participation:`, error);
+        throw error;
+      }
+
+      return data as EventParticipant;
+    } catch (error) {
       console.error(`Erreur lors de la mise à jour du statut de participation:`, error);
       throw error;
     }
-
-    return data as EventParticipant;
   },
 
   // Vérifier si un utilisateur est inscrit à un événement
   async isUserRegistered(eventId: string, userId: string) {
-    const { data, error } = await supabase
-      .from('evscatala_event_participants')
-      .select('id, status')
-      .eq('event_id', eventId)
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_event_participants')
+        .select('id, status')
+        .eq('event_id', eventId)
+        .eq('user_id', userId)
+        .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
+          console.warn('Table evscatala_event_participants non trouvée');
+          return null;
+        }
+        console.error(`Erreur lors de la vérification d'inscription:`, error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
       console.error(`Erreur lors de la vérification d'inscription:`, error);
-      throw error;
+      return null;
     }
-
-    return data;
   },
 
   // Récupérer les participants d'un événement
   async getEventParticipants(eventId: string) {
-    const { data, error } = await supabase
-      .from('evscatala_event_participants')
-      .select(`
-        *,
-        user:evscatala_profiles(firstname, lastname, avatar_url, role)
-      `)
-      .eq('event_id', eventId)
-      .order('registered_at', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_event_participants')
+        .select(`
+          *,
+          user:evscatala_profiles(firstname, lastname, avatar_url, role)
+        `)
+        .eq('event_id', eventId)
+        .order('registered_at', { ascending: true });
 
-    if (error) {
+      if (error) {
+        // Si la table n'existe pas encore, retourner un tableau vide
+        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
+          console.warn('Table evscatala_event_participants non trouvée, retour d\'un tableau vide');
+          return [];
+        }
+        console.error(`Erreur lors de la récupération des participants:`, error);
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
       console.error(`Erreur lors de la récupération des participants:`, error);
-      throw error;
+      // En cas d'erreur, retourner un tableau vide plutôt que de faire planter l'app
+      return [];
     }
-
-    return data;
   },
 
   // === FONCTIONS UTILITAIRES ===
