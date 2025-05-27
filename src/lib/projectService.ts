@@ -201,11 +201,25 @@ export const projectService = {
 
   // Créer un nouveau projet
   async createProject(formData: ProjectFormData, userId: string) {
-    const now = new Date().toISOString();
-    
-    const { data, error } = await supabase
-      .from('evscatala_projects')
-      .insert({
+    try {
+      console.log('🚀 Début de création de projet:', {
+        formData,
+        userId,
+        timestamp: new Date().toISOString()
+      });
+
+      // Vérifier que l'utilisateur est connecté
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('❌ Erreur d\'authentification lors de la création de projet:', userError);
+        throw new Error('Vous devez être connecté pour créer un projet. Veuillez vous reconnecter.');
+      }
+
+      console.log('✅ Utilisateur authentifié:', user.id);
+
+      const now = new Date().toISOString();
+      
+      const insertData = {
         title: formData.title,
         description: formData.description,
         status: formData.status,
@@ -215,32 +229,86 @@ export const projectService = {
         created_by: userId,
         created_at: now,
         updated_at: now
-      })
-      .select()
-      .single();
+      };
 
-    if (error) {
-      console.error('Erreur lors de la création du projet:', error);
-      throw error;
+      console.log('📝 Données à insérer:', insertData);
+
+      const { data, error } = await supabase
+        .from('evscatala_projects')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Erreur lors de l\'insertion du projet:', {
+          error,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        
+        // Messages d'erreur spécifiques selon le type d'erreur
+        if (error.code === '42501' || error.message.includes('permission')) {
+          throw new Error('Vous n\'avez pas les permissions nécessaires pour créer un projet.');
+        } else if (error.code === '23505') {
+          throw new Error('Un projet avec ce titre existe déjà.');
+        } else if (error.message.includes('JWT')) {
+          throw new Error('Votre session a expiré. Veuillez vous reconnecter.');
+        } else if (error.code === '42P01') {
+          throw new Error('La table des projets n\'existe pas. Contactez l\'administrateur.');
+        } else {
+          throw new Error(`Erreur lors de la création: ${error.message}`);
+        }
+      }
+
+      console.log('✅ Projet créé avec succès:', data);
+
+      // Ajouter automatiquement le créateur comme membre du projet
+      try {
+        console.log('👥 Ajout du créateur comme membre du projet...');
+        await this.addProjectMember(data.id, userId, 'admin');
+        console.log('✅ Créateur ajouté comme membre admin');
+      } catch (memberError) {
+        console.warn('⚠️ Erreur lors de l\'ajout du membre (non critique):', memberError);
+        // Ne pas faire échouer la création du projet si l'ajout du membre échoue
+      }
+
+      const projectResult = this.convertToProject({
+        ...data,
+        members: [{
+          id: '', // sera généré par Supabase
+          userId,
+          projectId: data.id,
+          role: 'admin',
+          joinedAt: new Date(now)
+        }],
+        tasks: [],
+        budgets: [],
+        documents: [],
+        communications: []
+      });
+
+      console.log('🎉 Projet créé et converti avec succès:', projectResult.id);
+      return projectResult;
+
+    } catch (error) {
+      console.error('💥 Erreur dans createProject:', error);
+      
+      // Si c'est déjà une erreur avec un message personnalisé, la relancer
+      if (error instanceof Error && (
+        error.message.includes('connecté') || 
+        error.message.includes('permission') || 
+        error.message.includes('session') ||
+        error.message.includes('table') ||
+        error.message.includes('existe déjà')
+      )) {
+        throw error;
+      }
+      
+      // Sinon, message générique avec plus d'informations
+      throw new Error(`Impossible de créer le projet. Détails: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-
-    // Ajouter automatiquement le créateur comme membre du projet
-    await this.addProjectMember(data.id, userId, 'admin');
-
-    return this.convertToProject({
-      ...data,
-      members: [{
-        id: '', // sera généré par Supabase
-        userId,
-        projectId: data.id,
-        role: 'admin',
-        joinedAt: new Date(now)
-      }],
-      tasks: [],
-      budgets: [],
-      documents: [],
-      communications: []
-    });
   },
 
   // Mettre à jour un projet

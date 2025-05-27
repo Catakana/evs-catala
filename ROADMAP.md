@@ -139,6 +139,22 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Navigation rapide** : Bouton "Voir tout" vers la page des annonces
 - ✅ **Styles line-clamp** : Limitation du texte à 2 lignes avec CSS utilities
 
+#### Diagnostic et correction module Projets ✅ TERMINÉ (27/05/2025)
+- ✅ **Scripts de diagnostic** : `test_projects_creation.sql` pour identifier les problèmes
+- ✅ **Amélioration logs service** : Messages détaillés avec emojis pour le débogage
+- ✅ **Gestion d'erreurs spécifiques** : Messages clairs selon le type d'erreur (permissions, tables, session)
+- ✅ **Amélioration formulaire** : Logs détaillés et boutons de reconnexion automatiques
+- ✅ **Script de création simple** : `create_projects_tables_simple.sql` avec politiques RLS basiques
+- ✅ **Vérification authentification** : Contrôle de session avant création de projet
+- ✅ **Messages utilisateur améliorés** : Erreurs détaillées et actions suggérées
+- ✅ **Scripts de diagnostic** : `test_projects_creation.sql` pour identifier les problèmes
+- ✅ **Amélioration logs service** : Messages détaillés avec emojis pour le débogage
+- ✅ **Gestion d'erreurs spécifiques** : Messages clairs selon le type d'erreur (permissions, tables, session)
+- ✅ **Amélioration formulaire** : Logs détaillés et boutons de reconnexion automatiques
+- ✅ **Script de création simple** : `create_projects_tables_simple.sql` avec politiques RLS basiques
+- ✅ **Vérification authentification** : Contrôle de session avant création de projet
+- ✅ **Messages utilisateur améliorés** : Erreurs détaillées et actions suggérées
+
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
 - **Semaine 2**: Gestion de profil et récupération de mot de passe ✅

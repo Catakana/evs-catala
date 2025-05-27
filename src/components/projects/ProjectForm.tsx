@@ -109,8 +109,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('📝 Soumission du formulaire de projet:', {
+      formData,
+      userId,
+      projectId,
+      timestamp: new Date().toISOString()
+    });
+    
     // Validation de base
     if (!formData.title.trim()) {
+      console.warn('⚠️ Validation échouée: titre manquant');
       toast({
         title: 'Erreur de validation',
         description: 'Le titre du projet est requis.',
@@ -124,6 +132,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       const start = new Date(formData.startDate);
       const end = new Date(formData.endDate);
       if (start > end) {
+        console.warn('⚠️ Validation échouée: dates incohérentes');
         toast({
           title: 'Erreur de validation',
           description: 'La date de fin doit être postérieure à la date de début.',
@@ -135,34 +144,74 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     
     try {
       setLoading(true);
+      console.log('🚀 Début de l\'opération de sauvegarde...');
+      
       let project: Project;
       
       if (projectId) {
         // Mise à jour d'un projet existant
+        console.log('📝 Mise à jour du projet existant:', projectId);
         project = await projectService.updateProject(projectId, formData);
+        console.log('✅ Projet mis à jour avec succès');
         toast({
           title: 'Succès',
           description: 'Le projet a été mis à jour avec succès.',
         });
       } else {
         // Création d'un nouveau projet
+        console.log('🆕 Création d\'un nouveau projet...');
         project = await projectService.createProject(formData, userId);
+        console.log('✅ Projet créé avec succès');
         toast({
           title: 'Succès',
           description: 'Le projet a été créé avec succès.',
         });
       }
       
+      console.log('🎉 Opération terminée, appel de onSuccess');
       onSuccess(project);
+      
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du projet:', error);
+      console.error('💥 Erreur lors de la sauvegarde du projet:', {
+        error,
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
+        stack: error instanceof Error ? error.stack : undefined,
+        formData,
+        userId,
+        projectId
+      });
+      
+      // Afficher un message d'erreur détaillé
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      
       toast({
         title: 'Erreur',
-        description: `Impossible de ${projectId ? 'mettre à jour' : 'créer'} le projet. Veuillez réessayer.`,
+        description: `Impossible de ${projectId ? 'mettre à jour' : 'créer'} le projet. ${errorMessage}`,
         variant: 'destructive',
       });
+      
+      // Si c'est un problème d'authentification, proposer une reconnexion
+      if (errorMessage.includes('connecté') || errorMessage.includes('session')) {
+        setTimeout(() => {
+          toast({
+            title: 'Action requise',
+            description: 'Veuillez vous reconnecter et réessayer.',
+            action: (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.href = '/login'}
+              >
+                Se reconnecter
+              </Button>
+            ),
+          });
+        }, 2000);
+      }
+      
     } finally {
       setLoading(false);
+      console.log('🏁 Fin de l\'opération de sauvegarde');
     }
   };
 
