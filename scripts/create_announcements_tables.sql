@@ -66,8 +66,9 @@ ALTER TABLE evscatala_announcement_reads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evscatala_announcement_attachments ENABLE ROW LEVEL SECURITY;
 
 -- Politiques pour evscatala_announcements
+DROP POLICY IF EXISTS "Lecture des annonces" ON evscatala_announcements;
 CREATE POLICY "Lecture des annonces" ON evscatala_announcements
-  FOR SELECT TO authenticated 
+  FOR SELECT TO anon, authenticated 
   USING (
     NOT is_archived 
     AND (expire_date IS NULL OR expire_date > NOW())

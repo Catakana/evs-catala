@@ -48,8 +48,9 @@ CREATE INDEX idx_vote_responses_v2_user_id ON evscatala_vote_responses_v2(user_i
 -- Votes : lecture pour tous, création pour staff+
 ALTER TABLE evscatala_votes_v2 ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Lecture des votes" ON evscatala_votes_v2;
 CREATE POLICY "Lecture des votes" ON evscatala_votes_v2
-  FOR SELECT TO authenticated USING (true);
+  FOR SELECT TO anon, authenticated USING (true);
 
 CREATE POLICY "Création de votes" ON evscatala_votes_v2
   FOR INSERT TO authenticated 
