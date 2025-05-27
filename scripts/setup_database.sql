@@ -345,7 +345,7 @@ ALTER TABLE evscatala_project_communications ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Lecture des projets" ON evscatala_projects;
 CREATE POLICY "Lecture des projets" 
 ON evscatala_projects FOR SELECT 
-TO authenticated 
+TO anon, authenticated 
 USING (true);
 
 DROP POLICY IF EXISTS "Création de projets" ON evscatala_projects;
