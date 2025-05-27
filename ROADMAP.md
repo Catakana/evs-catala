@@ -147,13 +147,20 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Script de création simple** : `create_projects_tables_simple.sql` avec politiques RLS basiques
 - ✅ **Vérification authentification** : Contrôle de session avant création de projet
 - ✅ **Messages utilisateur améliorés** : Erreurs détaillées et actions suggérées
-- ✅ **Scripts de diagnostic** : `test_projects_creation.sql` pour identifier les problèmes
-- ✅ **Amélioration logs service** : Messages détaillés avec emojis pour le débogage
-- ✅ **Gestion d'erreurs spécifiques** : Messages clairs selon le type d'erreur (permissions, tables, session)
-- ✅ **Amélioration formulaire** : Logs détaillés et boutons de reconnexion automatiques
-- ✅ **Script de création simple** : `create_projects_tables_simple.sql` avec politiques RLS basiques
-- ✅ **Vérification authentification** : Contrôle de session avant création de projet
-- ✅ **Messages utilisateur améliorés** : Erreurs détaillées et actions suggérées
+
+#### Amélioration gestion d'équipe des projets ✅ TERMINÉ (27/05/2025)
+- ✅ **Service utilisateurs** : Création de `userService.ts` pour récupérer les profils complets
+- ✅ **Affichage noms complets** : Remplacement des IDs par les noms et prénoms des membres
+- ✅ **Composant ProjectTeamManager** : Interface CRUD complète pour gérer l'équipe
+- ✅ **Recherche d'utilisateurs** : Fonction de recherche par nom, prénom ou email
+- ✅ **Gestion des rôles** : Attribution et modification des rôles (membre, contributeur, gestionnaire, admin)
+- ✅ **Avatars et initiales** : Affichage visuel des membres avec avatars ou initiales
+- ✅ **Actions CRUD** : Ajouter, modifier le rôle, et retirer des membres de l'équipe
+- ✅ **Permissions** : Seuls les admins peuvent modifier l'équipe (sauf leur propre profil)
+- ✅ **Interface moderne** : Design avec cartes, badges colorés par rôle et icônes
+- ✅ **Script de test** : `test_user_profiles.sql` pour vérifier et créer la table des profils
+- ✅ **Gestion d'erreurs** : Messages d'erreur clairs et notifications de succès
+- ✅ **Intégration complète** : Remplacement de l'ancienne section équipe dans ProjectDetails
 
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅

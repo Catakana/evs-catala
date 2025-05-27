@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Project, ProjectTask, TaskStatus, TaskPriority } from '@/types/project';
 import { projectService } from '@/lib/projectService';
+import ProjectTeamManager from './ProjectTeamManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -245,26 +246,13 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onBack, onEd
                 </p>
               </div>
               
-              <div>
-                <h3 className="text-lg font-medium mb-2">Équipe</h3>
-                {project.members.length === 0 ? (
-                  <p className="text-muted-foreground">Aucun membre n'a encore été ajouté à l'équipe.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.members.map(member => (
-                      <Card key={member.id} className="flex items-center p-4">
-                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3">
-                          <Users className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{member.userId}</p>
-                          <p className="text-sm text-muted-foreground">{member.role}</p>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ProjectTeamManager
+                projectId={projectId}
+                members={project.members}
+                currentUserId={userId}
+                isUserAdmin={isUserAdmin()}
+                onMembersUpdate={loadProject}
+              />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
