@@ -107,8 +107,14 @@ export function ProductionDebugger() {
     }
   };
 
-  // Afficher seulement en développement ou si explicitement demandé
-  if (!import.meta.env.DEV && !isVisible) {
+  // Afficher seulement si les outils de debug sont activés
+  const debugEnabled = import.meta.env.VITE_ENABLE_DEBUG_TOOLS === 'true' || import.meta.env.DEV;
+  
+  if (!debugEnabled) {
+    return null;
+  }
+
+  if (!isVisible) {
     return (
       <div className="fixed bottom-4 right-4 z-50">
         <Button

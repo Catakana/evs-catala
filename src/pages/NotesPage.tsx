@@ -32,6 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { notesService, Note, NoteFilters } from '@/lib/notesService';
 import { authService } from '@/lib/supabase';
 import { QuickNoteModal } from '@/components/notes/QuickNoteModal';
+import { DebugToggle } from '@/components/debug/DebugToggle';
 // import { NotesDebugger } from '@/components/notes/NotesDebugger';
 
 export default function NotesPage() {
@@ -192,6 +193,9 @@ export default function NotesPage() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Debugger temporaire - commenté pour test */}
       {/* <NotesDebugger /> */}
+      
+      {/* Affichage du statut des outils de debug */}
+      <DebugToggle />
       
       {/* En-tête */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

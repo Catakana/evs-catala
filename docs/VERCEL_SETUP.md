@@ -11,6 +11,12 @@ VITE_SUPABASE_URL = https://oybpmjjtbmlesvhlgabn.supabase.co
 VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YnBtamp0Ym1sZXN2aGxnYWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDY4MDIsImV4cCI6MjA2MzUyMjgwMn0.0rhAdkCJSwAg8RDfgbX8A_jdRBwPaaXkpb8yXWPOxRI
 ```
 
+### Variables de debug (optionnelles)
+
+```
+VITE_ENABLE_DEBUG_TOOLS = false  # true pour activer les outils de debug en production
+```
+
 ## 📋 Configuration via Dashboard Vercel
 
 1. **Allez sur le dashboard Vercel** : https://vercel.com/dashboard
@@ -24,6 +30,10 @@ VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
    - Name: `VITE_SUPABASE_ANON_KEY`
    - Value: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YnBtamp0Ym1sZXN2aGxnYWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDY4MDIsImV4cCI6MjA2MzUyMjgwMn0.0rhAdkCJSwAg8RDfgbX8A_jdRBwPaaXkpb8yXWPOxRI`
    - Environment: `Production`
+   
+   - Name: `VITE_ENABLE_DEBUG_TOOLS` (optionnel)
+   - Value: `false` (ou `true` pour activer les outils de debug)
+   - Environment: `Production`
 
 ## 🔧 Configuration via Vercel CLI
 
@@ -35,6 +45,10 @@ vercel env add VITE_SUPABASE_URL production
 
 vercel env add VITE_SUPABASE_ANON_KEY production
 # Entrez la valeur: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YnBtamp0Ym1sZXN2aGxnYWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDY4MDIsImV4cCI6MjA2MzUyMjgwMn0.0rhAdkCJSwAg8RDfgbX8A_jdRBwPaaXkpb8yXWPOxRI
+
+# Optionnel : pour activer les outils de debug en production
+vercel env add VITE_ENABLE_DEBUG_TOOLS production
+# Entrez la valeur: false
 ```
 
 ## 🔄 Redéploiement

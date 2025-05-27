@@ -71,7 +71,7 @@ const Index = () => {
       >
         <div className="container mx-auto px-4 py-6">
           {/* Diagnostic temporaire pour la production */}
-          {import.meta.env.PROD && (
+          {(import.meta.env.VITE_ENABLE_DEBUG_TOOLS === 'true' || import.meta.env.DEV) && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
