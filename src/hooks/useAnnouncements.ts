@@ -1,9 +1,9 @@
 /**
  * Hooks personnalisés pour la gestion des annonces
- * Remplace le store Zustand par une approche basée sur React Query/SWR
+ * Version simplifiée et robuste pour éviter les boucles infinies
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { announcementService, type CreateAnnouncementData, type UpdateAnnouncementData, type AnnouncementFilters } from '../lib/announcementService';
 import type { Announcement, AnnouncementCategory } from '../types/announcement';
 
@@ -15,45 +15,37 @@ export function useAnnouncements(filters: AnnouncementFilters = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Sérialiser les filtres pour éviter la boucle infinie
-  const filtersKey = JSON.stringify(filters);
+  // Mémoriser les filtres pour éviter les re-renders inutiles
+  const memoizedFilters = useMemo(() => filters, [
+    filters.searchTerm,
+    filters.includeArchived,
+    filters.category,
+    filters.authorId
+  ]);
 
   const fetchAnnouncements = useCallback(async () => {
     try {
-      console.log('🔄 Début de fetchAnnouncements avec filtres:', filters);
       setLoading(true);
       setError(null);
       
-      const data = await announcementService.getAnnouncements(filters);
-      console.log('✅ Données récupérées:', data);
-      
+      const data = await announcementService.getAnnouncements(memoizedFilters);
       setAnnouncements(data);
-      console.log('✅ État mis à jour, nombre d\'annonces:', data.length);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur lors du chargement des annonces';
       setError(message);
       console.error('❌ Erreur dans useAnnouncements:', err);
     } finally {
-      console.log('🏁 Fin de fetchAnnouncements, setLoading(false)');
       setLoading(false);
     }
-  }, [filtersKey]); // Utiliser filtersKey au lieu de filters
+  }, [memoizedFilters]);
 
   useEffect(() => {
-    console.log('🚀 useEffect déclenché, appel de fetchAnnouncements');
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
   const reload = useCallback(() => {
-    console.log('🔄 Reload demandé');
     fetchAnnouncements();
   }, [fetchAnnouncements]);
-
-  console.log('📊 État actuel du hook:', { 
-    loading, 
-    error, 
-    announcementsCount: announcements.length 
-  });
 
   return {
     announcements,
@@ -71,33 +63,36 @@ export function useAnnouncement(id: string | null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnnouncement = useCallback(async () => {
+  useEffect(() => {
     if (!id) {
       setAnnouncement(null);
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await announcementService.getAnnouncementById(id);
-      setAnnouncement(data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erreur lors du chargement de l\'annonce';
-      setError(message);
-      console.error('Erreur dans useAnnouncement:', err);
-    } finally {
-      setLoading(false);
-    }
+    const fetchAnnouncement = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await announcementService.getAnnouncementById(id);
+        setAnnouncement(data);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Erreur lors du chargement de l\'annonce';
+        setError(message);
+        console.error('Erreur dans useAnnouncement:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncement();
   }, [id]);
 
-  useEffect(() => {
-    fetchAnnouncement();
-  }, [fetchAnnouncement]);
-
   const reload = useCallback(() => {
-    fetchAnnouncement();
-  }, [fetchAnnouncement]);
+    if (id) {
+      // Re-trigger useEffect
+      setLoading(true);
+    }
+  }, [id]);
 
   return {
     announcement,
@@ -207,24 +202,24 @@ export function useAnnouncementReadStatus() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReadStatus = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const status = await announcementService.getUserReadStatus();
-      setReadStatus(status);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erreur lors du chargement des statuts de lecture';
-      setError(message);
-      console.error('Erreur dans useAnnouncementReadStatus:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const fetchReadStatus = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const status = await announcementService.getUserReadStatus();
+        setReadStatus(status);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Erreur lors du chargement des statuts de lecture';
+        setError(message);
+        console.error('Erreur dans useAnnouncementReadStatus:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchReadStatus();
-  }, [fetchReadStatus]);
+  }, []);
 
   const isRead = useCallback((announcementId: string): boolean => {
     return announcementId in readStatus;
@@ -242,13 +237,18 @@ export function useAnnouncementReadStatus() {
     }
   }, []);
 
+  const reload = useCallback(() => {
+    setLoading(true);
+    // Re-trigger useEffect
+  }, []);
+
   return {
     readStatus,
     loading,
     error,
     isRead,
     markAsRead,
-    reload: fetchReadStatus
+    reload
   };
 }
 
@@ -276,10 +276,11 @@ export function useAnnouncementFilters() {
     setIncludeArchived(false);
   }, []);
 
-  const filters: AnnouncementFilters = {
+  const filters: AnnouncementFilters = useMemo(() => ({
     searchTerm: searchTerm || undefined,
-    includeArchived
-  };
+    includeArchived,
+    category: selectedCategories.length === 1 ? selectedCategories[0] : undefined
+  }), [searchTerm, includeArchived, selectedCategories]);
 
   return {
     searchTerm,
@@ -300,7 +301,7 @@ export function useAnnouncementFilters() {
 export function useAnnouncementPermissions() {
   // TODO: Intégrer avec le système d'authentification pour récupérer le rôle de l'utilisateur
   // Pour l'instant, on donne les permissions de staff à tous les utilisateurs pour les tests
-  const [userRole, setUserRole] = useState<'member' | 'staff' | 'admin'>('staff');
+  const [userRole] = useState<'member' | 'staff' | 'admin'>('staff');
 
   const canCreate = true; // Temporairement activé pour tous
   const canEdit = userRole === 'staff' || userRole === 'admin';

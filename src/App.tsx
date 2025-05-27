@@ -36,6 +36,7 @@ import SupabaseDebugTest from '@/pages/test/SupabaseDebugTest';
 import AuthDebugPage from '@/pages/test/AuthDebugPage';
 import ServicesTestPage from '@/pages/test/ServicesTestPage';
 import PublicDisplayPage from '@/pages/PublicDisplayPage';
+import PresentationPage from '@/pages/PresentationPage';
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,9 @@ const App = () => {
               
               {/* Page d'affichage public (plein écran, sans layout) */}
               <Route path="/public-display" element={<PublicDisplayPage />} />
+              
+              {/* Page de présentation (plein écran, sans layout) */}
+              <Route path="/presentation" element={<PresentationPage />} />
               
               {/* Routes avec layout principal incluant la barre de navigation */}
               <Route

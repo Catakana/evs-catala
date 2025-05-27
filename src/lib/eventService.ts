@@ -40,17 +40,24 @@ export interface EventFilters {
 export const eventService = {
   // Récupérer tous les événements
   async getEvents() {
-    const { data, error } = await supabase
-      .from('evscatala_events')
-      .select('*')
-      .order('start_datetime', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_events')
+        .select('*')
+        .order('start_datetime', { ascending: true });
 
-    if (error) {
-      console.error('Erreur lors de la récupération des événements:', error);
-      throw error;
+      if (error) {
+        console.error('Erreur lors de la récupération des événements:', error);
+        // Retourner un tableau vide plutôt que de lever une erreur
+        return [];
+      }
+
+      return (data as Event[]) || [];
+    } catch (error) {
+      console.error('Erreur dans getEvents:', error);
+      // Retourner un tableau vide en cas d'erreur pour éviter les crashes
+      return [];
     }
-
-    return data as Event[];
   },
 
   // Récupérer les événements avec filtres

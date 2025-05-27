@@ -4,6 +4,7 @@ import { Calendar, Clock, Users, MapPin, Bell, Briefcase, Target, User, Vote, Sk
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useEvents } from '../hooks/useEvents';
 import { eventService } from '../lib/eventService';
 import { projectService } from '../lib/projectService';
 import { voteService } from '../lib/voteService';
@@ -25,42 +26,14 @@ const PublicDisplayPage: React.FC = () => {
   const [currentMode, setCurrentMode] = useState<DisplayMode>('announcements');
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
-  const [events, setEvents] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [votes, setVotes] = useState<any[]>([]);
-  const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingVotes, setLoadingVotes] = useState(true);
 
-  // Hook pour récupérer les annonces
+  // Hooks pour récupérer les données
   const { announcements, loading: loadingAnnouncements } = useAnnouncements();
-
-  console.log('📢 État des annonces:', { 
-    announcements: announcements?.length || 0, 
-    loading: loadingAnnouncements 
-  });
-
-  // Charger les événements
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoadingEvents(true);
-        console.log('🔄 Début du chargement des événements...');
-        const data = await eventService.getEvents();
-        console.log('✅ Événements chargés:', data);
-        console.log('📊 Nombre d\'événements:', data?.length || 0);
-        setEvents(data || []);
-      } catch (error) {
-        console.error('❌ Erreur lors du chargement des événements:', error);
-        setEvents([]);
-      } finally {
-        setLoadingEvents(false);
-        console.log('🏁 Fin du chargement des événements');
-      }
-    };
-
-    loadEvents();
-  }, []);
+  const { events, loading: loadingEvents } = useEvents();
 
   // Charger les projets
   useEffect(() => {

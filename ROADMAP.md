@@ -143,6 +143,28 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Responsive optimisé** : Adaptation parfaite pour tous les écrans
 - ✅ **Performance** : Rendu conditionnel pour éviter les problèmes SSR
 
+#### Page de présentation de l'application ✅ TERMINÉ (27/05/2025)
+- ✅ **Page de présentation complète** : Nouvelle page `/presentation` avec défilement vertical
+- ✅ **Hero section animée** : Section d'accueil avec fond dégradé et animations parallax
+- ✅ **Présentation des fonctionnalités** : 7 modules présentés avec cartes interactives
+- ✅ **Animations de transition** : Animations d'apparition au scroll avec Framer Motion
+- ✅ **Design moderne** : Gradients colorés, particules animées, effets de survol
+- ✅ **CTA vers inscription** : Boutons d'appel à l'action redirigeant vers le formulaire d'inscription
+- ✅ **Navigation fluide** : Scroll automatique vers les sections, indicateur de scroll
+- ✅ **Responsive design** : Adaptation parfaite pour tous les écrans
+- ✅ **Accès depuis header** : Bouton de présentation accessible depuis toutes les pages
+- ✅ **Route dédiée** : Page accessible via `/presentation` sans layout de navigation
+
+#### Refactorisation page de présentation ✅ TERMINÉ (27/05/2025)
+- ✅ **Organisation claire** : Restructuration complète avec sections lisibles par fonctionnalité
+- ✅ **Illustrations interactives** : Mockups visuels pour chaque module (calendrier, planning, votes, etc.)
+- ✅ **Layout alterné** : Disposition en zigzag pour une lecture fluide
+- ✅ **Descriptions détaillées** : Fonctionnalités expliquées avec exemples concrets
+- ✅ **Design cohérent** : Gradients colorés uniques par module avec illustrations assorties
+- ✅ **CTA corrigé** : Redirection vers `/register` au lieu de `/auth/register`
+- ✅ **Contenu enrichi** : Ajout d'exemples visuels (planning permanences, interface votes, etc.)
+- ✅ **Amélioration UX** : Suppression des éléments redondants, focus sur l'essentiel
+
 #### Améliorations gestion d'erreurs ✅ TERMINÉ (27/05/2025)
 - ✅ **Messages d'erreur clairs** : Amélioration des messages d'authentification
 - ✅ **Gestion erreurs spécifiques** : Permissions, session expirée, JWT invalide

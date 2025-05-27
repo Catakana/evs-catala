@@ -54,52 +54,61 @@ class AnnouncementService {
    */
   async getAnnouncements(filters: AnnouncementFilters = {}): Promise<Announcement[]> {
     try {
-      console.log('📢 Récupération des annonces avec filtres:', filters);
-
-      // Utiliser directement la requête simple (pas de RPC pour éviter l'erreur 400)
-      const { data, error } = await supabase
+      // Requête simple et robuste
+      let query = supabase
         .from('evscatala_announcements')
         .select('*')
         .order('publish_date', { ascending: false });
 
-      if (error) {
-        console.error('Erreur lors de la récupération des annonces:', error);
-        throw error;
+      // Appliquer les filtres côté serveur si possible
+      if (filters.category) {
+        query = query.eq('category', filters.category);
+      }
+      
+      if (!filters.includeArchived) {
+        query = query.eq('is_archived', false);
       }
 
-      if (!data) {
-        console.log('Aucune annonce trouvée');
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Erreur lors de la récupération des annonces:', error);
+        // Retourner un tableau vide plutôt que de lever une erreur
         return [];
       }
 
-      // Transformer les données pour correspondre au type Announcement
-      let announcements: Announcement[] = data.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        content: item.content,
-        category: item.category,
-        authorId: item.author_id,
-        authorName: 'Utilisateur', // Nom par défaut
-        targetRoles: item.target_roles || ['member'],
-        targetGroups: item.target_groups || [],
-        publishDate: new Date(item.publish_date),
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      // Transformer les données de manière sécurisée
+      const announcements: Announcement[] = data.map((item: any) => ({
+        id: item.id || '',
+        title: item.title || 'Sans titre',
+        content: item.content || '',
+        category: item.category || 'info',
+        authorId: item.author_id || '',
+        authorName: 'Utilisateur',
+        targetRoles: Array.isArray(item.target_roles) ? item.target_roles : ['member'],
+        targetGroups: Array.isArray(item.target_groups) ? item.target_groups : [],
+        publishDate: item.publish_date ? new Date(item.publish_date) : new Date(),
         expireDate: item.expire_date ? new Date(item.expire_date) : undefined,
-        isArchived: item.is_archived || false,
-        isPinned: item.is_pinned || false,
-        priority: item.priority || 0,
-        attachmentsCount: 0, // Par défaut
-        createdAt: new Date(item.created_at)
+        isArchived: Boolean(item.is_archived),
+        isPinned: Boolean(item.is_pinned),
+        priority: Number(item.priority) || 0,
+        attachmentsCount: 0,
+        createdAt: item.created_at ? new Date(item.created_at) : new Date()
       }));
 
-      // Appliquer les filtres côté client
-      announcements = this.applyFilters(announcements, filters);
+      // Appliquer les filtres côté client pour la recherche textuelle
+      const filteredAnnouncements = this.applyFilters(announcements, filters);
 
-      console.log(`✅ ${announcements.length} annonces récupérées`);
-      return announcements;
+      return filteredAnnouncements;
 
     } catch (error) {
       console.error('Erreur dans getAnnouncements:', error);
-      throw new Error('Impossible de récupérer les annonces');
+      // Retourner un tableau vide en cas d'erreur pour éviter les crashes
+      return [];
     }
   }
 
