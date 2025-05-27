@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/lib/supabase';
+import { eventService } from '@/lib/eventService';
+import { notesService } from '@/lib/notesService';
 
 export function ProductionDebugger() {
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [isVisible, setIsVisible] = useState(false);
+  const [testResults, setTestResults] = useState<any>({});
 
   useEffect(() => {
     // Collecter les informations de debug
@@ -37,6 +41,71 @@ export function ProductionDebugger() {
       console.log('🔧 [PROD DEBUG] Informations de debug:', info);
     }
   }, []);
+
+  const testSupabaseConnection = async () => {
+    try {
+      console.log('🔧 [PROD DEBUG] Test de connexion Supabase...');
+      
+      // Test de connexion basique
+      const { data, error } = await supabase.from('evscatala_profiles').select('count(*)', { count: 'exact', head: true });
+      
+      const result = {
+        success: !error,
+        error: error?.message,
+        errorCode: error?.code,
+        profilesCount: data?.length || 0,
+        timestamp: new Date().toISOString()
+      };
+      
+      setTestResults(prev => ({ ...prev, supabase: result }));
+      console.log('🔧 [PROD DEBUG] Résultat test Supabase:', result);
+      
+    } catch (err) {
+      const result = {
+        success: false,
+        error: err instanceof Error ? err.message : 'Erreur inconnue',
+        timestamp: new Date().toISOString()
+      };
+      setTestResults(prev => ({ ...prev, supabase: result }));
+      console.error('🔧 [PROD DEBUG] Erreur test Supabase:', err);
+    }
+  };
+
+  const testServices = async () => {
+    try {
+      console.log('🔧 [PROD DEBUG] Test des services...');
+      
+      // Test du service événements
+      const eventsResult = await eventService.getEvents().then(
+        events => ({ success: true, count: events.length, data: events.slice(0, 2) }),
+        error => ({ success: false, error: error.message })
+      );
+      
+      // Test du service notes
+      const notesResult = await notesService.getNotes().then(
+        notes => ({ success: true, count: notes.length, data: notes.slice(0, 2) }),
+        error => ({ success: false, error: error.message })
+      );
+      
+      const results = {
+        events: eventsResult,
+        notes: notesResult,
+        timestamp: new Date().toISOString()
+      };
+      
+      setTestResults(prev => ({ ...prev, services: results }));
+      console.log('🔧 [PROD DEBUG] Résultat test services:', results);
+      
+    } catch (err) {
+      const result = {
+        success: false,
+        error: err instanceof Error ? err.message : 'Erreur inconnue',
+        timestamp: new Date().toISOString()
+      };
+      setTestResults(prev => ({ ...prev, services: result }));
+      console.error('🔧 [PROD DEBUG] Erreur test services:', err);
+    }
+  };
 
   // Afficher seulement en développement ou si explicitement demandé
   if (!import.meta.env.DEV && !isVisible) {
@@ -92,17 +161,46 @@ export function ProductionDebugger() {
             </pre>
           </div>
           
-          <Button
-            onClick={() => {
-              console.log('🔧 [PROD DEBUG] Informations complètes:', debugInfo);
-              alert('Informations loggées dans la console');
-            }}
-            variant="outline"
-            size="sm"
-            className="w-full mt-2"
-          >
-            Log Console
-          </Button>
+          <div className="space-y-2">
+            <Button
+              onClick={() => {
+                console.log('🔧 [PROD DEBUG] Informations complètes:', debugInfo);
+                alert('Informations loggées dans la console');
+              }}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Log Console
+            </Button>
+            
+            <Button
+              onClick={testSupabaseConnection}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Test Supabase
+            </Button>
+            
+            <Button
+              onClick={testServices}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Test Services
+            </Button>
+          </div>
+          
+          {Object.keys(testResults).length > 0 && (
+            <div>
+              <strong>Résultats des tests:</strong>
+              <pre className="text-xs bg-gray-800 p-1 rounded mt-1 max-h-32 overflow-y-auto">
+                {JSON.stringify(testResults, null, 2)}
+              </pre>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

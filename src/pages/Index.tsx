@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Welcome from '@/components/home/Welcome';
 import UpcomingEvents from '@/components/home/UpcomingEvents';
 import ModuleSection from '@/components/home/ModuleSection';
+import { DataLoadingDiagnostic } from '@/components/debug/DataLoadingDiagnostic';
 
 const Index = () => {
   const { scrollY } = useScroll();
@@ -69,6 +70,18 @@ const Index = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div className="container mx-auto px-4 py-6">
+          {/* Diagnostic temporaire pour la production */}
+          {import.meta.env.PROD && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="mb-6"
+            >
+              <DataLoadingDiagnostic />
+            </motion.div>
+          )}
+          
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
