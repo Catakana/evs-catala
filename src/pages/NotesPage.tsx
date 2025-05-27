@@ -32,6 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { notesService, Note, NoteFilters } from '@/lib/notesService';
 import { authService } from '@/lib/supabase';
 import { QuickNoteModal } from '@/components/notes/QuickNoteModal';
+// import { NotesDebugger } from '@/components/notes/NotesDebugger';
 
 export default function NotesPage() {
   const { toast } = useToast();
@@ -189,6 +190,9 @@ export default function NotesPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* Debugger temporaire - commenté pour test */}
+      {/* <NotesDebugger /> */}
+      
       {/* En-tête */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -197,10 +201,56 @@ export default function NotesPage() {
             Gérez vos notes, idées et compte-rendus
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nouvelle note
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={async () => {
+              try {
+                console.log('🧪 [TEST] Test de création directe...');
+                const user = await authService.getCurrentUser();
+                if (!user) {
+                  toast({
+                    title: "Erreur",
+                    description: "Pas d'utilisateur connecté",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                
+                const testNote = await notesService.createNote({
+                  content: 'Note de test directe - ' + new Date().toISOString(),
+                  title: 'Test direct',
+                  context_type: 'free',
+                  status: 'draft',
+                  tags: ['test-direct'],
+                  is_private: false
+                }, user.id);
+                
+                console.log('✅ [TEST] Note créée:', testNote);
+                toast({
+                  title: "Test réussi",
+                  description: "Note de test créée avec succès",
+                });
+                
+                await loadNotes();
+              } catch (error) {
+                console.error('❌ [TEST] Erreur:', error);
+                toast({
+                  title: "Test échoué",
+                  description: error instanceof Error ? error.message : "Erreur inconnue",
+                  variant: "destructive",
+                });
+              }
+            }}
+            variant="outline" 
+            size="sm"
+          >
+            🧪 Test Direct
+          </Button>
+          <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Nouvelle note
+          </Button>
+        </div>
       </div>
 
       {/* Statistiques rapides */}

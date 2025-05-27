@@ -61,6 +61,8 @@ export const notesService = {
   // Méthode alternative pour récupérer les notes
   async getNotesAlternative(filters: NoteFilters = {}) {
     try {
+      console.log('🔄 Récupération des notes avec filtres:', filters);
+      
       let query = supabase
         .from('evscatala_notes')
         .select('*');
@@ -95,6 +97,7 @@ export const notesService = {
       const { data: notes, error } = await query;
 
       if (error) {
+        console.error('❌ Erreur lors de la récupération des notes:', error);
         // Si la table n'existe pas encore, retourner un tableau vide
         if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
           console.warn('Table evscatala_notes non trouvée, retour d\'un tableau vide');
@@ -103,7 +106,10 @@ export const notesService = {
         throw error;
       }
 
+      console.log(`✅ Notes récupérées: ${notes?.length || 0} notes trouvées`);
+
       if (!notes || notes.length === 0) {
+        console.log('ℹ️ Aucune note trouvée');
         return [];
       }
 
@@ -196,31 +202,56 @@ export const notesService = {
   // Créer une nouvelle note
   async createNote(noteData: NoteData, userId: string) {
     try {
+      console.log('🔄 Création de note en cours...', { noteData, userId });
+      
+      // Préparer les données à insérer
+      const insertData = {
+        content: noteData.content,
+        title: noteData.title,
+        author_id: userId,
+        context_type: noteData.context_type,
+        context_id: noteData.context_id,
+        status: noteData.status || 'draft',
+        tags: noteData.tags || [],
+        shared_with: noteData.shared_with || [],
+        is_private: noteData.is_private || false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('📝 Données à insérer:', insertData);
+      
+      console.log('🔄 Appel Supabase insert...');
       const { data: note, error } = await supabase
         .from('evscatala_notes')
-        .insert({
-          content: noteData.content,
-          title: noteData.title,
-          author_id: userId,
-          context_type: noteData.context_type,
-          context_id: noteData.context_id,
-          status: noteData.status || 'draft',
-          tags: noteData.tags || [],
-          shared_with: noteData.shared_with || [],
-          is_private: noteData.is_private || false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+        .insert(insertData)
         .select('*')
         .single();
 
+      console.log('📊 Résultat Supabase:', { note, error });
+
       if (error) {
+        console.error('❌ Erreur Supabase lors de la création de la note:', error);
+        console.error('❌ Code d\'erreur:', error.code);
+        console.error('❌ Message d\'erreur:', error.message);
+        console.error('❌ Détails complets:', JSON.stringify(error, null, 2));
+        
         if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
-          throw new Error('La table des notes n\'existe pas encore. Veuillez exécuter le script de création de la base de données.');
+          throw new Error('La table des notes n\'existe pas encore. Veuillez exécuter le script scripts/fix_notes_issue.sql dans Supabase.');
         }
-        console.error('Erreur lors de la création de la note:', error);
-        throw error;
+        
+        if (error.code === '42501') {
+          throw new Error('Permissions insuffisantes. Vérifiez que vous êtes bien connecté.');
+        }
+        
+        if (error.code === '23505') {
+          throw new Error('Une note avec cet identifiant existe déjà.');
+        }
+        
+        throw new Error(`Erreur de base de données: ${error.message} (Code: ${error.code})`);
       }
+
+      console.log('✅ Note créée avec succès:', note);
 
       // Récupérer le profil de l'auteur
       const { data: author } = await supabase

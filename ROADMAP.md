@@ -198,6 +198,40 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Gestion des rôles** : Attribution et modification des rôles (membre, contributeur, gestionnaire, admin)
 - ✅ **Avatars et initiales** : Affichage visuel des membres avec avatars ou initiales
 - ✅ **Actions CRUD** : Ajouter, modifier le rôle, et retirer des membres de l'équipe
+
+#### Optimisation interface page d'accueil ✅ TERMINÉ (27/05/2025)
+- ✅ **Suppression bouton présentation** : Retrait du bouton de présentation du header
+- ✅ **Nouveau bouton découverte** : Remplacement des statistiques mock par un bouton vers la page de présentation
+- ✅ **Design amélioré** : Bouton avec gradient violet-rose et animations au survol
+- ✅ **Navigation simplifiée** : Accès direct aux fonctionnalités depuis la page d'accueil
+- ✅ **Nettoyage imports** : Suppression des imports inutilisés (Presentation icon)
+- ✅ **UX cohérente** : Centralisation de l'accès à la présentation depuis l'accueil
+
+#### Amélioration visuelle page de présentation ✅ TERMINÉ (27/05/2025)
+- ✅ **Dégradé blanc/bleu** : Remplacement du fond coloré par un dégradé élégant blanc vers bleu
+- ✅ **Adaptation des couleurs** : Textes et éléments adaptés au nouveau fond clair
+- ✅ **Particules animées** : Ajout de particules bleues flottantes pour l'ambiance
+- ✅ **Indicateur de scroll amélioré** : Invitation claire à défiler avec texte et flèche animée
+- ✅ **Cohérence visuelle** : Harmonisation des couleurs avec la charte graphique bleue
+- ✅ **Effets parallax** : Conservation des effets de parallax avec le nouveau design
+
+#### Navigation améliorée page de présentation ✅ TERMINÉ (27/05/2025)
+- ✅ **Bouton retour accueil** : Ajout d'un bouton fixe en haut à gauche pour retourner à l'accueil
+- ✅ **Liens fonctionnels** : Configuration des boutons "Découvrir" pour rediriger vers les pages correspondantes
+- ✅ **Navigation directe** : Accès direct aux modules depuis la page de présentation
+- ✅ **UX améliorée** : Boutons avec états disabled pour les modules non encore développés
+- ✅ **Design cohérent** : Bouton retour avec style backdrop-blur et transparence
+- ✅ **Liens configurés** : Agenda (/agenda), Permanences (/permanences), Votes (/votes), Projets (/projects), Annonces (/announcements), Messages (/messages), Trombinoscope (/trombinoscope)
+
+#### Correction problème enregistrement Notes ✅ TERMINÉ (27/05/2025)
+- ✅ **Diagnostic du problème** : Identification du problème de table manquante ou politiques RLS incorrectes
+- ✅ **Script de réparation** : Création de `scripts/fix_notes_issue.sql` pour corriger la structure de base de données
+- ✅ **Script de test** : Création de `scripts/test_notes_creation.sql` pour vérifier le fonctionnement
+- ✅ **Amélioration gestion d'erreurs** : Messages d'erreur détaillés avec codes spécifiques dans le service
+- ✅ **Logs de débogage** : Ajout de logs détaillés pour faciliter le diagnostic
+- ✅ **Guide de dépannage** : Documentation complète dans `docs/TROUBLESHOOTING_NOTES.md`
+- ✅ **UX améliorée** : Fermeture automatique de la modal après création réussie
+- ✅ **Messages utilisateur** : Affichage des erreurs spécifiques selon le type de problème
 - ✅ **Permissions** : Seuls les admins peuvent modifier l'équipe (sauf leur propre profil)
 - ✅ **Interface moderne** : Design avec cartes, badges colorés par rôle et icônes
 - ✅ **Script de test** : `test_user_profiles.sql` pour vérifier et créer la table des profils

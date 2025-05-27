@@ -55,7 +55,9 @@ const FeatureSection: React.FC<{
   gradient: string;
   illustration: React.ReactNode;
   reverse?: boolean;
-}> = ({ icon, title, description, features, gradient, illustration, reverse = false }) => {
+  linkTo?: string;
+}> = ({ icon, title, description, features, gradient, illustration, reverse = false, linkTo }) => {
+  const navigate = useNavigate();
   return (
     <AnimatedSection>
       <div className={cn(
@@ -92,6 +94,8 @@ const FeatureSection: React.FC<{
           <Button 
             size="lg" 
             className={cn("text-white shadow-lg hover:shadow-xl transition-all", gradient)}
+            onClick={() => linkTo && navigate(linkTo)}
+            disabled={!linkTo}
           >
             Découvrir {title}
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -378,18 +382,31 @@ const PresentationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Bouton retour accueil */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => navigate('/')}
+          className="bg-white/90 backdrop-blur-sm border-blue-200 text-blue-600 hover:bg-blue-50 shadow-lg"
+        >
+          <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
+          Retour accueil
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Fond animé */}
+        {/* Fond animé avec dégradé blanc/bleu */}
         <motion.div 
           className="absolute inset-0 -z-10"
           style={{ y: heroY, opacity: heroOpacity }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600" />
+          <div className="absolute inset-0 bg-gradient-to-br from-white via-blue-100 to-blue-600" />
           
           {/* Formes géométriques animées */}
           <motion.div
-            className="absolute -top-40 -right-40 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.2, 1],
               rotate: [0, 180, 360],
@@ -397,17 +414,40 @@ const PresentationPage: React.FC = () => {
             transition={{ duration: 20, repeat: Infinity }}
           />
           <motion.div
-            className="absolute top-1/2 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"
+            className="absolute top-1/2 -left-40 w-80 h-80 bg-blue-300/20 rounded-full blur-3xl"
             animate={{
               scale: [1.2, 1, 1.2],
               rotate: [360, 180, 0],
             }}
             transition={{ duration: 15, repeat: Infinity }}
           />
+          
+          {/* Particules flottantes bleues */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-blue-400/40 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-20, 20, -20],
+                x: [-10, 10, -10],
+                opacity: [0.2, 0.6, 0.2],
+              }}
+              transition={{
+                duration: 4 + Math.random() * 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
         </motion.div>
 
         {/* Contenu Hero */}
-        <div className="container mx-auto px-4 text-center text-white relative z-10">
+        <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -418,15 +458,15 @@ const PresentationPage: React.FC = () => {
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 4, repeat: Infinity }}
             >
-              <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-2">
+              <Badge className="bg-blue-600/20 text-blue-800 border-blue-300 text-lg px-4 py-2 backdrop-blur-sm">
                 ✨ Portail Associatif Moderne
               </Badge>
             </motion.div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight bg-gradient-to-br from-blue-900 via-blue-700 to-blue-600 bg-clip-text text-transparent">
               <span className="block">EVS CATALA</span>
               <motion.span 
-                className="block text-4xl md:text-5xl text-yellow-300"
+                className="block text-4xl md:text-5xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -434,7 +474,7 @@ const PresentationPage: React.FC = () => {
               </motion.span>
             </h1>
             
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-700 leading-relaxed">
               Une plateforme complète pour gérer, organiser et faire vivre votre association. 
               Découvrez tous les outils dont vous avez besoin en un seul endroit.
             </p>
@@ -447,7 +487,7 @@ const PresentationPage: React.FC = () => {
             >
               <Button 
                 size="lg" 
-                className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4 rounded-full shadow-xl"
+                className="bg-blue-600 text-white hover:bg-blue-700 text-lg px-8 py-4 rounded-full shadow-xl"
                 onClick={() => navigate('/register')}
               >
                 <Sparkles className="mr-2 h-5 w-5" />
@@ -458,7 +498,7 @@ const PresentationPage: React.FC = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-white text-white hover:bg-white/10 text-lg px-8 py-4 rounded-full"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 rounded-full"
                 onClick={() => {
                   document.getElementById('features')?.scrollIntoView({ 
                     behavior: 'smooth' 
@@ -471,19 +511,48 @@ const PresentationPage: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Indicateur de scroll */}
+        {/* Indicateur de scroll amélioré */}
         <motion.div 
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+          <motion.div
+            className="text-blue-600 mb-2 text-sm font-medium"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+          >
+            Découvrez plus
+          </motion.div>
+          
+          <div className="w-6 h-10 border-2 border-blue-600/70 rounded-full flex justify-center bg-white/30 backdrop-blur-sm">
             <motion.div 
-              className="w-1 h-3 bg-white rounded-full mt-2"
+              className="w-1 h-3 bg-blue-600 rounded-full mt-2"
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           </div>
+          
+          <motion.div
+            className="mt-2"
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+          >
+            <svg 
+              className="w-6 h-6 text-blue-600" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+              />
+            </svg>
+          </motion.div>
         </motion.div>
       </section>
 
@@ -543,6 +612,7 @@ const PresentationPage: React.FC = () => {
             ]}
             gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
             illustration={<CalendarIllustration />}
+            linkTo="/agenda"
           />
 
           {/* Permanences */}
@@ -559,6 +629,7 @@ const PresentationPage: React.FC = () => {
             gradient="bg-gradient-to-br from-green-500 to-emerald-600"
             illustration={<PermanencesIllustration />}
             reverse
+            linkTo="/permanences"
           />
 
           {/* Votes */}
@@ -574,6 +645,7 @@ const PresentationPage: React.FC = () => {
             ]}
             gradient="bg-gradient-to-br from-purple-500 to-pink-600"
             illustration={<VotesIllustration />}
+            linkTo="/votes"
           />
 
           {/* Projets */}
@@ -590,6 +662,7 @@ const PresentationPage: React.FC = () => {
             gradient="bg-gradient-to-br from-orange-500 to-red-600"
             illustration={<ProjectsIllustration />}
             reverse
+            linkTo="/projects"
           />
 
           {/* Annonces */}
@@ -605,6 +678,7 @@ const PresentationPage: React.FC = () => {
             ]}
             gradient="bg-gradient-to-br from-cyan-500 to-blue-600"
             illustration={<AnnouncesIllustration />}
+            linkTo="/announcements"
           />
 
           {/* Messagerie */}
@@ -621,6 +695,7 @@ const PresentationPage: React.FC = () => {
             gradient="bg-gradient-to-br from-teal-500 to-green-600"
             illustration={<MessagesIllustration />}
             reverse
+            linkTo="/messages"
           />
 
           {/* Trombinoscope */}
@@ -636,6 +711,7 @@ const PresentationPage: React.FC = () => {
             ]}
             gradient="bg-gradient-to-br from-indigo-500 to-purple-600"
             illustration={<TrombinoscopeIllustration />}
+            linkTo="/trombinoscope"
           />
         </div>
       </section>

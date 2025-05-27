@@ -155,31 +155,28 @@ const Welcome: React.FC<WelcomeProps> = ({ className }) => {
           contribuer et s'épanouir. 🚀
         </motion.p>
 
-        {/* Statistiques rapides */}
+        {/* Bouton de découverte */}
         <motion.div 
-          className="flex flex-wrap justify-center gap-6 mb-8"
+          className="flex justify-center mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          {[
-            { icon: '👥', label: 'Membres actifs', value: '50+' },
-            { icon: '📅', label: 'Événements', value: '25+' },
-            { icon: '💡', label: 'Projets', value: '12+' }
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-gray-200/50 shadow-sm"
-              whileHover={{ scale: 1.05, y: -2 }}
-              transition={{ type: "spring", stiffness: 300 }}
+          <motion.div
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Button 
+              size="lg"
+              onClick={() => navigate('/presentation')}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg rounded-full"
             >
-              <span className="text-xl">{stat.icon}</span>
-              <div className="text-left">
-                <div className="font-bold text-gray-800">{stat.value}</div>
-                <div className="text-xs text-gray-600">{stat.label}</div>
-              </div>
-            </motion.div>
-          ))}
+              <Sparkles className="mr-3 h-6 w-6" />
+              Découvrir toutes les fonctionnalités
+              <ArrowRight className="ml-3 h-6 w-6" />
+            </Button>
+          </motion.div>
         </motion.div>
       </motion.div>
 

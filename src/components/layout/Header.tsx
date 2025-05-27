@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut, PenTool, Monitor, AlertTriangle, LogIn, Presentation } from 'lucide-react';
+import { Menu, User, LogOut, PenTool, Monitor, AlertTriangle, LogIn } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,17 +75,7 @@ const Header: React.FC = () => {
             <span className="sr-only">Menu</span>
           </Button>
           
-          {/* Bouton d'accès à la présentation - toujours visible */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigate('/presentation')}
-            title="Découvrir l'application"
-            className="hover:bg-purple-50 hover:text-purple-600"
-          >
-            <Presentation className="h-5 w-5" />
-            <span className="sr-only">Présentation</span>
-          </Button>
+
           
           {/* Bouton d'accès rapide à l'affichage public - toujours visible */}
           <Button 

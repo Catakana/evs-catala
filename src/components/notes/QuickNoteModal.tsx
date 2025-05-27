@@ -69,17 +69,33 @@ export function QuickNoteModal({
 
   const loadInitialData = async () => {
     try {
+      console.log('🔄 [MODAL] Chargement des données initiales...');
+      
       // Charger l'utilisateur actuel
+      console.log('👤 [MODAL] Récupération de l\'utilisateur...');
       const user = await authService.getCurrentUser();
       if (user) {
+        console.log('✅ [MODAL] Utilisateur trouvé:', user);
         setCurrentUser(user);
+      } else {
+        console.log('❌ [MODAL] Aucun utilisateur trouvé');
       }
 
       // Charger les événements disponibles pour le contexte
-      const events = await eventService.getEvents();
-      setAvailableEvents(events);
+      console.log('📅 [MODAL] Récupération des événements...');
+      try {
+        const events = await eventService.getEvents();
+        console.log('✅ [MODAL] Événements récupérés:', events.length);
+        setAvailableEvents(events);
+      } catch (eventError) {
+        console.error('❌ [MODAL] Erreur lors du chargement des événements:', eventError);
+        // Continuer même si les événements ne se chargent pas
+        setAvailableEvents([]);
+      }
+      
+      console.log('✅ [MODAL] Données initiales chargées');
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
+      console.error('❌ [MODAL] Erreur lors du chargement des données:', error);
     }
   };
 
@@ -87,7 +103,12 @@ export function QuickNoteModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🚀 [MODAL] Début de la soumission du formulaire');
+    console.log('📋 [MODAL] Données du formulaire:', formData);
+    console.log('👤 [MODAL] Utilisateur actuel:', currentUser);
+    
     if (!formData.content.trim()) {
+      console.log('❌ [MODAL] Contenu vide');
       toast({
         title: "Erreur",
         description: "Le contenu de la note ne peut pas être vide",
@@ -97,6 +118,7 @@ export function QuickNoteModal({
     }
 
     if (!currentUser) {
+      console.log('❌ [MODAL] Pas d\'utilisateur connecté');
       toast({
         title: "Erreur",
         description: "Vous devez être connecté pour créer une note",
@@ -107,8 +129,16 @@ export function QuickNoteModal({
 
     try {
       setIsLoading(true);
+      console.log('⏳ [MODAL] Début de l\'enregistrement...');
       
-      await notesService.createNote(formData, currentUser.id);
+      console.log('🔄 [MODAL] Appel notesService.createNote avec:', { 
+        formData, 
+        userId: currentUser.id 
+      });
+      
+      const createdNote = await notesService.createNote(formData, currentUser.id);
+      
+      console.log('✅ [MODAL] Note créée avec succès:', createdNote);
       
       toast({
         title: "Note créée",
@@ -116,6 +146,7 @@ export function QuickNoteModal({
       });
 
       // Réinitialiser le formulaire
+      console.log('🔄 [MODAL] Réinitialisation du formulaire...');
       setFormData({
         content: '',
         title: '',
@@ -127,16 +158,27 @@ export function QuickNoteModal({
       });
 
       if (onNoteSaved) {
+        console.log('📞 [MODAL] Appel du callback onNoteSaved...');
         onNoteSaved();
       }
+      
+      // Fermer la modal après succès
+      console.log('🚪 [MODAL] Fermeture de la modal...');
+      onClose();
     } catch (error) {
-      console.error('Erreur lors de la création de la note:', error);
+      console.error('❌ [MODAL] Erreur lors de la création de la note:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue lors de la création de la note";
+      
+      console.log('📢 [MODAL] Affichage du toast d\'erreur:', errorMessage);
+      
       toast({
         title: "Erreur",
-        description: "Impossible de créer la note",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
+      console.log('🏁 [MODAL] Fin de l\'enregistrement, isLoading = false');
       setIsLoading(false);
     }
   };
@@ -180,7 +222,14 @@ export function QuickNoteModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form 
+          onSubmit={(e) => {
+            console.log('📝 [MODAL] Événement onSubmit du formulaire déclenché');
+            handleSubmit(e);
+          }} 
+          className="space-y-6"
+          noValidate
+        >
           {/* Titre (optionnel) */}
           <div className="space-y-2">
             <Label htmlFor="title">Titre (optionnel)</Label>
@@ -202,7 +251,6 @@ export function QuickNoteModal({
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
               rows={6}
               className="resize-none"
-              required
             />
           </div>
 
@@ -327,7 +375,16 @@ export function QuickNoteModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Annuler
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading || !formData.content.trim()}
+              onClick={(e) => {
+                console.log('🖱️ [MODAL] Clic sur le bouton Enregistrer');
+                console.log('📋 [MODAL] FormData au moment du clic:', formData);
+                console.log('👤 [MODAL] CurrentUser au moment du clic:', currentUser);
+                // Le onClick ne doit pas empêcher la soumission du formulaire
+              }}
+            >
               {isLoading ? (
                 "Enregistrement..."
               ) : (
