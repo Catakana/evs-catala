@@ -131,6 +131,18 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Optimisation mobile** : Amélioration de l'affichage sur petits écrans
 - ✅ **Remise Notes dans navigation** : Ajout de l'item "Notes" dans Organisation (sans bouton flottant)
 
+#### Amélioration page d'accueil ✅ TERMINÉ (27/05/2025)
+- ✅ **Fond dégradé parallax** : Arrière-plan animé avec formes géométriques et effet parallax
+- ✅ **Animations d'émoticônes** : Rotation automatique des émoticônes dans l'en-tête principal
+- ✅ **Design moderne** : Titre avec gradient de couleurs et effets visuels avancés
+- ✅ **Statistiques animées** : Cartes de statistiques avec animations au survol
+- ✅ **Cartes améliorées** : Annonces et événements avec effets de survol et animations
+- ✅ **Particules décoratives** : Éléments flottants subtils en arrière-plan
+- ✅ **Animations séquentielles** : Apparition progressive des éléments avec délais
+- ✅ **Styles CSS personnalisés** : Animations float, shimmer, gradient et effets de verre
+- ✅ **Responsive optimisé** : Adaptation parfaite pour tous les écrans
+- ✅ **Performance** : Rendu conditionnel pour éviter les problèmes SSR
+
 #### Améliorations gestion d'erreurs ✅ TERMINÉ (27/05/2025)
 - ✅ **Messages d'erreur clairs** : Amélioration des messages d'authentification
 - ✅ **Gestion erreurs spécifiques** : Permissions, session expirée, JWT invalide
