@@ -131,6 +131,14 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Scripts de test** : Annonces de test pour vérifier le fonctionnement
 - ✅ **Actualisation automatique** : Bouton pour recharger la page si nécessaire
 
+#### Amélioration page d'accueil ✅ TERMINÉ (27/05/2025)
+- ✅ **Suppression boutons inutiles** : Retrait des boutons "Commencer" et "En savoir plus"
+- ✅ **Tableau des annonces récentes** : Affichage des 5 dernières annonces en cours
+- ✅ **Filtrage intelligent** : Annonces non archivées et non expirées uniquement
+- ✅ **Design moderne** : Cartes avec badges de catégorie et informations détaillées
+- ✅ **Navigation rapide** : Bouton "Voir tout" vers la page des annonces
+- ✅ **Styles line-clamp** : Limitation du texte à 2 lignes avec CSS utilities
+
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
 - **Semaine 2**: Gestion de profil et récupération de mot de passe ✅
