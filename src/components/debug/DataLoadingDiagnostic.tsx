@@ -31,36 +31,42 @@ export function DataLoadingDiagnostic() {
       // Test table profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('evscatala_profiles')
-        .select('count(*)', { count: 'exact', head: true });
+        .select('id')
+        .limit(1);
       
       results.tables = {
         profiles: {
           success: !profilesError,
           error: profilesError?.message,
-          code: profilesError?.code
+          code: profilesError?.code,
+          hasData: profilesData && profilesData.length > 0
         }
       };
 
       // Test table events
       const { data: eventsData, error: eventsError } = await supabase
         .from('evscatala_events')
-        .select('count(*)', { count: 'exact', head: true });
+        .select('id')
+        .limit(1);
       
       results.tables.events = {
         success: !eventsError,
         error: eventsError?.message,
-        code: eventsError?.code
+        code: eventsError?.code,
+        hasData: eventsData && eventsData.length > 0
       };
 
       // Test table notes
       const { data: notesData, error: notesError } = await supabase
         .from('evscatala_notes')
-        .select('count(*)', { count: 'exact', head: true });
+        .select('id')
+        .limit(1);
       
       results.tables.notes = {
         success: !notesError,
         error: notesError?.message,
-        code: notesError?.code
+        code: notesError?.code,
+        hasData: notesData && notesData.length > 0
       };
 
       // Test 3: Politiques RLS
@@ -155,7 +161,7 @@ export function DataLoadingDiagnostic() {
           {Object.entries(diagnostics.tables || {}).map(([tableName, tableInfo]: [string, any]) => (
             <div key={tableName} className="ml-4">
               <div className={`${getStatusColor(tableInfo.success)}`}>
-                {getStatusIcon(tableInfo.success)} {tableName}
+                {getStatusIcon(tableInfo.success)} {tableName} {tableInfo.hasData ? '(contient des données)' : '(vide)'}
               </div>
               {tableInfo.error && (
                 <div className="text-red-600 text-xs ml-4">

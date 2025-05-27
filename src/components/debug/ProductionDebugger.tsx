@@ -47,7 +47,7 @@ export function ProductionDebugger() {
       console.log('🔧 [PROD DEBUG] Test de connexion Supabase...');
       
       // Test de connexion basique
-      const { data, error } = await supabase.from('evscatala_profiles').select('count(*)', { count: 'exact', head: true });
+      const { data, error } = await supabase.from('evscatala_profiles').select('id').limit(1);
       
       const result = {
         success: !error,
