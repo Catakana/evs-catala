@@ -37,6 +37,7 @@ import AuthDebugPage from '@/pages/test/AuthDebugPage';
 import ServicesTestPage from '@/pages/test/ServicesTestPage';
 import PublicDisplayPage from '@/pages/PublicDisplayPage';
 import PresentationPage from '@/pages/PresentationPage';
+import { ProductionDebugger } from '@/components/debug/ProductionDebugger';
 
 const queryClient = new QueryClient();
 
@@ -195,6 +196,9 @@ const App = () => {
               />
             </Routes>
           </BrowserRouter>
+          
+          {/* Debugger de production */}
+          <ProductionDebugger />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
