@@ -145,27 +145,6 @@ const AgendaPage: React.FC = () => {
     <div className="container mx-auto p-4 space-y-6">
       {/* En-tête avec navigation et filtres */}
       <div className="flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Agenda</h1>
-          <div className="flex items-center space-x-2">
-            {/* Filtres */}
-            <AgendaFilters
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-              isOpen={isFiltersOpen}
-              onToggle={() => setIsFiltersOpen(!isFiltersOpen)}
-            />
-            
-            {/* Bouton de création (si autorisé) */}
-            {canCreateEvent && (
-              <Button size="sm" onClick={handleCreateEvent}>
-                <PlusCircle className="mr-1 h-4 w-4" />
-                Nouvel événement
-              </Button>
-            )}
-          </div>
-        </div>
-
         {/* Navigation de l'agenda */}
         <AgendaHeader 
           view={view} 
@@ -174,6 +153,14 @@ const AgendaPage: React.FC = () => {
           setSelectedDate={setSelectedDate}
           onAddEvent={canCreateEvent ? handleCreateEvent : undefined}
           onFilter={() => setIsFiltersOpen(!isFiltersOpen)}
+        />
+
+        {/* Filtres */}
+        <AgendaFilters
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          isOpen={isFiltersOpen}
+          onToggle={() => setIsFiltersOpen(!isFiltersOpen)}
         />
 
         {/* Indicateur de filtres actifs */}

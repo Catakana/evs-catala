@@ -12,30 +12,42 @@ interface AgendaHeaderProps {
   setView: (view: 'month' | 'week' | 'day' | 'list') => void;
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
+  onAddEvent?: () => void;
+  onFilter?: () => void;
 }
 
 const AgendaHeader: React.FC<AgendaHeaderProps> = ({ 
   view, 
   setView, 
   selectedDate, 
-  setSelectedDate 
+  setSelectedDate,
+  onAddEvent,
+  onFilter
 }) => {
   const { toast } = useToast();
 
   const handleAddEvent = () => {
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "La création d'événements sera bientôt disponible.",
-      duration: 3000,
-    });
+    if (onAddEvent) {
+      onAddEvent();
+    } else {
+      toast({
+        title: "Fonctionnalité à venir",
+        description: "La création d'événements sera bientôt disponible.",
+        duration: 3000,
+      });
+    }
   };
 
   const handleFilter = () => {
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "Le filtrage des événements sera bientôt disponible.",
-      duration: 3000,
-    });
+    if (onFilter) {
+      onFilter();
+    } else {
+      toast({
+        title: "Fonctionnalité à venir",
+        description: "Le filtrage des événements sera bientôt disponible.",
+        duration: 3000,
+      });
+    }
   };
 
   const navigate = (direction: 'prev' | 'next') => {
