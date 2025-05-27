@@ -168,7 +168,7 @@ DROP POLICY IF EXISTS "Les utilisateurs peuvent voir les participants aux perman
 CREATE POLICY "Les utilisateurs peuvent voir les participants aux permanences" 
 ON public.evscatala_permanence_participants
 FOR SELECT
-USING ((SELECT auth.role()) IS NOT NULL);
+USING (true);
 
 DROP POLICY IF EXISTS "Les utilisateurs peuvent se désinscrire de leurs permanences" ON public.evscatala_permanence_participants;
 CREATE POLICY "Les utilisateurs peuvent se désinscrire de leurs permanences" 

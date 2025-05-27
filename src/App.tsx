@@ -12,12 +12,12 @@ import AgendaPage from "./pages/AgendaPage";
 import PermanencesPage from "./pages/PermanencesPage";
 import TrombinoscopePage from "./pages/TrombinoscopePage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
-import VotesPage from './pages/VotesPage';
-import VoteDetailPage from './pages/VoteDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
 import MessagesPage from './pages/MessagesPage';
 import InfosPage from './pages/InfosPage';
 import NotesPage from './pages/NotesPage';
+import { VotesPage } from './pages/VotesPage';
+import { VoteDetailPage } from './pages/VoteDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -34,6 +34,8 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
 import SupabaseDebugTest from '@/pages/test/SupabaseDebugTest';
 import AuthDebugPage from '@/pages/test/AuthDebugPage';
+import ServicesTestPage from '@/pages/test/ServicesTestPage';
+import PublicDisplayPage from '@/pages/PublicDisplayPage';
 
 const queryClient = new QueryClient();
 
@@ -55,6 +57,9 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/verify-email" element={<EmailVerificationPage />} />
+              
+              {/* Page d'affichage public (plein écran, sans layout) */}
+              <Route path="/public-display" element={<PublicDisplayPage />} />
               
               {/* Routes avec layout principal incluant la barre de navigation */}
               <Route
@@ -98,22 +103,6 @@ const App = () => {
                 }
               />
               <Route
-                path="/votes"
-                element={
-                  <AppLayout>
-                    <VotesPage />
-                  </AppLayout>
-                }
-              />
-              <Route
-                path="/votes/:id"
-                element={
-                  <AppLayout>
-                    <VoteDetailPage />
-                  </AppLayout>
-                }
-              />
-              <Route
                 path="/projects"
                 element={
                   <AppLayout>
@@ -134,6 +123,22 @@ const App = () => {
                 element={
                   <AppLayout>
                     <NotesPage />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/votes"
+                element={
+                  <AppLayout>
+                    <VotesPage />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/votes/:id"
+                element={
+                  <AppLayout>
+                    <VoteDetailPage />
                   </AppLayout>
                 }
               />
@@ -168,6 +173,7 @@ const App = () => {
               <Route path="/test/profiles-migration" element={<ProfileMigrationTest />} />
               <Route path="/test/supabase" element={<SupabaseDebugTest />} />
               <Route path="/test/auth-debug" element={<AuthDebugPage />} />
+              <Route path="/test/services" element={<ServicesTestPage />} />
               
               {/* Routes protégées (utilisateurs connectés) */}
               <Route element={<ProtectedRoute />}>

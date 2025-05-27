@@ -120,13 +120,91 @@ const navTexts: TextEntry[] = [
 
 // Textes pour le profil
 const profileTexts: TextEntry[] = [
-  { id: 'profile.title', text: 'Profil' },
+  { id: 'profile.title', text: 'Mon profil' },
   { id: 'profile.settings', text: 'Paramètres' },
+  { id: 'profile.personalInfo', text: 'Informations personnelles' },
+  { id: 'profile.security', text: 'Sécurité' },
+  { id: 'profile.preferences', text: 'Préférences' },
+  { id: 'profile.updatePersonalInfo', text: 'Mettez à jour vos informations personnelles' },
+  { id: 'profile.securitySettings', text: 'Gérez vos paramètres de sécurité' },
+  { id: 'profile.preferencesSettings', text: 'Configurez vos préférences d\'affichage et de notification' },
+  { id: 'profile.changeAvatar', text: 'Changer la photo' },
+  { id: 'profile.saveChanges', text: 'Enregistrer les modifications' },
+  { id: 'profile.phone', text: 'Téléphone' },
+  { id: 'profile.changePassword', text: 'Changer de mot de passe' },
+  { id: 'profile.updateSuccess', text: 'Profil mis à jour' },
+  { id: 'profile.updateSuccessMessage', text: 'Vos informations ont été mises à jour avec succès' },
+  { id: 'profile.preferencesComingSoon', text: 'Les préférences seront disponibles prochainement' },
 ];
 
 // Textes pour l'application
 const appTexts: TextEntry[] = [
   { id: 'app.footer', text: '© 2024 EVS CATALA. Tous droits réservés.' },
+];
+
+// Textes pour les annonces
+const announcementsTexts: TextEntry[] = [
+  // Page principale
+  { id: 'announcements.title', text: 'Annonces' },
+  { id: 'announcements.create', text: 'Créer une annonce' },
+  { id: 'announcements.search', text: 'Rechercher dans les annonces...' },
+  { id: 'announcements.filters', text: 'Filtres' },
+  { id: 'announcements.noResults', text: 'Aucune annonce trouvée' },
+  { id: 'announcements.createFirst', text: 'Créez la première annonce !' },
+  { id: 'announcements.loading', text: 'Chargement des annonces...' },
+  
+  // Catégories
+  { id: 'announcements.category.info', text: 'Information' },
+  { id: 'announcements.category.urgent', text: 'Urgent' },
+  { id: 'announcements.category.event', text: 'Événement' },
+  { id: 'announcements.category.project', text: 'Projet' },
+  
+  // Formulaire
+  { id: 'announcements.form.title', text: 'Titre' },
+  { id: 'announcements.form.titlePlaceholder', text: 'Titre de l\'annonce' },
+  { id: 'announcements.form.content', text: 'Contenu' },
+  { id: 'announcements.form.contentPlaceholder', text: 'Contenu de l\'annonce' },
+  { id: 'announcements.form.category', text: 'Catégorie' },
+  { id: 'announcements.form.recipients', text: 'Destinataires' },
+  { id: 'announcements.form.publishDate', text: 'Date de publication' },
+  { id: 'announcements.form.expireDate', text: 'Date d\'expiration (optionnel)' },
+  { id: 'announcements.form.pin', text: 'Épingler l\'annonce' },
+  { id: 'announcements.form.pinDescription', text: 'L\'annonce apparaîtra en haut de la liste' },
+  { id: 'announcements.form.priority', text: 'Priorité (0-100)' },
+  { id: 'announcements.form.attachments', text: 'Pièces jointes' },
+  { id: 'announcements.form.addFiles', text: 'Cliquez pour ajouter des fichiers' },
+  { id: 'announcements.form.advancedOptions', text: 'Options avancées' },
+  
+  // Actions
+  { id: 'announcements.actions.edit', text: 'Modifier' },
+  { id: 'announcements.actions.archive', text: 'Archiver' },
+  { id: 'announcements.actions.delete', text: 'Supprimer' },
+  { id: 'announcements.actions.save', text: 'Enregistrer' },
+  { id: 'announcements.actions.cancel', text: 'Annuler' },
+  { id: 'announcements.actions.create', text: 'Créer l\'annonce' },
+  { id: 'announcements.actions.update', text: 'Mettre à jour' },
+  
+  // Messages
+  { id: 'announcements.messages.created', text: 'Annonce créée avec succès' },
+  { id: 'announcements.messages.updated', text: 'Annonce mise à jour avec succès' },
+  { id: 'announcements.messages.deleted', text: 'Annonce supprimée avec succès' },
+  { id: 'announcements.messages.archived', text: 'Annonce archivée avec succès' },
+  { id: 'announcements.messages.confirmDelete', text: 'Êtes-vous sûr de vouloir supprimer cette annonce ?' },
+  { id: 'announcements.messages.confirmArchive', text: 'Êtes-vous sûr de vouloir archiver cette annonce ?' },
+  
+  // Validation
+  { id: 'announcements.validation.titleRequired', text: 'Le titre est requis' },
+  { id: 'announcements.validation.titleTooLong', text: 'Le titre ne peut pas dépasser 255 caractères' },
+  { id: 'announcements.validation.contentRequired', text: 'Le contenu est requis' },
+  { id: 'announcements.validation.contentTooLong', text: 'Le contenu ne peut pas dépasser 5000 caractères' },
+  { id: 'announcements.validation.expireDateInvalid', text: 'La date d\'expiration doit être postérieure à la date de publication' },
+  { id: 'announcements.validation.priorityRange', text: 'La priorité doit être entre 0 et 100' },
+  
+  // Statuts
+  { id: 'announcements.status.pinned', text: 'Épinglé' },
+  { id: 'announcements.status.attachments', text: 'pièce(s) jointe(s)' },
+  { id: 'announcements.status.by', text: 'Par' },
+  { id: 'announcements.status.saving', text: 'Enregistrement...' },
 ];
 
 // Textes pour les votes et sondages
@@ -336,7 +414,7 @@ export const TEXTS: Record<TextCategory, TextEntry[]> = {
   auth: authTexts,
   agenda: [], // À compléter
   trombinoscope: [], // À compléter
-  annonces: [], // À compléter
+  annonces: announcementsTexts,
   permanences: [], // À compléter
   votes: votesTexts,
   projects: [], // À compléter
@@ -407,11 +485,42 @@ const fallbackTexts: Record<string, string> = {
   'nav.organisation': 'Organisation',
   
   // Profil
-  'profile.title': 'Profil',
+  'profile.title': 'Mon profil',
   'profile.settings': 'Paramètres',
+  'profile.personalInfo': 'Informations personnelles',
+  'profile.security': 'Sécurité',
+  'profile.preferences': 'Préférences',
+  'profile.updatePersonalInfo': 'Mettez à jour vos informations personnelles',
+  'profile.securitySettings': 'Gérez vos paramètres de sécurité',
+  'profile.preferencesSettings': 'Configurez vos préférences d\'affichage et de notification',
+  'profile.changeAvatar': 'Changer la photo',
+  'profile.saveChanges': 'Enregistrer les modifications',
+  'profile.phone': 'Téléphone',
+  'profile.changePassword': 'Changer de mot de passe',
+  'profile.updateSuccess': 'Profil mis à jour',
+  'profile.updateSuccessMessage': 'Vos informations ont été mises à jour avec succès',
+  'profile.preferencesComingSoon': 'Les préférences seront disponibles prochainement',
   
   // App
-  'app.footer': '© 2024 EVS CATALA. Tous droits réservés.'
+  'app.footer': '© 2024 EVS CATALA. Tous droits réservés.',
+  
+  // Annonces
+  'announcements.title': 'Annonces',
+  'announcements.create': 'Créer une annonce',
+  'announcements.search': 'Rechercher dans les annonces...',
+  'announcements.filters': 'Filtres',
+  'announcements.noResults': 'Aucune annonce trouvée',
+  'announcements.loading': 'Chargement des annonces...',
+  'announcements.category.info': 'Information',
+  'announcements.category.urgent': 'Urgent',
+  'announcements.category.event': 'Événement',
+  'announcements.category.project': 'Projet',
+  'announcements.form.title': 'Titre',
+  'announcements.form.content': 'Contenu',
+  'announcements.actions.edit': 'Modifier',
+  'announcements.actions.delete': 'Supprimer',
+  'announcements.actions.save': 'Enregistrer',
+  'announcements.actions.cancel': 'Annuler'
 };
 
 // Remplir le cache des textes
@@ -436,6 +545,11 @@ function buildTextCache() {
   
   // Ajouter les textes d'application
   appTexts.forEach(entry => {
+    textCache[entry.id] = entry.text;
+  });
+  
+  // Ajouter les textes d'annonces
+  announcementsTexts.forEach(entry => {
     textCache[entry.id] = entry.text;
   });
 }

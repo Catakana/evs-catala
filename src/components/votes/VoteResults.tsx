@@ -1,148 +1,169 @@
+// Composant VoteResults - Affichage des résultats d'un vote
+// Architecture simplifiée avec calculs côté client
+
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Vote, VoteOption, VoteStatus } from '@/types/vote';
-import { Calendar, Clock, Users, UserCheck, Info, AlertCircle } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { getText } from '@/lib/textBank';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+import { Badge } from '../ui/badge';
+import { BarChart3, Users, TrendingUp } from 'lucide-react';
+import type { Vote, VoteOption, VoteResult } from '../../types/vote';
 
 interface VoteResultsProps {
   vote: Vote;
+  options: VoteOption[];
+  results: VoteResult[];
+  totalResponses: number;
 }
 
-const VoteResults = ({ vote }: VoteResultsProps) => {
-  const t = (key: string, variables?: Record<string, string>) => getText(key, variables);
-  
-  // Calcul du nombre total de votes
-  const totalVotes = vote.options.reduce((sum, option) => sum + (option.count || 0), 0);
-  
-  // Calcul du pourcentage pour chaque option
-  const getOptionPercentage = (count: number): number => {
-    if (totalVotes === 0) return 0;
-    return Math.round((count / totalVotes) * 100);
+export function VoteResults({ vote, options, results, totalResponses }: VoteResultsProps) {
+  const getMaxCount = () => {
+    return Math.max(...results.map(r => r.count), 1);
   };
-  
-  // Déterminer si les résultats peuvent être affichés
-  const canShowResults = (): boolean => {
-    // On peut toujours voir les résultats des votes clôturés
-    if (vote.status === 'closed') return true;
-    
-    // Sinon, cela dépend de la configuration de visibilité des résultats
-    return vote.resultVisibility === 'immediate';
-    // Note: la visibilité 'afterVote' nécessiterait de savoir si l'utilisateur a voté
+
+  const getWinningOptions = () => {
+    const maxCount = Math.max(...results.map(r => r.count));
+    return results.filter(r => r.count === maxCount && maxCount > 0);
   };
-  
-  // Déterminer la couleur du badge selon le statut
-  const getStatusBadgeVariant = (status: VoteStatus) => {
-    switch (status) {
-      case 'active':
-        return 'success';
-      case 'closed':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
+
+  const formatPercentage = (percentage: number) => {
+    return `${percentage.toFixed(1)}%`;
   };
-  
-  // Fonction pour obtenir le texte du statut
-  const getStatusText = (status: VoteStatus) => {
-    switch (status) {
-      case 'active':
-        return t('votes.status.active');
-      case 'closed':
-        return t('votes.status.closed');
-      case 'draft':
-        return t('votes.status.draft');
-      default:
-        return '';
-    }
-  };
-  
-  // Tri des options par nombre de votes (décroissant)
-  const sortedOptions = [...vote.options].sort((a, b) => 
-    (b.count || 0) - (a.count || 0)
-  );
+
+  const winningOptions = getWinningOptions();
+  const maxCount = getMaxCount();
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-2xl">{vote.title}</CardTitle>
-            <CardDescription className="mt-2">{vote.description}</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5" />
+          Résultats du vote
+        </CardTitle>
+        
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            <span>{totalResponses} participant{totalResponses > 1 ? 's' : ''}</span>
           </div>
-          <Badge variant={getStatusBadgeVariant(vote.status) as any}>
-            {getStatusText(vote.status)}
-          </Badge>
+          
+          {winningOptions.length > 0 && (
+            <div className="flex items-center gap-1">
+              <TrendingUp className="h-4 w-4" />
+              <span>
+                {winningOptions.length === 1 ? 'Option gagnante' : 'Égalité'}
+              </span>
+            </div>
+          )}
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-6">
-        {/* Métadonnées du vote */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center text-muted-foreground">
-            <Calendar className="h-4 w-4 mr-2" />
-            <span>
-              {format(vote.startDate, 'PPP', { locale: fr })} - {format(vote.endDate, 'PPP', { locale: fr })}
-            </span>
+      <CardContent>
+        {totalResponses === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>Aucun vote enregistré pour le moment</p>
           </div>
-          
-          <div className="flex items-center text-muted-foreground">
-            <UserCheck className="h-4 w-4 mr-2" />
-            <span>
-              {totalVotes} {t('votes.participants')}
-            </span>
-          </div>
-        </div>
-        
-        {/* Résultats */}
-        {canShowResults() ? (
+        ) : (
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">{t('votes.results.title')}</h3>
-            
-            {totalVotes === 0 ? (
-              <div className="p-4 border rounded-lg flex items-center justify-center text-muted-foreground">
-                <Info className="h-5 w-5 mr-2" />
-                <span>{t('votes.results.no_votes_yet')}</span>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {sortedOptions.map((option, index) => {
-                  const percentage = getOptionPercentage(option.count || 0);
-                  return (
-                    <div key={option.id || index} className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{option.text}</span>
-                        <span className="text-muted-foreground text-sm">
-                          {option.count || 0} ({percentage}%)
-                        </span>
-                      </div>
-                      <Progress value={percentage} className="h-2" />
+            {results.map((result) => {
+              const isWinning = winningOptions.some(w => w.optionId === result.optionId);
+              
+              return (
+                <div key={result.optionId} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{result.optionText}</span>
+                      {isWinning && totalResponses > 0 && (
+                        <Badge variant="default" className="text-xs">
+                          {winningOptions.length === 1 ? 'Gagnant' : 'Égalité'}
+                        </Badge>
+                      )}
                     </div>
-                  );
-                })}
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-medium">{result.count}</span>
+                      <span className="text-muted-foreground">
+                        ({formatPercentage(result.percentage)})
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <Progress 
+                    value={result.percentage} 
+                    className={`h-2 ${isWinning ? 'bg-green-100' : ''}`}
+                  />
+                </div>
+              );
+            })}
+            
+            {/* Statistiques supplémentaires */}
+            <div className="pt-4 border-t">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-blue-600">{totalResponses}</div>
+                  <div className="text-xs text-muted-foreground">Total votes</div>
+                </div>
+                
+                <div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {options.length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Options</div>
+                </div>
+                
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {formatPercentage(Math.max(...results.map(r => r.percentage)))}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Score max</div>
+                </div>
+                
+                <div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {winningOptions.length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {winningOptions.length === 1 ? 'Gagnant' : 'Égalités'}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Analyse rapide */}
+            {totalResponses > 0 && (
+              <div className="pt-4 border-t">
+                <h4 className="font-medium mb-2">Analyse</h4>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  {winningOptions.length === 1 && (
+                    <p>
+                      • L'option "{winningOptions[0].optionText}" arrive en tête avec {winningOptions[0].count} vote{winningOptions[0].count > 1 ? 's' : ''} 
+                      ({formatPercentage(winningOptions[0].percentage)})
+                    </p>
+                  )}
+                  
+                  {winningOptions.length > 1 && (
+                    <p>
+                      • Égalité entre {winningOptions.length} options avec {winningOptions[0].count} vote{winningOptions[0].count > 1 ? 's' : ''} chacune
+                    </p>
+                  )}
+                  
+                  {vote.type === 'multiple_choice' && (
+                    <p>
+                      • Vote à choix multiples : les participants pouvaient sélectionner plusieurs options
+                    </p>
+                  )}
+                  
+                  {totalResponses < 5 && (
+                    <p>
+                      • Échantillon réduit : les résultats peuvent évoluer avec plus de participants
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </div>
-        ) : (
-          <Alert variant="default" className="bg-muted/50">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>{t('votes.results.hidden_title')}</AlertTitle>
-            <AlertDescription>
-              {vote.resultVisibility === 'afterVote' 
-                ? t('votes.results.visible_after_vote') 
-                : vote.resultVisibility === 'afterClose'
-                  ? t('votes.results.visible_after_close')
-                  : t('votes.results.not_available')}
-            </AlertDescription>
-          </Alert>
         )}
       </CardContent>
     </Card>
   );
-};
-
-export default VoteResults; 
+} 

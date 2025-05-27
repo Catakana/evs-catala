@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { getText as t } from '@/lib/textBank';
+import { Home } from 'lucide-react';
 
 // Schéma de validation
 const loginSchema = z.object({
@@ -60,6 +61,17 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-slate-50 p-4">
+      {/* Lien de retour à l'accueil */}
+      <div className="absolute top-4 left-4">
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          <span className="text-sm">Retour à l'accueil</span>
+        </Link>
+      </div>
+
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">

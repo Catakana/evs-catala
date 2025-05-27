@@ -60,11 +60,11 @@ const Dashboard: React.FC = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle>Votes en cours</CardTitle>
-            <CardDescription>Participez aux décisions</CardDescription>
+            <CardTitle>Projets actifs</CardTitle>
+            <CardDescription>Suivez vos projets</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Plusieurs votes sont ouverts et attendent votre participation.</p>
+            <p>Plusieurs projets sont en cours et nécessitent votre attention.</p>
           </CardContent>
         </Card>
       </div>

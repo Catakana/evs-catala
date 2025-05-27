@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { getText as t } from '@/lib/textBank';
-import { Mail, Info } from 'lucide-react';
+import { Mail, Info, Home, AlertTriangle } from 'lucide-react';
 
 // Schéma de validation
 const registerSchema = z.object({
@@ -99,6 +99,16 @@ const RegisterPage: React.FC = () => {
   if (isSuccess) {
     return (
       <div className="container flex items-center justify-center min-h-screen py-8">
+        <div className="absolute top-4 left-4">
+          <Link 
+            to="/" 
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            <span className="text-sm">Retour à l'accueil</span>
+          </Link>
+        </div>
+
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <div className="flex justify-center mb-2">
@@ -121,6 +131,20 @@ const RegisterPage: React.FC = () => {
               </p>
             </div>
             
+            <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+              <div className="flex items-start space-x-2">
+                <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-orange-800 mb-1">
+                    Action requise : Confirmez votre email
+                  </p>
+                  <p className="text-sm text-orange-700">
+                    Vous devez cliquer sur le lien de confirmation dans l'email que nous venons de vous envoyer pour activer votre compte.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
             <div className="space-y-4">
               <div className="flex items-start space-x-2">
                 <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
@@ -134,11 +158,21 @@ const RegisterPage: React.FC = () => {
                   {t('auth.checkSpam')}
                 </p>
               </div>
+              <div className="flex items-start space-x-2">
+                <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <p className="text-sm text-muted-foreground">
+                  Le lien de confirmation expire dans 24 heures.
+                </p>
+              </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center border-t pt-6">
-            <Button variant="outline" onClick={() => navigate('/login')}>
+          <CardFooter className="flex flex-col gap-3 border-t pt-6">
+            <Button variant="outline" onClick={() => navigate('/login')} className="w-full">
               Retour à la page de connexion
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/')} className="w-full">
+              <Home className="h-4 w-4 mr-2" />
+              Retour à l'accueil
             </Button>
           </CardFooter>
         </Card>
@@ -148,6 +182,16 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="container flex items-center justify-center min-h-screen py-8">
+      <div className="absolute top-4 left-4">
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          <span className="text-sm">Retour à l'accueil</span>
+        </Link>
+      </div>
+
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -164,6 +208,20 @@ const RegisterPage: React.FC = () => {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+          
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-start space-x-2">
+              <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-blue-800 mb-1">
+                  Confirmation par email requise
+                </p>
+                <p className="text-sm text-blue-700">
+                  Après inscription, vous recevrez un email de confirmation. Vous devez cliquer sur le lien pour activer votre compte.
+                </p>
+              </div>
+            </div>
+          </div>
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

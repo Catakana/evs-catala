@@ -137,12 +137,59 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
       return;
     }
     
+    // Validation du format de la date et des heures
+    if (!formData.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      toast({
+        title: "Format de date incorrect",
+        description: "La date doit être au format AAAA-MM-JJ.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validation du format des heures
+    const startTimeParts = formData.start_time.split(':');
+    const endTimeParts = formData.end_time.split(':');
+    
+    if (startTimeParts.length < 2 || endTimeParts.length < 2) {
+      toast({
+        title: "Format d'heure incorrect",
+        description: "Les heures doivent être au format HH:MM.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       setLoading(true);
       
-      // L'API s'occupe de convertir date + times en start_date/end_date
+      // Normaliser les heures avant de les envoyer (assure un format HH:MM)
+      const normalizedStartTime = `${startTimeParts[0].padStart(2, '0')}:${startTimeParts[1].padStart(2, '0')}`;
+      const normalizedEndTime = `${endTimeParts[0].padStart(2, '0')}:${endTimeParts[1].padStart(2, '0')}`;
+      
+      // Construction directe des chaînes ISO pour les dates
+      const startDateISO = `${formData.date}T${normalizedStartTime}:00.000Z`;
+      const endDateISO = `${formData.date}T${normalizedEndTime}:00.000Z`;
+      
+      console.log("Données préparées pour l'insertion:", {
+        date: formData.date,
+        start_time: normalizedStartTime,
+        end_time: normalizedEndTime,
+        start_date_iso: startDateISO,
+        end_date_iso: endDateISO
+      });
+      
+      // Préparation des données simplifiées pour éviter les erreurs
       const permanenceData = {
-        ...formData,
+        title: formData.title,
+        description: formData.description || '',
+        location: formData.location,
+        required_volunteers: formData.required_volunteers,
+        max_volunteers: formData.max_volunteers,
+        min_volunteers: formData.min_volunteers,
+        notes: formData.notes || '',
+        start_date: startDateISO,
+        end_date: endDateISO,
         status: PermanenceStatus.OPEN,
         created_by: currentUser.id
       };
@@ -151,6 +198,7 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
       
       if (isEditMode && permanence) {
         // Mode édition
+        console.log("Mise à jour de la permanence:", permanenceData);
         result = await permanenceService.updatePermanence(permanence.id, permanenceData);
         
         if (result) {
@@ -161,6 +209,7 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
         }
       } else {
         // Mode création
+        console.log("Création de la permanence:", permanenceData);
         result = await permanenceService.createPermanence(permanenceData);
         
         if (result) {
@@ -175,13 +224,29 @@ export const CreatePermanenceModal: React.FC<CreatePermanenceModalProps> = ({
         onCreated();
         onClose();
       } else {
-        throw new Error("Erreur lors de l'opération");
+        // Si result est null, une erreur s'est produite mais nous n'avons pas les détails
+        console.error("Erreur: Le service a retourné null");
+        throw new Error("Erreur lors de l'opération - aucune donnée retournée");
       }
     } catch (error) {
       console.error('Erreur lors de la création/édition de la permanence:', error);
+      
+      // Essayer d'extraire plus d'informations de l'erreur
+      let errorMessage = "Une erreur est survenue. Veuillez réessayer.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        try {
+          errorMessage = JSON.stringify(error);
+        } catch (e) {
+          // Si la conversion en JSON échoue, on garde le message par défaut
+        }
+      }
+      
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

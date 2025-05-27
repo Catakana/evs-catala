@@ -260,11 +260,11 @@ export default function NotesPage() {
           {/* Filtres */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Select
-              value={filters.context_type || ''}
+              value={filters.context_type || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  context_type: value as 'event' | 'project' | 'free' || undefined 
+                  context_type: value === 'all' ? undefined : value as 'event' | 'project' | 'free'
                 }))
               }
             >
@@ -272,7 +272,7 @@ export default function NotesPage() {
                 <SelectValue placeholder="Contexte" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les contextes</SelectItem>
+                <SelectItem value="all">Tous les contextes</SelectItem>
                 <SelectItem value="free">📝 Notes libres</SelectItem>
                 <SelectItem value="event">📅 Événements</SelectItem>
                 <SelectItem value="project">📌 Projets</SelectItem>
@@ -280,11 +280,11 @@ export default function NotesPage() {
             </Select>
 
             <Select
-              value={filters.status || ''}
+              value={filters.status || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  status: value as 'draft' | 'validated' | 'pending' || undefined 
+                  status: value === 'all' ? undefined : value as 'draft' | 'validated' | 'pending'
                 }))
               }
             >
@@ -292,7 +292,7 @@ export default function NotesPage() {
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="draft">📝 Brouillon</SelectItem>
                 <SelectItem value="pending">⌛ À valider</SelectItem>
                 <SelectItem value="validated">✅ Validée</SelectItem>
@@ -300,11 +300,11 @@ export default function NotesPage() {
             </Select>
 
             <Select
-              value={filters.tags?.[0] || ''}
+              value={filters.tags?.[0] || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  tags: value ? [value] : undefined 
+                  tags: value === 'all' ? undefined : [value]
                 }))
               }
             >
@@ -312,7 +312,7 @@ export default function NotesPage() {
                 <SelectValue placeholder="Tag" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les tags</SelectItem>
+                <SelectItem value="all">Tous les tags</SelectItem>
                 {availableTags.map((tag) => (
                   <SelectItem key={tag} value={tag}>
                     #{tag}

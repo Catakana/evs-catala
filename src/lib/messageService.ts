@@ -18,11 +18,19 @@ export const messageService = {
    */
   async getUserConversations(): Promise<Conversation[]> {
     try {
+      // Récupérer l'utilisateur actuel
+      const currentUser = await supabase.auth.getUser();
+      const userId = currentUser.data.user?.id;
+
+      if (!userId) {
+        throw new Error('Utilisateur non connecté');
+      }
+
       // Récupération des conversations auxquelles l'utilisateur participe
       const { data: participations, error: participationsError } = await supabase
         .from('evscatala_conversation_participants')
         .select('conversation_id')
-        .eq('user_id', supabase.auth.getUser().then(res => res.data.user?.id));
+        .eq('user_id', userId);
 
       if (participationsError) {
         console.error('Erreur lors de la récupération des participations:', participationsError);

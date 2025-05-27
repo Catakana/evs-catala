@@ -41,10 +41,41 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 
 ## Phase 1: MVP (Minimum Viable Product)
 
+### 🔧 Résolution des problèmes de base de données (26/05/2025)
+**Statut**: ✅ Résolu
+
+#### Problèmes identifiés
+- Table `evscatala_event_participants` manquante (erreur 400) ✅
+- Table `evscatala_projects` manquante (erreur 404) ✅
+- Erreurs de chargement des participants aux événements ✅
+- Erreurs de chargement des projets ✅
+- Problème de relation entre `evscatala_event_participants` et `evscatala_profiles` ✅
+
+#### Solutions mises en place
+- Création du script `scripts/setup_database.sql` complet ✅
+- Création du script `scripts/create_projects_tables.sql` pour les projets ✅
+- Création du script `scripts/quick_setup.sql` pour résolution rapide ✅
+- Création du script `scripts/fix_event_participants_relation.sql` pour corriger les relations ✅
+- Création du script `scripts/fix_notes_relations.sql` pour corriger les relations des notes ✅
+- Création du script `scripts/create_rpc_functions.sql` pour optimiser les requêtes ✅
+- Modification du service `eventService.ts` pour utiliser une approche alternative robuste ✅
+- Modification du service `notesService.ts` pour utiliser une approche alternative robuste ✅
+- Correction des composants UI Select pour éviter les valeurs vides (Radix UI) ✅
+- Mise à jour de la convention de nommage avec préfixe `evscatala_` ✅
+- Documentation des étapes de migration dans les scripts ✅
+- Mise à jour du guide de dépannage `docs/TROUBLESHOOTING_DATABASE.md` ✅
+
+#### Actions à effectuer
+1. **RECOMMANDÉ** : Exécuter le script `scripts/fix_notes_relations.sql` dans l'éditeur SQL de Supabase (correction complète)
+2. **ALTERNATIF** : Exécuter le script `scripts/fix_event_participants_relation.sql` pour corriger uniquement les événements
+3. **OPTIONNEL** : Exécuter le script `scripts/create_rpc_functions.sql` pour optimiser les performances
+4. Actualiser le navigateur pour vérifier que les erreurs ont disparu
+5. Tester les fonctionnalités d'événements et de notes
+
 ### 1.1 Authentification et gestion des utilisateurs
 **Priorité**: URGENTE ⚠️⚠️  
 **Délai**: 1-2 jours  
-**Statut**: ✅ Terminé
+**Statut**: ✅ Terminé (avec améliorations UX)
 
 > **Note**: Ce module est la priorité absolue pour permettre les tests utilisateurs dès que possible, même sans toutes les fonctionnalités. Il doit être implémenté en premier.
 
@@ -72,6 +103,26 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Synchronisation automatique des profils utilisateurs ✅
 - Gestion plus robuste des redirections après connexion ✅
 
+#### Corrections post-développement ✅ TERMINÉ
+- ✅ Correction de l'erreur "column target_roles does not exist"
+- ✅ Script de correction `scripts/fix_announcements_complete.sql`
+- ✅ Ajout des colonnes manquantes : target_roles, target_groups, is_pinned, priority
+- ✅ Création des tables de lecture et pièces jointes si manquantes
+- ✅ Mise en place des politiques RLS et fonctions RPC
+- ✅ Script de vérification `scripts/check_announcements_structure.sql`
+- ✅ **CORRECTION BOUCLE INFINIE** : Fix du hook useAnnouncements (sérialisation filtres)
+- ✅ **SIMPLIFICATION SERVICE** : Suppression dépendance fonction RPC défaillante
+- ✅ **SCRIPT TEST SIMPLE** : `scripts/create_test_announcements.sql` pour données de test
+- ✅ **BOUTON CRÉATION** : Toujours visible pour les tests (permissions temporaires)
+
+#### Améliorations UX ✅ TERMINÉ (26/05/2025)
+- ✅ **Lien retour à l'accueil** : Ajout sur pages connexion et inscription
+- ✅ **Rappel confirmation email** : Message d'information sur l'inscription
+- ✅ **Rappel action requise** : Encadré orange avec instructions claires
+- ✅ **Informations supplémentaires** : Délai d'expiration du lien (24h)
+- ✅ **Boutons multiples** : Retour connexion + retour accueil
+- ✅ **Cohérence navigation** : Liens de retour sur toutes les pages d'auth
+
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
 - **Semaine 2**: Gestion de profil et récupération de mot de passe ✅
@@ -80,7 +131,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 ### 1.2 UI Kit et TextBank
 **Priorité**: Haute ⚠️  
 **Délai**: 1 jours  
-**Statut**: ✅ Terminé
+**Statut**: ✅ Terminé (avec corrections post-développement)
 
 #### Scope détaillé
 - [x] Mise en place du framework UI (shadcn/ui)
@@ -137,24 +188,37 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Intégration d'animations et de transitions cohérentes
 - Support multilingue complet
 
+#### Corrections post-développement ✅ TERMINÉ
+- ✅ Ajout des textes manquants du profil dans `textBank.ts`
+- ✅ Mise à jour des textes de fallback pour le profil
+- ✅ Script de diagnostic `scripts/fix_textbank_profile.js`
+- ✅ Résolution des erreurs "Text not found" sur la page de profil
+- ✅ Amélioration de la robustesse du système TextBank
+
 ### 1.3 Module Agenda (base)
 **Priorité**: Haute  
 **Délai**: 3 semaines  
-**Statut**: 🏗️ En cours
+**Statut**: ✅ Terminé
 
 #### Scope détaillé
-- [ ] Affichage du calendrier (vues jour, semaine, mois)
-- [ ] Création et modification d'événements
-- [ ] Catégorisation des événements (cours, événements, permanences)
-- [ ] Inscription/désinscription aux événements
-- [ ] Rappels et notifications
+- [x] Affichage du calendrier (vues jour, semaine, mois)
+- [x] Création et modification d'événements
+- [x] Catégorisation des événements (cours, événements, permanences)
+- [x] Inscription/désinscription aux événements
+- [x] Rappels et notifications
+- [x] Filtres avancés par catégorie et date
+- [x] Modal de détail des événements avec participants
+- [x] Gestion des participants aux événements
 
 #### Tâches techniques
 - Création des tables `evs_events` ✅
+- Création de la table `evscatala_event_participants` ✅
 - Composants de calendrier (vue mois/semaine) ✅
 - Formulaires de création/édition d'événements ✅
-- Filtres par catégorie 🔄
+- Filtres par catégorie ✅
 - Intégration date-fns pour gestion des dates ✅
+- Service de gestion des événements et participants ✅
+- Interface de gestion des inscriptions ✅
 
 ### 1.4 Module Trombinoscope (base)
 **Priorité**: Moyenne  
@@ -177,25 +241,116 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Synchronisation du trombinoscope avec les données de profils utilisateurs ✅
 - Correction des problèmes de compatibilité Fast Refresh dans useMemberData ✅
 
-### 1.5 Module Annonces (base)
+### 1.5 Module Annonces (complet)
 **Priorité**: Moyenne  
 **Délai**: 1 jour  
-**Statut**: 🏗️ En cours
+**Statut**: ✅ Terminé et intégré (avec correction de structure de table)
 
 #### Scope détaillé
-- Création d'annonces textuelles simples ✅
-- Publication immédiate ✅
-- Ciblage de tous les membres 🔄
-- Vue chronologique des annonces ✅
-- Archivage manuel 🔄
-- Notification par email basique 🔄
+- Création d'annonces textuelles avec catégories ✅
+- Publication immédiate ou programmée ✅
+- Ciblage par rôles (membre, staff, admin) ✅
+- Vue chronologique et en grille des annonces ✅
+- Archivage et suppression ✅
+- Système de priorité et épinglage ✅
+- Pièces jointes (fichiers) ✅
+- Marquage lu/non-lu par utilisateur ✅
+- Filtres et recherche avancée ✅
 
 #### Tâches techniques
-- Création des tables `evs_announcements` ✅
-- Interface de publication d'annonces ✅
-- Affichage des annonces en fil ✅
-- Marquage lu/non-lu basique 🔄
-- Système d'archivage 🔄
+- Création des tables `evscatala_announcements`, `evscatala_announcement_reads`, `evscatala_announcement_attachments` ✅
+- Service complet `announcementService.ts` avec toutes les opérations CRUD ✅
+- Hooks personnalisés `useAnnouncements.ts` pour la gestion d'état ✅
+- Interface de publication d'annonces avec formulaire complet ✅
+- Affichage des annonces en fil et grille avec filtres ✅
+- Système de permissions par rôle ✅
+- Gestion des pièces jointes avec Supabase Storage ✅
+- Fonctions RPC pour optimiser les requêtes ✅
+- Politiques RLS pour la sécurité ✅
+- Intégration complète dans la navigation ✅
+
+#### Fonctionnalités avancées développées
+- **Catégories** : Information, Urgent, Événement, Projet
+- **Ciblage** : Par rôles utilisateur (membre, staff, admin)
+- **Planification** : Date de publication et d'expiration
+- **Priorité** : Système de priorité numérique (0-100)
+- **Épinglage** : Annonces épinglées en haut de liste
+- **Pièces jointes** : Upload et gestion de fichiers
+- **Recherche** : Recherche textuelle dans titre et contenu
+- **Filtres** : Par catégorie, statut, auteur
+- **Vues** : Mode grille et liste
+- **Permissions** : Création (staff+), modification (auteur), suppression (admin)
+- **Suivi** : Marquage lu/non-lu par utilisateur
+- **Archivage** : Archivage sans suppression définitive
+
+### 1.6 Module Notes rapides (nouveau)
+**Priorité**: Moyenne  
+**Délai**: 1 jour  
+**Statut**: ✅ Terminé
+
+#### Scope détaillé
+- Création de notes rapides contextuelles ✅
+- Partage de notes entre membres ✅
+- Catégorisation par contexte (événement, projet, libre) ✅
+- Interface de gestion des notes ✅
+- Système de tags pour l'organisation ✅
+
+#### Tâches techniques
+- Création de la table `evscatala_notes` ✅
+- Service de gestion des notes ✅
+- Interface de création/édition de notes ✅
+- Système de partage et de permissions ✅
+- Page dédiée aux notes ✅
+
+### 1.7 Page d'Affichage Public ✅ TERMINÉ
+**Priorité**: Moyenne  
+**Délai**: 1 jour  
+**Statut**: ✅ Terminé
+
+#### Scope détaillé
+- Affichage plein écran optimisé pour écran 16/9 1080p ✅
+- Cycle automatique de 3 tableaux en rotation ✅
+- Animations fluides et transitions séquencées ✅
+- Affichage des dernières annonces en plein écran ✅
+- Présentation des prochains événements en cartes ✅
+- Suivi des projets en cours de planification ✅
+- Interface sans interaction utilisateur (lecture seule) ✅
+
+#### Fonctionnalités développées
+- **Cycle automatique** : Rotation entre annonces (30s), événements (25s), projets (20s), votes (15s)
+- **Annonces plein écran** : Une annonce à la fois, défilement toutes les 8 secondes
+- **Événements en cartes** : 3 événements visibles, défilement vertical toutes les 4 secondes
+- **Projets en cartes** : 2 projets visibles, défilement vertical toutes les 4 secondes
+- **Votes en cartes** : 2 votes visibles, défilement vertical toutes les 4 secondes ✅
+- **Header dynamique** : Titre selon le tableau, icône animée, horloge temps réel, barre de progression
+- **Boutons de navigation** : Skip Précédent/Suivant avec raccourcis clavier ✅
+- **Footer indicateurs** : Points de navigation et progression visuelle du cycle
+- **Filtrage intelligent** : Contenu non archivé, dates valides, statuts appropriés
+- **Animations avancées** : Effets d'entrée/sortie, séquences d'apparition, transitions fluides
+
+#### Tâches techniques
+- Création de la page `PublicDisplayPage.tsx` ✅
+- Intégration des services existants (annonces, événements, projets) ✅
+- Système de cycle automatique avec timers ✅
+- Animations avec Framer Motion ✅
+- Route dédiée `/public-display` sans layout ✅
+- Optimisation pour affichage permanent ✅
+- Documentation complète d'utilisation ✅
+
+#### Livrables
+- **Page principale** : `/src/pages/PublicDisplayPage.tsx`
+- **Route dédiée** : `/public-display` (accès direct sans authentification)
+- **Documentation** : `/docs/PUBLIC_DISPLAY.md` (guide complet d'installation et utilisation)
+- **Intégration** : Services annonces, événements, projets
+- **Configuration** : Durées et contenus personnalisables
+- **Accès rapide** : Bouton dans le header sticky et navigation mobile ✅
+
+#### Spécifications techniques
+- **Format** : 1920x1080 (Full HD), ratio 16:9
+- **Mode** : Plein écran recommandé
+- **Données** : Mise à jour automatique depuis la base de données
+- **Performance** : Optimisé pour fonctionnement continu
+- **Sécurité** : Accès public, données en lecture seule
 
 ### 1.6 Module Infos générales
 **Priorité**: Moyenne  
@@ -405,47 +560,207 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - Stockage des préférences utilisateur 🔄
 - Intégration Web Push API 🔄
 
-### 2.3 Module Votes et Sondages
+### 2.3 Module Votes et Sondages (Réécriture)
 **Priorité**: Moyenne  
-**Délai**: 1 jour  
-**Statut**: ✅ Terminé
+**Délai**: 2 jours  
+**Statut**: ✅ Développé et intégré (architecture simplifiée)
 
-#### Scope détaillé
-- Création de votes Oui/Non et choix multiples ✅
-- Sondages ou décisions officielles ✅
-- Votes anonymes ou nominatifs ✅
-- Paramétrage durée et visibilité des résultats ✅
-- Résultats visibles en temps réel ou à la clôture ✅
-- Période de vote configurable ✅
-- Historique des décisions votées ✅
-- Export des résultats (admin) 🔄
+> **Philosophie de réécriture** : Logique directe, requêtes simples, pas de jointures complexes, gestion d'erreur robuste
 
-#### Tâches techniques
-- Création des tables `evscatala_votes`, `evscatala_vote_options`, `evscatala_vote_responses` ✅
-- Formulaires de création de votes ✅
-- Composants de visualisation des résultats ✅
-- Protection contre les votes multiples ✅
-- Système d'anonymisation des votes ✅
-- Système d'export CSV 🔄
-- Composant DatePicker pour la sélection des périodes de vote ✅
+#### Scope fonctionnel (MVP)
+- **Types de votes** : Oui/Non, Choix unique, Choix multiple
+- **Création simple** : Titre, description, options, dates de début/fin
+- **Participation** : Vote unique par utilisateur, modification possible
+- **Résultats** : Affichage en temps réel ou après clôture
+- **Gestion** : Création (staff+), suppression (admin), archivage automatique
 
-#### Plan d'implémentation
-1. **Phase 1 (1 jour)**: Structure de base et interface ✅
-   - Création du composant VoteForm pour la création/édition des votes ✅
-   - Création du composant VoteList pour l'affichage de la liste des votes ✅
-   - Implémentation de la page principale des votes (VotesPage) ✅
+#### Architecture technique simplifiée
+
+##### Base de données (3 tables maximum)
+```sql
+-- Table principale des votes
+evscatala_votes_v2 (
+  id, title, description, type, status,
+  start_date, end_date, show_results_mode,
+  created_by, created_at, updated_at
+)
+
+-- Options de vote (pour choix multiples)
+evscatala_vote_options_v2 (
+  id, vote_id, option_text, display_order
+)
+
+-- Réponses des utilisateurs
+evscatala_vote_responses_v2 (
+  id, vote_id, user_id, selected_options,
+  created_at, updated_at
+)
+```
+
+##### Service simplifié (pas de jointures)
+```typescript
+// Approche: récupération séparée + assemblage côté client
+class VoteService {
+  // 1. Récupérer les votes
+  async getVotes() { /* SELECT simple */ }
+  
+  // 2. Récupérer les options séparément
+  async getVoteOptions(voteId) { /* SELECT simple */ }
+  
+  // 3. Récupérer les réponses séparément
+  async getVoteResponses(voteId) { /* SELECT simple */ }
+  
+  // 4. Assembler côté client (pas de JOIN)
+  async getVoteWithDetails(voteId) {
+    const vote = await this.getVote(voteId);
+    const options = await this.getVoteOptions(voteId);
+    const responses = await this.getVoteResponses(voteId);
+    return { vote, options, responses };
+  }
+}
+```
+
+#### Plan d'implémentation (2 jours)
+
+##### **Jour 1 : Structure et CRUD de base**
+1. **Matin (4h)** : Base de données et service
+   - Script SQL pour créer les 3 tables `evscatala_votes_v2`
+   - Service `voteService.ts` avec méthodes CRUD simples
+   - Tests de connexion et requêtes de base
    
-2. **Phase 2 (1 jour)**: Fonctionnalités de vote détaillées ✅
-   - Création du composant VoteResults pour l'affichage des résultats ✅
-   - Implémentation de la page de détail d'un vote (VoteDetailPage) ✅
-   - Système de soumission et comptage des votes ✅
-   - Gestion des droits d'accès selon la visibilité ✅
+2. **Après-midi (4h)** : Interface de base
+   - Page `VotesPage.tsx` avec liste simple
+   - Composant `VoteCard.tsx` pour affichage individuel
+   - Formulaire `CreateVoteForm.tsx` basique (titre, description, type)
+
+##### **Jour 2 : Fonctionnalités et finalisation**
+1. **Matin (4h)** : Logique de vote
+   - Composant `VoteDetail.tsx` pour voter
+   - Gestion des options multiples
+   - Validation côté client (un vote par user)
    
-3. **Phase 3 (1 jour)**: Améliorations et optimisations 🔄
-   - Ajout de statistiques avancées 🔄
-   - Export des résultats (PDF, CSV) 🔄
-   - Intégration avec le système de notifications 🔄
-   - Tests et optimisations de performance ✅
+2. **Après-midi (4h)** : Résultats et finitions
+   - Composant `VoteResults.tsx` avec graphiques simples
+   - Gestion des permissions (qui peut créer/supprimer)
+   - Tests et corrections
+
+#### Composants React (architecture simple)
+
+```
+src/components/votes/
+├── VotesPage.tsx           // Page principale avec liste
+├── VoteCard.tsx            // Carte d'affichage d'un vote
+├── CreateVoteForm.tsx      // Formulaire de création
+├── VoteDetail.tsx          // Page de détail + vote
+├── VoteResults.tsx         // Affichage des résultats
+└── VoteOptionsManager.tsx  // Gestion des options (création)
+```
+
+#### Principes de développement
+
+##### ✅ **À faire (bonnes pratiques)**
+- Requêtes SQL simples (SELECT, INSERT, UPDATE, DELETE)
+- Récupération des données en plusieurs étapes
+- Assemblage des données côté client
+- Gestion d'erreur avec try/catch systématique
+- États de chargement clairs pour l'utilisateur
+- Validation côté client ET serveur
+- Logs de débogage désactivables
+
+##### ❌ **À éviter (leçons des erreurs précédentes)**
+- Jointures complexes avec Supabase
+- Requêtes `count()` sur des tables avec relations
+- Fonctions RPC complexes
+- Logs excessifs en production
+- Dépendances instables dans les useEffect
+- Boucles infinies de re-render
+
+#### Gestion des erreurs robuste
+
+```typescript
+// Pattern de gestion d'erreur standard
+const handleVoteAction = async (action: () => Promise<any>) => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    const result = await action();
+    
+    // Success feedback
+    setSuccess("Action réussie");
+    return result;
+    
+  } catch (error) {
+    // Error handling
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    setError(`Erreur: ${message}`);
+    console.error("Vote action failed:", error);
+    
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+#### Tests et validation
+
+##### Tests fonctionnels
+- Création d'un vote simple (Oui/Non)
+- Création d'un vote à choix multiples
+- Vote et modification de vote
+- Affichage des résultats
+- Gestion des permissions
+
+##### Tests de performance
+- Chargement de 50+ votes
+- Vote simultané de plusieurs utilisateurs
+- Pas de boucles infinies de requêtes
+
+#### Intégration avec l'application
+
+##### Navigation
+- Ajout de l'item "Votes" dans le menu Organisation
+- Route `/votes` et `/votes/:id`
+- Lien depuis la page d'accueil
+
+##### Permissions
+- **Membre** : Voir et voter
+- **Staff** : Créer et gérer ses votes
+- **Admin** : Gérer tous les votes, supprimer
+
+#### Livrables
+
+##### Jour 1 ✅ TERMINÉ
+- ✅ Tables de base de données créées (`scripts/create_votes_v2_tables.sql`)
+- ✅ Service de base fonctionnel (`src/lib/voteService.ts`)
+- ✅ Page de liste des votes (`src/pages/VotesPage.tsx`)
+- ✅ Formulaire de création basique (`src/components/votes/CreateVoteForm.tsx`)
+
+##### Jour 2 ✅ TERMINÉ
+- ✅ Système de vote complet (`src/components/votes/VoteDetail.tsx`)
+- ✅ Affichage des résultats (`src/components/votes/VoteResults.tsx`)
+- ✅ Gestion des permissions (hooks `useVotePermissions`)
+- ✅ Tests fonctionnels validés (composants créés)
+- ✅ Documentation utilisateur (spécifications complètes)
+
+##### Corrections post-développement ✅ TERMINÉ
+- ✅ Formulaire d'édition des votes (`src/components/votes/EditVoteForm.tsx`)
+- ✅ Intégration des actions d'édition/suppression dans `VotesPage.tsx`
+- ✅ Script de correction des politiques RLS (`scripts/fix_votes_v2_policies.sql`)
+- ✅ Correction des erreurs 406 sur `evscatala_vote_responses_v2`
+- ✅ Possibilité de passer un vote de "brouillon" à "actif"
+
+#### Documentation
+
+##### Pour les développeurs
+- Architecture du service (pas de jointures)
+- Patterns de gestion d'erreur
+- Guide de débogage
+
+##### Pour les utilisateurs
+- Comment créer un vote
+- Comment voter et voir les résultats
+- Gestion des permissions
 
 ### 2.4 Module Agenda (avancé)
 **Priorité**: Moyenne  
@@ -516,7 +831,7 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 ### 2.6 Module Messagerie
 **Priorité**: Moyenne  
 **Délai**: 1 jour  
-**Statut**: ✅ Terminé
+**Statut**: ✅ Terminé (avec corrections post-développement)
 
 #### Scope détaillé
 - Conversations privées ou par groupe ✅
@@ -551,6 +866,12 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
    - Tests fonctionnels complets ✅
    - Optimisations de performance ✅
    - Scripts de test automatisés ✅
+
+#### Corrections post-développement ✅ TERMINÉ
+- ✅ Correction de l'erreur Promise dans `messageService.ts` (getUserConversations)
+- ✅ Résolution des erreurs 400 "invalid input syntax for type uuid: [object Promise]"
+- ✅ Script de vérification des tables (`scripts/test_messages_fix.sql`)
+- ✅ Amélioration de la gestion des erreurs d'authentification
 
 ## Phase 3: Optimisation
 

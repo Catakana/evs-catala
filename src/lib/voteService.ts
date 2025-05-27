@@ -1,471 +1,365 @@
+// Service pour le module Votes v2
+// Architecture simplifiée : pas de jointures, requêtes simples
+
 import { supabase } from './supabase';
-import { Vote, VoteOption, VoteResponse, VoteType, VoteStatus, VoteVisibility, VoteResultVisibility } from '@/types/vote';
+import type { 
+  Vote, 
+  VoteOption, 
+  VoteResponse, 
+  CreateVoteData, 
+  VoteWithDetails, 
+  VoteResult 
+} from '../types/vote';
 
-// Constantes pour les noms de tables
-const VOTES_TABLE = 'evscatala_votes';
-const VOTE_OPTIONS_TABLE = 'evscatala_vote_options';
-const VOTE_RESPONSES_TABLE = 'evscatala_vote_responses';
-
-/**
- * Service de gestion des votes et sondages
- */
-export const voteService = {
-  /**
-   * Récupérer tous les votes (avec filtrage optionnel)
-   * @param status Statut des votes à récupérer
-   * @returns Liste des votes
-   */
-  async getAllVotes(status?: VoteStatus): Promise<Vote[]> {
-    let query = supabase
-      .from(VOTES_TABLE)
-      .select('*');
-    
-    if (status) {
-      query = query.eq('status', status);
-    }
-    
-    const { data, error } = await query.order('created_at', { ascending: false });
-    
-    if (error) {
+class VoteService {
+  // ===== VOTES =====
+  
+  async getVotes(): Promise<Vote[]> {
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_votes_v2')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
       console.error('Erreur lors de la récupération des votes:', error);
       throw error;
     }
-    
-    // Récupérer les options pour chaque vote
-    const votes = await Promise.all(
-      (data || []).map(async (vote) => {
-        const options = await this.getVoteOptions(vote.id);
-        
-        return {
-          id: vote.id,
-          title: vote.title,
-          description: vote.description,
-          type: vote.type as VoteType,
-          status: vote.status as VoteStatus,
-          visibility: vote.visibility as VoteVisibility,
-          resultVisibility: vote.result_visibility as VoteResultVisibility,
-          options: options,
-          startDate: new Date(vote.start_date),
-          endDate: new Date(vote.end_date),
-          createdBy: vote.created_by,
-          createdAt: new Date(vote.created_at),
-          updatedAt: new Date(vote.updated_at)
-        };
-      })
-    );
-    
-    return votes;
-  },
+  }
   
-  /**
-   * Récupérer un vote par son ID
-   * @param id ID du vote
-   * @returns Vote demandé ou null si non trouvé
-   */
-  async getVoteById(id: string): Promise<Vote | null> {
+  async getVote(id: string): Promise<Vote | null> {
+    try {
     const { data, error } = await supabase
-      .from(VOTES_TABLE)
+        .from('evscatala_votes_v2')
       .select('*')
       .eq('id', id)
       .single();
       
     if (error) {
-      console.error(`Erreur lors de la récupération du vote ${id}:`, error);
-      return null;
+        if (error.code === 'PGRST116') return null; // No rows found
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du vote:', error);
+      throw error;
     }
-    
-    if (!data) return null;
-    
-    // Récupérer les options du vote
-    const options = await this.getVoteOptions(id);
-    
-    // Récupérer les réponses si pertinent
-    const responses = await this.getVoteResponses(id);
-    
-    return {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      type: data.type as VoteType,
-      status: data.status as VoteStatus,
-      visibility: data.visibility as VoteVisibility,
-      resultVisibility: data.result_visibility as VoteResultVisibility,
-      options: options,
-      startDate: new Date(data.start_date),
-      endDate: new Date(data.end_date),
-      createdBy: data.created_by,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
-      responses: responses
-    };
-  },
+  }
   
-  /**
-   * Récupérer les options d'un vote
-   * @param voteId ID du vote
-   * @returns Liste des options
-   */
-  async getVoteOptions(voteId: string): Promise<VoteOption[]> {
-    const { data, error } = await supabase
-      .from(VOTE_OPTIONS_TABLE)
-      .select('*')
-      .eq('vote_id', voteId)
-      .order('created_at');
+  async createVote(voteData: CreateVoteData): Promise<Vote> {
+    try {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) throw new Error('Utilisateur non connecté');
       
-    if (error) {
-      console.error(`Erreur lors de la récupération des options pour le vote ${voteId}:`, error);
-      return [];
-    }
-    
-    // Récupérer le nombre de votes pour chaque option
-    const options = await Promise.all(
-      (data || []).map(async (option) => {
-        const { count } = await supabase
-          .from(VOTE_RESPONSES_TABLE)
-          .select('id', { count: 'exact' })
-          .eq('option_id', option.id);
-          
-        return {
-          id: option.id,
-          text: option.text,
-          count: count || 0
-        };
-      })
-    );
-    
-    return options;
-  },
-  
-  /**
-   * Récupérer les réponses d'un vote
-   * @param voteId ID du vote
-   * @returns Liste des réponses
-   */
-  async getVoteResponses(voteId: string): Promise<VoteResponse[]> {
-    const { data, error } = await supabase
-      .from(VOTE_RESPONSES_TABLE)
-      .select('*')
-      .eq('vote_id', voteId);
+      const { options, ...vote } = voteData;
       
-    if (error) {
-      console.error(`Erreur lors de la récupération des réponses pour le vote ${voteId}:`, error);
-      return [];
-    }
-    
-    return (data || []).map(response => ({
-      id: response.id,
-      userId: response.user_id,
-      voteId: response.vote_id,
-      optionId: response.option_id,
-      createdAt: new Date(response.created_at)
-    }));
-  },
-  
-  /**
-   * Vérifier si un utilisateur a déjà voté
-   * @param voteId ID du vote
-   * @param userId ID de l'utilisateur
-   * @returns true si l'utilisateur a déjà voté
-   */
-  async hasUserVoted(voteId: string, userId: string): Promise<boolean> {
-    const { count } = await supabase
-      .from(VOTE_RESPONSES_TABLE)
-      .select('id', { count: 'exact' })
-      .eq('vote_id', voteId)
-      .eq('user_id', userId);
+      const { data, error } = await supabase
+        .from('evscatala_votes_v2')
+        .insert({
+          ...vote,
+          created_by: user.data.user.id
+        })
+        .select()
+        .single();
       
-    return count !== null && count > 0;
-  },
-  
-  /**
-   * Créer un nouveau vote
-   * @param vote Données du vote à créer
-   * @returns Le nouveau vote créé
-   */
-  async createVote(vote: Omit<Vote, 'id' | 'createdAt' | 'updatedAt' | 'responses'>): Promise<Vote> {
-    const { data, error } = await supabase
-      .from(VOTES_TABLE)
-      .insert({
-        title: vote.title,
-        description: vote.description,
-        type: vote.type,
-        status: vote.status,
-        visibility: vote.visibility,
-        result_visibility: vote.resultVisibility,
-        start_date: vote.startDate.toISOString(),
-        end_date: vote.endDate.toISOString(),
-        created_by: vote.createdBy
-      })
-      .select()
-      .single();
+      if (error) throw error;
       
-    if (error) {
+      // Créer les options si nécessaire
+      if (options && options.length > 0) {
+        await this.createVoteOptions(data.id, options);
+      }
+      
+      return data;
+    } catch (error) {
       console.error('Erreur lors de la création du vote:', error);
       throw error;
     }
-    
-    // Créer les options du vote
-    const options = await Promise.all(
-      vote.options.map(option => 
-        this.createVoteOption(data.id, option.text)
-      )
-    );
-    
-    return {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      type: data.type as VoteType,
-      status: data.status as VoteStatus,
-      visibility: data.visibility as VoteVisibility,
-      resultVisibility: data.result_visibility as VoteResultVisibility,
-      options: options,
-      startDate: new Date(data.start_date),
-      endDate: new Date(data.end_date),
-      createdBy: data.created_by,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at)
-    };
-  },
+  }
   
-  /**
-   * Créer une option pour un vote
-   * @param voteId ID du vote
-   * @param text Texte de l'option
-   * @returns L'option créée
-   */
-  async createVoteOption(voteId: string, text: string): Promise<VoteOption> {
-    const { data, error } = await supabase
-      .from(VOTE_OPTIONS_TABLE)
-      .insert({
-        vote_id: voteId,
-        text: text
-      })
-      .select()
-      .single();
+  async updateVote(id: string, updates: Partial<Vote>): Promise<Vote> {
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_votes_v2')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
       
-    if (error) {
-      console.error(`Erreur lors de la création de l'option pour le vote ${voteId}:`, error);
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du vote:', error);
       throw error;
     }
-    
-    return {
-      id: data.id,
-      text: data.text,
-      count: 0
-    };
-  },
+  }
   
-  /**
-   * Mettre à jour un vote existant
-   * @param id ID du vote à mettre à jour
-   * @param vote Nouvelles données du vote
-   * @returns Le vote mis à jour
-   */
-  async updateVote(id: string, vote: Partial<Vote>): Promise<Vote | null> {
-    const { data, error } = await supabase
-      .from(VOTES_TABLE)
-      .update({
-        title: vote.title,
-        description: vote.description,
-        type: vote.type,
-        status: vote.status,
-        visibility: vote.visibility,
-        result_visibility: vote.resultVisibility,
-        start_date: vote.startDate?.toISOString(),
-        end_date: vote.endDate?.toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single();
-      
-    if (error) {
-      console.error(`Erreur lors de la mise à jour du vote ${id}:`, error);
-      return null;
-    }
-    
-    // Mettre à jour les options si nécessaire
-    if (vote.options) {
-      // Supprimer les options existantes
-      await supabase
-        .from(VOTE_OPTIONS_TABLE)
+  async deleteVote(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('evscatala_votes_v2')
         .delete()
-        .eq('vote_id', id);
-        
-      // Créer les nouvelles options
-      const options = await Promise.all(
-        vote.options.map(option => 
-          this.createVoteOption(id, option.text)
-        )
-      );
+        .eq('id', id);
       
-      return this.getVoteById(id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erreur lors de la suppression du vote:', error);
+      throw error;
     }
-    
-    return this.getVoteById(id);
-  },
+  }
   
-  /**
-   * Supprimer un vote
-   * @param id ID du vote à supprimer
-   * @returns true si suppression réussie
-   */
-  async deleteVote(id: string): Promise<boolean> {
-    // Supprimer d'abord les réponses au vote
-    await supabase
-      .from(VOTE_RESPONSES_TABLE)
-      .delete()
-      .eq('vote_id', id);
+  // ===== OPTIONS =====
+  
+  async getVoteOptions(voteId: string): Promise<VoteOption[]> {
+    try {
+    const { data, error } = await supabase
+        .from('evscatala_vote_options_v2')
+      .select('*')
+      .eq('vote_id', voteId)
+        .order('display_order');
       
-    // Supprimer les options du vote
-    await supabase
-      .from(VOTE_OPTIONS_TABLE)
-      .delete()
-      .eq('vote_id', id);
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des options:', error);
+      throw error;
+    }
+  }
+  
+  async createVoteOptions(voteId: string, options: string[]): Promise<VoteOption[]> {
+    try {
+      const optionsData = options.map((text, index) => ({
+        vote_id: voteId,
+        option_text: text,
+        display_order: index
+      }));
       
-    // Supprimer le vote
-    const { error } = await supabase
-      .from(VOTES_TABLE)
-      .delete()
-      .eq('id', id);
+      const { data, error } = await supabase
+        .from('evscatala_vote_options_v2')
+        .insert(optionsData)
+        .select();
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la création des options:', error);
+      throw error;
+    }
+  }
+  
+  // ===== RÉPONSES =====
+  
+  async getVoteResponses(voteId: string): Promise<VoteResponse[]> {
+    try {
+    const { data, error } = await supabase
+        .from('evscatala_vote_responses_v2')
+      .select('*')
+      .eq('vote_id', voteId);
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des réponses:', error);
+      throw error;
+    }
+  }
+  
+  async getUserVoteResponse(voteId: string, userId: string): Promise<VoteResponse | null> {
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_vote_responses_v2')
+        .select('*')
+      .eq('vote_id', voteId)
+        .eq('user_id', userId)
+      .single();
       
     if (error) {
-      console.error(`Erreur lors de la suppression du vote ${id}:`, error);
-      return false;
+        if (error.code === 'PGRST116') return null; // No rows found
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la réponse utilisateur:', error);
+      throw error;
     }
-    
-    return true;
-  },
+  }
   
-  /**
-   * Soumettre une réponse à un vote
-   * @param voteId ID du vote
-   * @param optionId ID de l'option choisie
-   * @param userId ID de l'utilisateur
-   * @returns La réponse créée ou null en cas d'erreur
-   */
-  async submitVoteResponse(voteId: string, optionId: string, userId: string): Promise<VoteResponse | null> {
-    // Vérifier si l'utilisateur a déjà voté
-    const hasVoted = await this.hasUserVoted(voteId, userId);
-    
-    if (hasVoted) {
-      throw new Error('L\'utilisateur a déjà voté');
-    }
-    
-    // Vérifier si le vote est actif
-    const vote = await this.getVoteById(voteId);
-    
-    if (!vote) {
-      throw new Error('Vote non trouvé');
-    }
-    
-    if (vote.status !== 'active') {
-      throw new Error('Le vote n\'est pas actif');
-    }
-    
-    const now = new Date();
-    if (now < vote.startDate || now > vote.endDate) {
-      throw new Error('Le vote n\'est pas dans sa période active');
-    }
-    
-    // Soumettre la réponse
+  async submitVote(voteId: string, userId: string, selectedOptions: string[]): Promise<VoteResponse> {
+    try {
     const { data, error } = await supabase
-      .from(VOTE_RESPONSES_TABLE)
-      .insert({
+        .from('evscatala_vote_responses_v2')
+        .upsert({
         vote_id: voteId,
-        option_id: optionId,
-        user_id: userId
+          user_id: userId,
+          selected_options: selectedOptions,
+          updated_at: new Date().toISOString()
       })
       .select()
       .single();
       
-    if (error) {
-      console.error(`Erreur lors de la soumission de la réponse au vote ${voteId}:`, error);
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la soumission du vote:', error);
       throw error;
     }
-    
-    return {
-      id: data.id,
-      userId: data.user_id,
-      voteId: data.vote_id,
-      optionId: data.option_id,
-      createdAt: new Date(data.created_at)
-    };
-  },
+  }
   
-  /**
-   * Mettre à jour le statut d'un vote
-   * @param id ID du vote
-   * @param status Nouveau statut
-   * @returns true si mise à jour réussie
-   */
-  async updateVoteStatus(id: string, status: VoteStatus): Promise<boolean> {
-    const { error } = await supabase
-      .from(VOTES_TABLE)
-      .update({
-        status: status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id);
+  // ===== ASSEMBLAGE CÔTÉ CLIENT (pas de jointures) =====
+  
+  async getVoteWithDetails(voteId: string): Promise<VoteWithDetails> {
+    try {
+      // Récupération séparée des données (pas de JOIN)
+      const [vote, options, responses] = await Promise.all([
+        this.getVote(voteId),
+        this.getVoteOptions(voteId),
+        this.getVoteResponses(voteId)
+      ]);
       
-    if (error) {
-      console.error(`Erreur lors de la mise à jour du statut du vote ${id}:`, error);
-      return false;
+      if (!vote) throw new Error('Vote non trouvé');
+      
+      // Récupérer la réponse de l'utilisateur actuel si connecté
+      const user = await supabase.auth.getUser();
+      let userResponse;
+      if (user.data.user) {
+        userResponse = await this.getUserVoteResponse(voteId, user.data.user.id);
+      }
+      
+      // Calculer les résultats côté client
+      const results = this.calculateResults(options, responses);
+      
+      return { 
+        vote, 
+        options, 
+        responses, 
+        userResponse: userResponse || undefined,
+        results 
+      };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails du vote:', error);
+      throw error;
+    }
+  }
+  
+  // ===== STATISTIQUES (côté client) =====
+  
+  calculateResults(options: VoteOption[], responses: VoteResponse[]): VoteResult[] {
+    const totalResponses = responses.length;
+    
+    return options.map(option => {
+      const count = responses.filter(response => 
+        response.selected_options.includes(option.id)
+      ).length;
+      
+      const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0;
+      
+      return {
+        optionId: option.id,
+        optionText: option.option_text,
+        count,
+        percentage: Math.round(percentage * 100) / 100
+      };
+    });
+  }
+  
+  // ===== UTILITAIRES =====
+  
+  async getActiveVotes(): Promise<Vote[]> {
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_votes_v2')
+        .select('*')
+        .eq('status', 'active')
+        .lte('start_date', new Date().toISOString())
+        .gte('end_date', new Date().toISOString())
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des votes actifs:', error);
+      throw error;
+    }
+  }
+  
+  async getUserVotes(userId: string): Promise<Vote[]> {
+    try {
+      const { data, error } = await supabase
+        .from('evscatala_votes_v2')
+        .select('*')
+        .eq('created_by', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des votes utilisateur:', error);
+      throw error;
+    }
+  }
+  
+  // Validation côté client
+  validateVote(vote: Partial<CreateVoteData>): string[] {
+    const errors: string[] = [];
+    
+    if (!vote.title?.trim()) {
+      errors.push('Le titre est obligatoire');
     }
     
-    return true;
-  },
-  
-  /**
-   * Récupérer les votes créés par un utilisateur
-   * @param userId ID de l'utilisateur
-   * @returns Liste des votes
-   */
-  async getVotesByUser(userId: string): Promise<Vote[]> {
-    const { data, error } = await supabase
-      .from(VOTES_TABLE)
-      .select('*')
-      .eq('created_by', userId)
-      .order('created_at', { ascending: false });
-      
-    if (error) {
-      console.error(`Erreur lors de la récupération des votes de l'utilisateur ${userId}:`, error);
-      return [];
+    if (vote.title && vote.title.length > 200) {
+      errors.push('Le titre ne peut pas dépasser 200 caractères');
     }
     
-    // Récupérer les options pour chaque vote
-    const votes = await Promise.all(
-      (data || []).map(async (vote) => {
-        const options = await this.getVoteOptions(vote.id);
+    if (vote.description && vote.description.length > 1000) {
+      errors.push('La description ne peut pas dépasser 1000 caractères');
+    }
+    
+    if (vote.start_date && vote.end_date && new Date(vote.start_date) >= new Date(vote.end_date)) {
+      errors.push('La date de fin doit être après la date de début');
+    }
+    
+    if (vote.type && ['single_choice', 'multiple_choice'].includes(vote.type)) {
+      if (!vote.options || vote.options.length < 2) {
+        errors.push('Au moins 2 options sont requises pour ce type de vote');
+      }
+      if (vote.options && vote.options.length > 10) {
+        errors.push('Maximum 10 options autorisées');
+      }
+    }
+    
+    return errors;
+  }
+  
+  // Vérifier les permissions
+  async checkPermissions(userId: string): Promise<{
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+  }> {
+    try {
+      const { data: profile } = await supabase
+        .from('evscatala_profiles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      
+      const role = profile?.role || 'member';
         
         return {
-          id: vote.id,
-          title: vote.title,
-          description: vote.description,
-          type: vote.type as VoteType,
-          status: vote.status as VoteStatus,
-          visibility: vote.visibility as VoteVisibility,
-          resultVisibility: vote.result_visibility as VoteResultVisibility,
-          options: options,
-          startDate: new Date(vote.start_date),
-          endDate: new Date(vote.end_date),
-          createdBy: vote.created_by,
-          createdAt: new Date(vote.created_at),
-          updatedAt: new Date(vote.updated_at)
-        };
-      })
-    );
-    
-    return votes;
-  },
-  
-  /**
-   * Récupérer les votes actifs
-   * @returns Liste des votes actifs
-   */
-  async getActiveVotes(): Promise<Vote[]> {
-    return this.getAllVotes('active');
+        canCreate: ['staff', 'admin'].includes(role),
+        canEdit: ['staff', 'admin'].includes(role),
+        canDelete: role === 'admin'
+      };
+    } catch (error) {
+      console.error('Erreur lors de la vérification des permissions:', error);
+      return {
+        canCreate: false,
+        canEdit: false,
+        canDelete: false
+      };
+    }
   }
-};
+}
 
+export const voteService = new VoteService(); 

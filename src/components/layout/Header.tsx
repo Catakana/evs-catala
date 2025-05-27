@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut, PenTool } from 'lucide-react';
+import { Menu, User, LogOut, PenTool, Monitor } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +49,18 @@ const Header: React.FC = () => {
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
             <span className="sr-only">Menu</span>
+          </Button>
+          
+          {/* Bouton d'accès rapide à l'affichage public - toujours visible */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => window.open('/public-display', '_blank')}
+            title="Ouvrir l'affichage public"
+            className="hover:bg-green-50 hover:text-green-600"
+          >
+            <Monitor className="h-5 w-5" />
+            <span className="sr-only">Affichage public</span>
           </Button>
           
           {!loading && user && (

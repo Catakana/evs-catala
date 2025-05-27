@@ -70,9 +70,8 @@ const SupabaseDebugTest: React.FC = () => {
       // List of tables to check
       const tablesToCheck = [
         'evscatala_profiles',
-        'evscatala_votes',
-        'evscatala_vote_options',
-        'evscatala_vote_responses',
+
+
         'evscatala_events',
         'evscatala_announcements',
         'evscatala_announcement_reads',

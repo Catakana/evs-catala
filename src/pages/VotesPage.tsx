@@ -1,211 +1,297 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus, Filter } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useToast } from '@/components/ui/use-toast';
-import { getText } from '@/lib/textBank';
-import { Vote, VoteStatus, VoteType } from '@/types/vote';
-import { voteService } from '@/lib/voteService';
-import VoteList from '@/components/votes/VoteList';
-import VoteForm from '@/components/votes/VoteForm';
+// Page VotesPage - Liste des votes avec filtres et actions
+// Architecture simplifiée pour éviter les problèmes de performance
 
-const VotesPage: React.FC = () => {
-  const t = (key: string, variables?: Record<string, string>) => getText(key, variables);
-  const { toast } = useToast();
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Plus, Search, Filter, AlertCircle, Vote as VoteIcon } from 'lucide-react';
+import { VoteCard } from '../components/votes/VoteCard';
+import { CreateVoteForm } from '../components/votes/CreateVoteForm';
+import { EditVoteForm } from '../components/votes/EditVoteForm';
+import { useVotes, useActiveVotes, useVotePermissions } from '../hooks/useVote';
+import { voteService } from '../lib/voteService';
+import type { Vote } from '../types/vote';
+
+export function VotesPage() {
+  const { votes, loading, error, reload } = useVotes();
+  const { activeVotes, loading: loadingActive } = useActiveVotes();
+  const { permissions, loading: loadingPermissions } = useVotePermissions();
   
-  // États pour les filtres et onglets
-  const [filter, setFilter] = useState<VoteStatus | 'all'>('all');
-  const [activeTab, setActiveTab] = useState<'votes' | 'surveys'>('votes');
-  
-  // États pour les dialogues
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedVote, setSelectedVote] = useState<Vote | null>(null);
-  const [formType, setFormType] = useState<VoteType>('binary');
-  
-  // Ouvrir le dialogue de création avec le type approprié
-  const handleOpenCreateDialog = (type: VoteType) => {
-    setFormType(type);
-    setCreateDialogOpen(true);
-  };
-  
-  // Ouvrir le dialogue d'édition pour un vote
-  const handleEditVote = (vote: Vote) => {
-    setSelectedVote(vote);
-    setEditDialogOpen(true);
-  };
-  
-  // Ouvrir le dialogue de suppression pour un vote
-  const handleDeleteVote = (vote: Vote) => {
-    setSelectedVote(vote);
-    setDeleteDialogOpen(true);
-  };
-  
-  // Gérer la création d'un vote
-  const handleCreateVote = (vote: Vote) => {
-    setCreateDialogOpen(false);
-    toast({
-      title: t('votes.toast.created_title'),
-      description: t('votes.toast.created_description'),
-    });
-  };
-  
-  // Gérer la mise à jour d'un vote
-  const handleUpdateVote = (vote: Vote) => {
-    setEditDialogOpen(false);
-    toast({
-      title: t('votes.toast.updated_title'),
-      description: t('votes.toast.updated_description'),
-    });
-  };
-  
-  // Gérer la suppression d'un vote
-  const handleConfirmDelete = async () => {
-    if (!selectedVote) return;
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingVote, setEditingVote] = useState<Vote | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+
+  // Filtrage des votes
+  const filteredVotes = votes.filter(vote => {
+    const matchesSearch = vote.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (vote.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
     
-    try {
-      await voteService.deleteVote(selectedVote.id);
-      
-      toast({
-        title: t('votes.toast.deleted_title'),
-        description: t('votes.toast.deleted_description'),
-      });
-    } catch (error) {
-      console.error('Erreur lors de la suppression du vote:', error);
-      toast({
-        variant: 'destructive',
-        title: t('votes.toast.error_title'),
-        description: t('votes.toast.delete_error_description'),
-      });
-    } finally {
-      setDeleteDialogOpen(false);
+    const matchesStatus = statusFilter === 'all' || vote.status === statusFilter;
+    const matchesType = typeFilter === 'all' || vote.type === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  // Séparation des votes par statut
+  const draftVotes = filteredVotes.filter(vote => vote.status === 'draft');
+  const closedVotes = filteredVotes.filter(vote => vote.status === 'closed' || vote.status === 'archived');
+
+  const handleVoteCreated = (vote: Vote) => {
+    setShowCreateForm(false);
+    reload(); // Recharger la liste
+  };
+
+  const handleVoteUpdated = (vote: Vote) => {
+    setEditingVote(null);
+    reload(); // Recharger la liste
+  };
+
+  const handleEditVote = (vote: Vote) => {
+    setEditingVote(vote);
+  };
+
+  const handleDeleteVote = async (vote: Vote) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le vote "${vote.title}" ?`)) {
+      try {
+        await voteService.deleteVote(vote.id);
+        reload(); // Recharger la liste
+      } catch (error) {
+        console.error('Erreur lors de la suppression du vote:', error);
+        alert('Erreur lors de la suppression du vote');
+      }
     }
   };
 
-  return (
-    <div className="container py-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">{t('votes.page_title')}</h1>
-        
-        <div className="flex items-center gap-2 mt-4 sm:mt-0">
-          <Select 
-            value={filter} 
-            onValueChange={(value) => setFilter(value as VoteStatus | 'all')}
-          >
-            <SelectTrigger className="w-[150px]">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                <SelectValue placeholder={t('votes.filter.label')} />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('votes.filter.all')}</SelectItem>
-              <SelectItem value="active">{t('votes.filter.active')}</SelectItem>
-              <SelectItem value="closed">{t('votes.filter.closed')}</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Button 
-            className="gap-1"
-            onClick={() => handleOpenCreateDialog(activeTab === 'votes' ? 'binary' : 'survey')}
-          >
-            <Plus className="h-4 w-4" />
-            {t('votes.actions.create')}
-          </Button>
-        </div>
+  if (showCreateForm) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <CreateVoteForm
+          onSuccess={handleVoteCreated}
+          onCancel={() => setShowCreateForm(false)}
+        />
       </div>
-      
-      <Tabs 
-        defaultValue="votes" 
-        value={activeTab}
-        onValueChange={(value) => setActiveTab(value as 'votes' | 'surveys')}
-        className="w-full"
-      >
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="votes">{t('votes.tabs.official')}</TabsTrigger>
-          <TabsTrigger value="surveys">{t('votes.tabs.surveys')}</TabsTrigger>
-        </TabsList>
+    );
+  }
+
+  if (editingVote) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <EditVoteForm
+          vote={editingVote}
+          onSuccess={handleVoteUpdated}
+          onCancel={() => setEditingVote(null)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <VoteIcon className="h-8 w-8" />
+            Votes et Sondages
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Participez aux décisions collectives de l'association
+          </p>
+        </div>
         
-        <TabsContent value="votes" className="mt-6">
-          <VoteList 
-            filter={filter}
-            type="binary"
-            onCreateVote={() => handleOpenCreateDialog('binary')}
-            onEditVote={handleEditVote}
-            onDeleteVote={handleDeleteVote}
+        {permissions.canCreate && (
+          <Button onClick={() => setShowCreateForm(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nouveau vote
+          </Button>
+        )}
+      </div>
+
+      {/* Messages d'erreur */}
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Filtres */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un vote..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
           />
-        </TabsContent>
+        </div>
         
-        <TabsContent value="surveys" className="mt-6">
-          <VoteList 
-            filter={filter}
-            type="survey"
-            onCreateVote={() => handleOpenCreateDialog('survey')}
-            onEditVote={handleEditVote}
-            onDeleteVote={handleDeleteVote}
-          />
-        </TabsContent>
-      </Tabs>
-      
-      {/* Dialogue de création de vote */}
-      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="max-w-4xl">
-          <VoteForm 
-            onSubmit={handleCreateVote} 
-            onCancel={() => setCreateDialogOpen(false)}
-            initialType={formType}
-          />
-        </DialogContent>
-      </Dialog>
-      
-      {/* Dialogue d'édition de vote */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-4xl">
-          {selectedVote && (
-            <VoteForm 
-              vote={selectedVote}
-              onSubmit={handleUpdateVote} 
-              onCancel={() => setEditDialogOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Dialogue de confirmation de suppression */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('votes.delete.title')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('votes.delete.description')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.actions.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={handleConfirmDelete}
-            >
-              {t('votes.delete.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Statut" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les statuts</SelectItem>
+            <SelectItem value="draft">Brouillons</SelectItem>
+            <SelectItem value="active">Actifs</SelectItem>
+            <SelectItem value="closed">Fermés</SelectItem>
+            <SelectItem value="archived">Archivés</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les types</SelectItem>
+            <SelectItem value="yes_no">Oui/Non</SelectItem>
+            <SelectItem value="single_choice">Choix unique</SelectItem>
+            <SelectItem value="multiple_choice">Choix multiple</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Contenu principal */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Chargement des votes...</p>
+          </div>
+        </div>
+      ) : (
+        <Tabs defaultValue="active" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="active">
+              Actifs ({activeVotes.length})
+            </TabsTrigger>
+            <TabsTrigger value="all">
+              Tous ({filteredVotes.length})
+            </TabsTrigger>
+            <TabsTrigger value="drafts">
+              Brouillons ({draftVotes.length})
+            </TabsTrigger>
+            <TabsTrigger value="closed">
+              Fermés ({closedVotes.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Votes actifs */}
+          <TabsContent value="active" className="space-y-4">
+            {loadingActive ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-sm text-muted-foreground">Chargement...</p>
+              </div>
+            ) : activeVotes.length === 0 ? (
+              <div className="text-center py-12">
+                <VoteIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-medium mb-2">Aucun vote actif</h3>
+                <p className="text-muted-foreground mb-4">
+                  Il n'y a actuellement aucun vote en cours.
+                </p>
+                {permissions.canCreate && (
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer un vote
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {activeVotes.map((vote) => (
+                  <VoteCard key={vote.id} vote={vote} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          {/* Tous les votes */}
+          <TabsContent value="all" className="space-y-4">
+            {filteredVotes.length === 0 ? (
+              <div className="text-center py-12">
+                <VoteIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-medium mb-2">Aucun vote trouvé</h3>
+                <p className="text-muted-foreground">
+                  {searchTerm || statusFilter !== 'all' || typeFilter !== 'all'
+                    ? 'Aucun vote ne correspond à vos critères de recherche.'
+                    : 'Aucun vote n\'a encore été créé.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredVotes.map((vote) => (
+                  <VoteCard 
+                    key={vote.id} 
+                    vote={vote}
+                    showActions={permissions.canEdit}
+                    onEdit={handleEditVote}
+                    onDelete={permissions.canDelete ? handleDeleteVote : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          {/* Brouillons */}
+          <TabsContent value="drafts" className="space-y-4">
+            {draftVotes.length === 0 ? (
+              <div className="text-center py-12">
+                <VoteIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-medium mb-2">Aucun brouillon</h3>
+                <p className="text-muted-foreground">
+                  Vous n'avez aucun vote en brouillon.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {draftVotes.map((vote) => (
+                  <VoteCard 
+                    key={vote.id} 
+                    vote={vote}
+                    showActions={permissions.canEdit}
+                    onEdit={handleEditVote}
+                    onDelete={permissions.canDelete ? handleDeleteVote : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          {/* Votes fermés */}
+          <TabsContent value="closed" className="space-y-4">
+            {closedVotes.length === 0 ? (
+              <div className="text-center py-12">
+                <VoteIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-medium mb-2">Aucun vote fermé</h3>
+                <p className="text-muted-foreground">
+                  Aucun vote n'a encore été fermé.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {closedVotes.map((vote) => (
+                  <VoteCard 
+                    key={vote.id} 
+                    vote={vote}
+                    showActions={permissions.canDelete}
+                    onEdit={permissions.canEdit ? handleEditVote : undefined}
+                    onDelete={permissions.canDelete ? handleDeleteVote : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
-};
-
-export default VotesPage; 
+} 

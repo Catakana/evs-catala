@@ -32,22 +32,61 @@ export const permanenceService = {
    */
   async getPermanencesByPeriod(startDate: string, endDate: string): Promise<Permanence[]> {
     try {
+      console.log("Récupération des permanences entre", startDate, "et", endDate);
+      
+      // Récupérer uniquement les permanences sans joindre les participants
       const { data, error } = await supabase
         .from('evscatala_permanences')
-        .select(`
-          *,
-          participants:evscatala_permanence_participants(
-            user_id,
-            status,
-            user:evscatala_profiles(id, firstname, lastname, avatar_url)
-          )
-        `)
+        .select('*')
         .gte('start_date', `${startDate}T00:00:00`)
         .lte('start_date', `${endDate}T23:59:59`)
         .order('start_date', { ascending: true });
 
       if (error) throw error;
-      return data as unknown as Permanence[];
+      
+      if (!data || data.length === 0) {
+        console.log("Aucune permanence trouvée pour cette période");
+        return [];
+      }
+      
+      console.log(`${data.length} permanences trouvées`);
+      
+      // Convertir les données en type Permanence
+      const permanences: Permanence[] = data.map(p => ({
+        ...p,
+        participants: []
+      }));
+      
+      // Récupérer les participants séparément si nécessaire
+      if (permanences.length > 0) {
+        try {
+          // Récupérer tous les participants pour toutes les permanences de la période
+          const permanenceIds = permanences.map(p => p.id);
+          
+          const { data: allParticipants, error: participantsError } = await supabase
+            .from('evscatala_permanence_participants')
+            .select('*')
+            .in('permanence_id', permanenceIds);
+          
+          if (participantsError) {
+            console.error("Erreur lors de la récupération des participants:", participantsError);
+          } else if (allParticipants && allParticipants.length > 0) {
+            console.log(`${allParticipants.length} participants trouvés au total`);
+            
+            // Distribuer les participants dans leurs permanences respectives
+            for (const participant of allParticipants) {
+              const permanence = permanences.find(p => p.id === participant.permanence_id);
+              if (permanence && permanence.participants) {
+                permanence.participants.push(participant);
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Erreur lors de la récupération des participants:", e);
+        }
+      }
+      
+      return permanences;
     } catch (error) {
       console.error('Erreur lors de la récupération des permanences par période:', error);
       return [];
@@ -61,58 +100,67 @@ export const permanenceService = {
    */
   async createPermanence(permanenceData: Omit<Permanence, 'id' | 'created_at' | 'updated_at'>): Promise<Permanence | null> {
     try {
-      console.log("Données reçues pour création:", permanenceData);
+      console.log("Données reçues pour création:", JSON.stringify(permanenceData, null, 2));
       
-      // Vérifier que les données date et time sont valides
-      if (!permanenceData.date || !permanenceData.start_time || !permanenceData.end_time) {
-        throw new Error("Date ou heure manquante");
+      let formattedData: any = { ...permanenceData };
+      
+      // Si start_date et end_date sont déjà fournis, on les utilise directement
+      if (permanenceData.start_date && permanenceData.end_date) {
+        console.log("Utilisation directe des dates ISO fournies");
+        
+        // On conserve uniquement les champs nécessaires
+        delete formattedData.date;
+        delete formattedData.start_time;
+        delete formattedData.end_time;
+      } 
+      // Sinon, on convertit date + start_time/end_time en dates ISO
+      else if (permanenceData.date && permanenceData.start_time && permanenceData.end_time) {
+        // Vérifier que les données date et time sont valides
+        // S'assurer que date est au bon format (YYYY-MM-DD)
+        let dateStr = permanenceData.date;
+        if (typeof dateStr !== 'string' || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          console.error("Format de date invalide:", dateStr);
+          throw new Error("Format de date invalide");
+        }
+        
+        // S'assurer que les heures sont au bon format (HH:MM)
+        let startTimeStr = permanenceData.start_time;
+        let endTimeStr = permanenceData.end_time;
+        
+        console.log("Heures reçues:", { startTimeStr, endTimeStr });
+        
+        // Valider et normaliser le format des heures
+        const startTimeParts = startTimeStr.split(':');
+        const endTimeParts = endTimeStr.split(':');
+        
+        if (startTimeParts.length < 2 || endTimeParts.length < 2) {
+          console.error("Format d'heure invalide:", { startTimeStr, endTimeStr });
+          throw new Error("Format d'heure invalide");
+        }
+        
+        // Normaliser les heures au format HH:MM
+        const normalizedStartTime = `${startTimeParts[0].padStart(2, '0')}:${startTimeParts[1].padStart(2, '0')}`;
+        const normalizedEndTime = `${endTimeParts[0].padStart(2, '0')}:${endTimeParts[1].padStart(2, '0')}`;
+        
+        console.log("Heures normalisées:", { normalizedStartTime, normalizedEndTime });
+        
+        // Construction des dates ISO complètes
+        const startISO = `${dateStr}T${normalizedStartTime}:00.000Z`;
+        const endISO = `${dateStr}T${normalizedEndTime}:00.000Z`;
+        
+        console.log("Dates ISO formatées:", { startISO, endISO });
+        
+        // Préparation des données formatées sans utiliser d'objet Date
+        formattedData.start_date = startISO;
+        formattedData.end_date = endISO;
+        
+        // Suppression des champs individuels qui ne sont plus nécessaires
+        delete formattedData.date;
+        delete formattedData.start_time;
+        delete formattedData.end_time;
+      } else {
+        throw new Error("Données de date et heure manquantes ou incomplètes");
       }
-      
-      // S'assurer que date est au bon format (YYYY-MM-DD)
-      let dateStr = permanenceData.date;
-      if (typeof dateStr !== 'string' || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        console.error("Format de date invalide:", dateStr);
-        throw new Error("Format de date invalide");
-      }
-      
-      // S'assurer que les heures sont au bon format (HH:MM)
-      let startTimeStr = permanenceData.start_time;
-      let endTimeStr = permanenceData.end_time;
-      if (typeof startTimeStr !== 'string' || !startTimeStr.match(/^\d{1,2}:\d{2}$/)) {
-        console.error("Format d'heure de début invalide:", startTimeStr);
-        throw new Error("Format d'heure de début invalide");
-      }
-      if (typeof endTimeStr !== 'string' || !endTimeStr.match(/^\d{1,2}:\d{2}$/)) {
-        console.error("Format d'heure de fin invalide:", endTimeStr);
-        throw new Error("Format d'heure de fin invalide");
-      }
-      
-      // Conversion en objets Date valides
-      const startDateStr = `${dateStr}T${startTimeStr}:00`;
-      const endDateStr = `${dateStr}T${endTimeStr}:00`;
-      
-      console.log("Dates et heures formatées:", { startDateStr, endDateStr });
-      
-      const startDate = new Date(startDateStr);
-      const endDate = new Date(endDateStr);
-      
-      // Vérifier que les dates sont valides
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        console.error("Dates invalides après conversion:", { startDate, endDate });
-        throw new Error("Dates invalides après conversion");
-      }
-      
-      // Préparation des données formatées
-      const formattedData = {
-        ...permanenceData,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-      };
-      
-      // Suppression des champs individuels qui ne sont plus nécessaires
-      delete formattedData.date;
-      delete formattedData.start_time;
-      delete formattedData.end_time;
 
       console.log("Données formatées pour insertion:", formattedData);
       
@@ -123,7 +171,12 @@ export const permanenceService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur Supabase lors de l'insertion:", error);
+        throw error;
+      }
+      
+      console.log("Insertion réussie, données retournées:", data);
       return data as Permanence;
     } catch (error) {
       console.error('Erreur lors de la création de la permanence:', error);
@@ -143,13 +196,47 @@ export const permanenceService = {
       
       // Si des champs de date/heure sont fournis, les convertir en timestamps
       if (updates.date && (updates.start_time || updates.end_time)) {
+        let dateStr = updates.date;
+        
+        // S'assurer que la date est au bon format
+        if (typeof dateStr !== 'string' || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          console.error("Format de date invalide pour la mise à jour:", dateStr);
+          throw new Error("Format de date invalide");
+        }
+        
         if (updates.start_time) {
-          formattedUpdates.start_date = new Date(`${updates.date}T${updates.start_time}`).toISOString();
+          // Normaliser l'heure de début
+          const startTimeParts = updates.start_time.split(':');
+          if (startTimeParts.length < 2) {
+            throw new Error("Format d'heure de début invalide");
+          }
+          const normalizedStartTime = `${startTimeParts[0].padStart(2, '0')}:${startTimeParts[1].padStart(2, '0')}`;
+          const startDateStr = `${dateStr}T${normalizedStartTime}:00`;
+          const startDate = new Date(startDateStr);
+          
+          if (isNaN(startDate.getTime())) {
+            throw new Error("Date de début invalide après conversion");
+          }
+          
+          formattedUpdates.start_date = startDate.toISOString();
           delete formattedUpdates.start_time;
         }
         
         if (updates.end_time) {
-          formattedUpdates.end_date = new Date(`${updates.date}T${updates.end_time}`).toISOString();
+          // Normaliser l'heure de fin
+          const endTimeParts = updates.end_time.split(':');
+          if (endTimeParts.length < 2) {
+            throw new Error("Format d'heure de fin invalide");
+          }
+          const normalizedEndTime = `${endTimeParts[0].padStart(2, '0')}:${endTimeParts[1].padStart(2, '0')}`;
+          const endDateStr = `${dateStr}T${normalizedEndTime}:00`;
+          const endDate = new Date(endDateStr);
+          
+          if (isNaN(endDate.getTime())) {
+            throw new Error("Date de fin invalide après conversion");
+          }
+          
+          formattedUpdates.end_date = endDate.toISOString();
           delete formattedUpdates.end_time;
         }
         
@@ -286,5 +373,69 @@ export const permanenceService = {
       console.error('Erreur lors de la vérification de l\'inscription:', error);
       return false;
     }
-  }
+  },
+
+  /**
+   * Fonction de débogage pour tester l'insertion d'une permanence
+   * @returns {Promise<any>} Résultat du test
+   */
+  async testDirectInsertion(): Promise<any> {
+    try {
+      // Date future pour le test
+      const testDate = new Date();
+      testDate.setDate(testDate.getDate() + 7); // Une semaine dans le futur
+      
+      // Formater en ISO string sans millisecondes pour être plus propre
+      const startDate = new Date(testDate);
+      startDate.setHours(10, 0, 0, 0);
+      
+      const endDate = new Date(testDate);
+      endDate.setHours(12, 0, 0, 0);
+      
+      const startDateISO = startDate.toISOString();
+      const endDateISO = endDate.toISOString();
+      
+      // Préparer une permanence avec le minimum de champs requis
+      const testPermanence = {
+        title: 'Test Permanence',
+        start_date: startDateISO,
+        end_date: endDateISO,
+        location: 'Test Location',
+        required_volunteers: 2,
+        max_volunteers: 4,
+        min_volunteers: 1,
+        status: PermanenceStatus.OPEN,
+        created_by: '1cf4d0ea-1f4c-4812-bf77-6524080621ba'
+      };
+      
+      console.log("Test d'insertion directe:", testPermanence);
+      
+      // Effectuer l'insertion directe
+      const { data, error } = await supabase
+        .from('evscatala_permanences')
+        .insert([testPermanence])
+        .select()
+        .single();
+      
+      if (error) {
+        console.error("Erreur lors du test d'insertion directe:", error);
+        
+        // Analyse détaillée de l'erreur
+        const errorDetails = {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        };
+        
+        return { success: false, error: errorDetails };
+      }
+      
+      console.log("Insertion directe réussie:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Exception lors du test d'insertion directe:", error);
+      return { success: false, error };
+    }
+  },
 }; 

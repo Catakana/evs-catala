@@ -11,7 +11,9 @@ interface PermanencesCalendarProps {
   permanences: Permanence[];
   onRegister?: (permanenceId: string) => Promise<void>;
   onUnregister?: (permanenceId: string) => Promise<void>;
+  onDelete?: (permanenceId: string) => Promise<void>;
   currentUserId?: string;
+  userRole?: string | null;
   onCreateClick?: (date: Date, timeSlot: { start: number, end: number }) => void;
 }
 
@@ -22,7 +24,9 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
   isMobile,
   onRegister,
   onUnregister,
+  onDelete,
   currentUserId,
+  userRole,
   onCreateClick
 }) => {
   const [selectedPermanence, setSelectedPermanence] = React.useState<Permanence | null>(null);
@@ -52,6 +56,13 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
   const handleUnregister = async (permanenceId: string) => {
     await onUnregister?.(permanenceId);
     // Fermer la modal après la désinscription
+    setSelectedPermanence(null);
+  };
+
+  // Gérer la suppression d'une permanence
+  const handleDelete = async (permanenceId: string) => {
+    await onDelete?.(permanenceId);
+    // Fermer la modal après la suppression
     setSelectedPermanence(null);
   };
 
@@ -94,7 +105,13 @@ const PermanencesCalendar: React.FC<PermanencesCalendarProps> = ({
             () => onUnregister(selectedPermanence.id) : 
             undefined
           }
+          onDelete={
+            onDelete ? 
+            () => onDelete(selectedPermanence.id) : 
+            undefined
+          }
           currentUserId={currentUserId}
+          userRole={userRole}
         />
       )}
     </div>

@@ -175,21 +175,71 @@ export default function PermanencesPage() {
     }
   };
 
+  // Fonction pour supprimer une permanence
+  const handleDeletePermanence = async (permanenceId: string) => {
+    console.log("Attempting to delete permanence:", permanenceId);
+    if (!user || (userRole !== 'admin' && userRole !== 'staff')) {
+      console.log("User not authorized to delete permanence");
+      toast({
+        title: "Non autorisé",
+        description: "Vous n'avez pas les droits nécessaires pour supprimer cette permanence.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      console.log("Deleting permanence", permanenceId);
+      const success = await permanenceService.deletePermanence(permanenceId);
+      
+      if (success) {
+        toast({
+          title: "Succès",
+          description: "La permanence a été supprimée avec succès.",
+          variant: "default"
+        });
+        fetchPermanences();
+      } else {
+        throw new Error("Échec de la suppression");
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la permanence:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la permanence. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Gestionnaire pour ouvrir la modal de création avec des données pré-remplies
   const handleQuickCreateClick = (date: Date, timeSlot: { start: number, end: number }) => {
     console.log("Quick create clicked for", date, timeSlot);
     
-    // Calculer l'heure de fin (3 heures après le début par défaut)
-    const endDate = new Date(date);
-    endDate.setHours(timeSlot.end, 0, 0);
+    // Formater la date au format YYYY-MM-DD
+    const formattedDate = date.toISOString().split('T')[0];
+    
+    // S'assurer que les heures sont au bon format HH:MM avec padding de zéros
+    const startHours = String(timeSlot.start).padStart(2, '0');
+    const endHours = String(timeSlot.end).padStart(2, '0');
+    
+    // Créer les heures complètes au format HH:MM
+    const startTime = `${startHours}:00`;
+    const endTime = `${endHours}:00`;
+    
+    console.log("Données formatées pour création rapide:", {
+      date: formattedDate,
+      start_time: startTime,
+      end_time: endTime
+    });
     
     // Préparer les données initiales pour le formulaire
     setInitialFormData({
       title: 'Permanence',
       description: '',
-      date: date.toISOString().split('T')[0],
-      start_time: `${timeSlot.start.toString().padStart(2, '0')}:00`,
-      end_time: `${timeSlot.end.toString().padStart(2, '0')}:00`,
+      date: formattedDate,
+      start_time: startTime,
+      end_time: endTime,
       location: 'Local associatif',
       required_volunteers: 2,
       max_volunteers: 4,
@@ -249,7 +299,9 @@ export default function PermanencesPage() {
             permanences={permanences}
             onRegister={handleRegisterForPermanence}
             onUnregister={handleUnregisterFromPermanence}
+            onDelete={handleDeletePermanence}
             currentUserId={user?.id}
+            userRole={userRole}
             onCreateClick={canCreatePermanence ? handleQuickCreateClick : undefined}
           />
         )}

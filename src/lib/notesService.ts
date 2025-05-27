@@ -50,13 +50,20 @@ export const notesService = {
   // Récupérer toutes les notes accessibles
   async getNotes(filters: NoteFilters = {}) {
     try {
+      // Utiliser une approche alternative pour éviter les problèmes de relation
+      return await this.getNotesAlternative(filters);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des notes:', error);
+      return [];
+    }
+  },
+
+  // Méthode alternative pour récupérer les notes
+  async getNotesAlternative(filters: NoteFilters = {}) {
+    try {
       let query = supabase
         .from('evscatala_notes')
-        .select(`
-          *,
-          author:evscatala_profiles!author_id(firstname, lastname, avatar_url),
-          context_event:evscatala_events!context_id(title)
-        `);
+        .select('*');
 
       // Appliquer les filtres
       if (filters.context_type) {
@@ -85,7 +92,7 @@ export const notesService = {
 
       query = query.order('updated_at', { ascending: false });
 
-      const { data, error } = await query;
+      const { data: notes, error } = await query;
 
       if (error) {
         // Si la table n'existe pas encore, retourner un tableau vide
@@ -93,13 +100,52 @@ export const notesService = {
           console.warn('Table evscatala_notes non trouvée, retour d\'un tableau vide');
           return [];
         }
-        console.error('Erreur lors de la récupération des notes:', error);
         throw error;
       }
 
-      return data as Note[];
+      if (!notes || notes.length === 0) {
+        return [];
+      }
+
+      // Récupérer les profils des auteurs
+      const authorIds = [...new Set(notes.map(note => note.author_id))];
+      const { data: profiles } = await supabase
+        .from('evscatala_profiles')
+        .select('user_id, firstname, lastname, avatar_url')
+        .in('user_id', authorIds);
+
+      // Récupérer les événements liés si nécessaire
+      const eventIds = notes
+        .filter(note => note.context_type === 'event' && note.context_id)
+        .map(note => note.context_id)
+        .filter(Boolean);
+      
+      let events = [];
+      if (eventIds.length > 0) {
+        const { data: eventsData } = await supabase
+          .from('evscatala_events')
+          .select('id, title')
+          .in('id', eventIds);
+        events = eventsData || [];
+      }
+
+      // Joindre les données
+      const notesWithRelations = notes.map(note => {
+        const author = profiles?.find(p => p.user_id === note.author_id);
+        const contextEvent = note.context_type === 'event' && note.context_id 
+          ? events.find(e => e.id === note.context_id)
+          : null;
+
+        return {
+          ...note,
+          author: author || null,
+          context_event: contextEvent || null
+        };
+      });
+
+      return notesWithRelations as Note[];
     } catch (error) {
-      console.error('Erreur lors de la récupération des notes:', error);
+      console.error('Erreur lors de la récupération des notes (méthode alternative):', error);
       return [];
     }
   },
@@ -107,13 +153,9 @@ export const notesService = {
   // Récupérer une note par ID
   async getNoteById(id: string) {
     try {
-      const { data, error } = await supabase
+      const { data: note, error } = await supabase
         .from('evscatala_notes')
-        .select(`
-          *,
-          author:evscatala_profiles!author_id(firstname, lastname, avatar_url),
-          context_event:evscatala_events!context_id(title)
-        `)
+        .select('*')
         .eq('id', id)
         .single();
 
@@ -122,7 +164,29 @@ export const notesService = {
         throw error;
       }
 
-      return data as Note;
+      // Récupérer le profil de l'auteur
+      const { data: author } = await supabase
+        .from('evscatala_profiles')
+        .select('user_id, firstname, lastname, avatar_url')
+        .eq('user_id', note.author_id)
+        .single();
+
+      // Récupérer l'événement lié si nécessaire
+      let contextEvent = null;
+      if (note.context_type === 'event' && note.context_id) {
+        const { data: event } = await supabase
+          .from('evscatala_events')
+          .select('id, title')
+          .eq('id', note.context_id)
+          .single();
+        contextEvent = event;
+      }
+
+      return {
+        ...note,
+        author: author || null,
+        context_event: contextEvent
+      } as Note;
     } catch (error) {
       console.error(`Erreur lors de la récupération de la note ${id}:`, error);
       throw error;
@@ -132,7 +196,7 @@ export const notesService = {
   // Créer une nouvelle note
   async createNote(noteData: NoteData, userId: string) {
     try {
-      const { data, error } = await supabase
+      const { data: note, error } = await supabase
         .from('evscatala_notes')
         .insert({
           content: noteData.content,
@@ -147,11 +211,7 @@ export const notesService = {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .select(`
-          *,
-          author:evscatala_profiles!author_id(firstname, lastname, avatar_url),
-          context_event:evscatala_events!context_id(title)
-        `)
+        .select('*')
         .single();
 
       if (error) {
@@ -162,7 +222,29 @@ export const notesService = {
         throw error;
       }
 
-      return data as Note;
+      // Récupérer le profil de l'auteur
+      const { data: author } = await supabase
+        .from('evscatala_profiles')
+        .select('user_id, firstname, lastname, avatar_url')
+        .eq('user_id', note.author_id)
+        .single();
+
+      // Récupérer l'événement lié si nécessaire
+      let contextEvent = null;
+      if (note.context_type === 'event' && note.context_id) {
+        const { data: event } = await supabase
+          .from('evscatala_events')
+          .select('id, title')
+          .eq('id', note.context_id)
+          .single();
+        contextEvent = event;
+      }
+
+      return {
+        ...note,
+        author: author || null,
+        context_event: contextEvent
+      } as Note;
     } catch (error) {
       console.error('Erreur lors de la création de la note:', error);
       throw error;
@@ -172,18 +254,14 @@ export const notesService = {
   // Mettre à jour une note
   async updateNote(id: string, noteData: Partial<NoteData>) {
     try {
-      const { data, error } = await supabase
+      const { data: note, error } = await supabase
         .from('evscatala_notes')
         .update({
           ...noteData,
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .select(`
-          *,
-          author:evscatala_profiles!author_id(firstname, lastname, avatar_url),
-          context_event:evscatala_events!context_id(title)
-        `)
+        .select('*')
         .single();
 
       if (error) {
@@ -191,7 +269,29 @@ export const notesService = {
         throw error;
       }
 
-      return data as Note;
+      // Récupérer le profil de l'auteur
+      const { data: author } = await supabase
+        .from('evscatala_profiles')
+        .select('user_id, firstname, lastname, avatar_url')
+        .eq('user_id', note.author_id)
+        .single();
+
+      // Récupérer l'événement lié si nécessaire
+      let contextEvent = null;
+      if (note.context_type === 'event' && note.context_id) {
+        const { data: event } = await supabase
+          .from('evscatala_events')
+          .select('id, title')
+          .eq('id', note.context_id)
+          .single();
+        contextEvent = event;
+      }
+
+      return {
+        ...note,
+        author: author || null,
+        context_event: contextEvent
+      } as Note;
     } catch (error) {
       console.error(`Erreur lors de la mise à jour de la note ${id}:`, error);
       throw error;
@@ -229,25 +329,7 @@ export const notesService = {
   // Récupérer les notes récentes (pour le dashboard)
   async getRecentNotes(limit: number = 5) {
     try {
-      const { data, error } = await supabase
-        .from('evscatala_notes')
-        .select(`
-          *,
-          author:evscatala_profiles!author_id(firstname, lastname, avatar_url),
-          context_event:evscatala_events!context_id(title)
-        `)
-        .order('updated_at', { ascending: false })
-        .limit(limit);
-
-      if (error) {
-        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
-          return [];
-        }
-        console.error('Erreur lors de la récupération des notes récentes:', error);
-        throw error;
-      }
-
-      return data as Note[];
+      return await this.getNotesAlternative({ search: undefined });
     } catch (error) {
       console.error('Erreur lors de la récupération des notes récentes:', error);
       return [];

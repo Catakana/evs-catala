@@ -12,11 +12,12 @@ import {
   User,
   ChevronUp,
   Grid,
-  Vote,
   Settings,
   LogOut,
   Briefcase,
-  PenTool
+  PenTool,
+  Vote,
+  Monitor
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -77,10 +78,9 @@ const BottomNav: React.FC = () => {
       items: [
         { path: '/agenda', label: t('nav.agenda'), icon: <Calendar size={20} /> },
         { path: '/permanences', label: t('nav.permanences'), icon: <FileText size={20} /> },
+        { path: '/votes', label: 'Votes', icon: <Vote size={20} /> },
         { path: '/notes', label: 'Notes', icon: <PenTool size={20} /> },
-        { path: '/projects', label: 'Projets', icon: <Briefcase size={20} /> },
-        { path: '/votes', label: t('nav.votes'), icon: <Vote size={20} /> },
-        { path: '/announcements', label: t('nav.announcements'), icon: <Bell size={20} /> }
+        { path: '/projects', label: 'Projets', icon: <Briefcase size={20} /> }
       ]
     },
     {
@@ -88,9 +88,11 @@ const BottomNav: React.FC = () => {
       label: 'Infos',
       icon: <Info size={24} />,
       items: [
+        { path: '/announcements', label: t('nav.announcements'), icon: <Bell size={20} /> },
         { path: '/messages', label: t('nav.messages'), icon: <MessageSquare size={20} /> },
         { path: '/trombinoscope', label: t('nav.trombinoscope'), icon: <Users size={20} /> },
-        { path: '/infos', label: t('nav.infos'), icon: <Info size={20} /> }
+        { path: '/infos', label: t('nav.infos'), icon: <Info size={20} /> },
+        { path: 'public-display', label: 'Affichage Public', icon: <Monitor size={20} /> }
       ]
     },
     {
@@ -187,6 +189,12 @@ const BottomNav: React.FC = () => {
       return;
     }
     
+    // Cas spécial pour l'affichage public - ouvrir dans un nouvel onglet
+    if (item.path === 'public-display') {
+      window.open('/public-display', '_blank');
+      return;
+    }
+    
     // Navigation normale pour les autres items
     navigate(item.path);
   };
@@ -206,43 +214,88 @@ const BottomNav: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Sous-menu central qui s'ouvre vers le haut */}
+      {/* Sous-menu central avec animation séquencée des items */}
       <AnimatePresence>
         {activeSubMenu && activeCategory !== 'home' && (
           <motion.div
             className="fixed left-0 right-0 bottom-16 mx-auto bg-background/95 backdrop-blur-sm rounded-t-xl border border-border shadow-lg z-50 max-w-xs"
             style={{ width: 'calc(100% - 2rem)' }}
-            initial={{ opacity: 0, y: 20, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: 20, height: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
-            <div className="flex items-center justify-between py-3 px-4 border-b">
+            <motion.div 
+              className="flex items-center justify-between py-3 px-4 border-b"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
               <h3 className="font-medium">{activeSubMenu.label}</h3>
               <ChevronUp size={16} className="text-muted-foreground" />
-            </div>
+            </motion.div>
             
             <div className="py-2">
-              {activeSubMenu.items.map((item) => (
-                <div
+              {activeSubMenu.items.map((item, index) => (
+                <motion.div
                   key={item.path}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 hover:bg-accent/60 transition-colors cursor-pointer",
                     location.pathname === item.path && "bg-accent/80 text-primary"
                   )}
                   onClick={() => handleMenuItemClick(item)}
+                  initial={{ opacity: 0, x: -20, scale: 0.9 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -20, scale: 0.9 }}
+                  transition={{ 
+                    duration: 0.3,
+                    delay: 0.2 + (index * 0.1), // Délai séquentiel pour chaque item
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ 
+                    scale: 1.02,
+                    transition: { duration: 0.2 }
+                  }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="w-9 h-9 flex items-center justify-center rounded-full bg-muted">
+                  <motion.div 
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-muted"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ 
+                      duration: 0.4,
+                      delay: 0.3 + (index * 0.1),
+                      type: "spring",
+                      stiffness: 200
+                    }}
+                  >
                     {item.icon}
-                  </div>
-                  <span className="font-medium">{item.label}</span>
+                  </motion.div>
+                  <motion.span 
+                    className="font-medium"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ 
+                      duration: 0.2,
+                      delay: 0.4 + (index * 0.1)
+                    }}
+                  >
+                    {item.label}
+                  </motion.span>
                   {location.pathname === item.path && (
                     <motion.div
                       className="ml-auto w-2 h-2 rounded-full bg-primary"
                       layoutId={`indicator-${item.path}`}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ 
+                        duration: 0.3,
+                        delay: 0.5 + (index * 0.1),
+                        type: "spring"
+                      }}
                     />
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>

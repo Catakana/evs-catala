@@ -334,29 +334,71 @@ export const eventService = {
   // Récupérer les participants d'un événement
   async getEventParticipants(eventId: string) {
     try {
+      // Utiliser une requête RPC ou une approche différente pour éviter le problème de relation
       const { data, error } = await supabase
-        .from('evscatala_event_participants')
-        .select(`
-          *,
-          user:evscatala_profiles(firstname, lastname, avatar_url, role)
-        `)
-        .eq('event_id', eventId)
-        .order('registered_at', { ascending: true });
+        .rpc('get_event_participants_with_profiles', { event_id_param: eventId });
 
       if (error) {
-        // Si la table n'existe pas encore, retourner un tableau vide
-        if (error.code === 'PGRST106' || error.message.includes('does not exist')) {
-          console.warn('Table evscatala_event_participants non trouvée, retour d\'un tableau vide');
-          return [];
-        }
-        console.error(`Erreur lors de la récupération des participants:`, error);
-        throw error;
+        // Si la fonction RPC n'existe pas, utiliser une approche alternative
+        console.warn('Fonction RPC non trouvée, utilisation d\'une approche alternative');
+        return await this.getEventParticipantsAlternative(eventId);
       }
 
       return data || [];
     } catch (error) {
       console.error(`Erreur lors de la récupération des participants:`, error);
-      // En cas d'erreur, retourner un tableau vide plutôt que de faire planter l'app
+      // En cas d'erreur, essayer l'approche alternative
+      return await this.getEventParticipantsAlternative(eventId);
+    }
+  },
+
+  // Méthode alternative pour récupérer les participants
+  async getEventParticipantsAlternative(eventId: string) {
+    try {
+      // Récupérer d'abord les participants
+      const { data: participants, error: participantsError } = await supabase
+        .from('evscatala_event_participants')
+        .select('*')
+        .eq('event_id', eventId)
+        .order('registered_at', { ascending: true });
+
+      if (participantsError) {
+        if (participantsError.code === 'PGRST106' || participantsError.message.includes('does not exist')) {
+          console.warn('Table evscatala_event_participants non trouvée, retour d\'un tableau vide');
+          return [];
+        }
+        throw participantsError;
+      }
+
+      if (!participants || participants.length === 0) {
+        return [];
+      }
+
+      // Récupérer les profils pour chaque participant
+      const userIds = participants.map(p => p.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('evscatala_profiles')
+        .select('user_id, firstname, lastname, avatar_url, role')
+        .in('user_id', userIds);
+
+      if (profilesError) {
+        console.warn('Erreur lors de la récupération des profils:', profilesError);
+        // Retourner les participants sans les profils
+        return participants.map(p => ({ ...p, user: null }));
+      }
+
+      // Joindre les données
+      const participantsWithProfiles = participants.map(participant => {
+        const profile = profiles?.find(p => p.user_id === participant.user_id);
+        return {
+          ...participant,
+          user: profile || null
+        };
+      });
+
+      return participantsWithProfiles;
+    } catch (error) {
+      console.error(`Erreur lors de la récupération des participants (méthode alternative):`, error);
       return [];
     }
   },

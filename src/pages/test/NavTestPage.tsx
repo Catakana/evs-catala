@@ -70,7 +70,7 @@ const NavTestPage: React.FC = () => {
                       <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                         <li>Agenda</li>
                         <li>Permanences</li>
-                        <li>Votes</li>
+                        <li>Votes (supprimé)</li>
                         <li>Annonces</li>
                       </ul>
                     </div>

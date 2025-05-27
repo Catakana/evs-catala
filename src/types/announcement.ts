@@ -11,7 +11,10 @@ export interface Announcement {
   publishDate: Date;
   expireDate?: Date;
   isArchived: boolean;
+  isPinned?: boolean; // Annonce épinglée
+  priority?: number; // Priorité d'affichage
   attachments?: string[]; // URLs to attachments
+  attachmentsCount?: number; // Nombre de pièces jointes
   createdAt: Date;
 }
 
