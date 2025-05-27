@@ -123,6 +123,14 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Boutons multiples** : Retour connexion + retour accueil
 - ✅ **Cohérence navigation** : Liens de retour sur toutes les pages d'auth
 
+#### Améliorations gestion d'erreurs ✅ TERMINÉ (27/05/2025)
+- ✅ **Messages d'erreur clairs** : Amélioration des messages d'authentification
+- ✅ **Gestion erreurs spécifiques** : Permissions, session expirée, JWT invalide
+- ✅ **Boutons de reconnexion** : Actions rapides dans les formulaires
+- ✅ **Notification header** : Indicateur de déconnexion avec bouton connexion
+- ✅ **Scripts de test** : Annonces de test pour vérifier le fonctionnement
+- ✅ **Actualisation automatique** : Bouton pour recharger la page si nécessaire
+
 #### Livrables prioritaires
 - **Semaine 1**: Connexion/inscription fonctionnelle et pages protégées ✅
 - **Semaine 2**: Gestion de profil et récupération de mot de passe ✅

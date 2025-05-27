@@ -166,7 +166,8 @@ class AnnouncementService {
       // Récupérer l'utilisateur actuel
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
-        throw new Error('Utilisateur non connecté');
+        console.error('❌ Erreur d\'authentification:', userError);
+        throw new Error('Vous devez être connecté pour créer une annonce. Veuillez vous reconnecter.');
       }
 
       const { data, error } = await supabase
@@ -188,7 +189,17 @@ class AnnouncementService {
 
       if (error) {
         console.error('Erreur lors de la création de l\'annonce:', error);
-        throw error;
+        
+        // Messages d'erreur spécifiques selon le type d'erreur
+        if (error.code === '42501' || error.message.includes('permission')) {
+          throw new Error('Vous n\'avez pas les permissions nécessaires pour créer une annonce.');
+        } else if (error.code === '23505') {
+          throw new Error('Une annonce avec ce titre existe déjà.');
+        } else if (error.message.includes('JWT')) {
+          throw new Error('Votre session a expiré. Veuillez vous reconnecter.');
+        } else {
+          throw new Error(`Erreur lors de la création: ${error.message}`);
+        }
       }
 
       console.log('✅ Annonce créée avec succès:', data.id);
@@ -203,7 +214,14 @@ class AnnouncementService {
 
     } catch (error) {
       console.error('Erreur dans createAnnouncement:', error);
-      throw new Error('Impossible de créer l\'annonce');
+      
+      // Si c'est déjà une erreur avec un message personnalisé, la relancer
+      if (error instanceof Error && error.message.includes('connecté') || error.message.includes('permission') || error.message.includes('session')) {
+        throw error;
+      }
+      
+      // Sinon, message générique
+      throw new Error('Impossible de créer l\'annonce. Vérifiez votre connexion et réessayez.');
     }
   }
 

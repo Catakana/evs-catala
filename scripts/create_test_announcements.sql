@@ -101,4 +101,84 @@ ORDER BY is_pinned DESC, priority DESC, created_at DESC;
 
 -- Message de confirmation
 SELECT 'Annonces de test créées avec succès !' as result;
-SELECT COUNT(*) as nombre_total_annonces FROM evscatala_announcements; 
+SELECT COUNT(*) as nombre_total_annonces FROM evscatala_announcements;
+
+-- Vérifier d'abord que la table existe
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name = 'evscatala_announcements';
+
+-- Insérer quelques annonces de test
+INSERT INTO evscatala_announcements (
+  title,
+  content,
+  category,
+  author_id,
+  target_roles,
+  target_groups,
+  publish_date,
+  expire_date,
+  is_pinned,
+  priority,
+  is_archived,
+  created_at,
+  updated_at
+) VALUES 
+(
+  'Bienvenue sur le nouveau portail !',
+  'Nous sommes ravis de vous présenter le nouveau portail de l''EVS CATALA. Vous y trouverez toutes les informations importantes, les événements à venir, et pourrez participer à la vie de l''association.',
+  'info',
+  (SELECT id FROM auth.users LIMIT 1), -- Premier utilisateur disponible
+  ARRAY['member', 'staff', 'admin'],
+  ARRAY[]::text[],
+  NOW(),
+  NOW() + INTERVAL '30 days',
+  true,
+  90,
+  false,
+  NOW(),
+  NOW()
+),
+(
+  'Réunion mensuelle - Juin 2025',
+  'La prochaine réunion mensuelle aura lieu le 15 juin 2025 à 19h00 dans nos locaux. Ordre du jour : bilan des activités, projets en cours, et préparation de l''événement d''été.',
+  'event',
+  (SELECT id FROM auth.users LIMIT 1),
+  ARRAY['member', 'staff'],
+  ARRAY[]::text[],
+  NOW(),
+  '2025-06-15 19:00:00'::timestamp,
+  false,
+  70,
+  false,
+  NOW(),
+  NOW()
+),
+(
+  'Nouveau projet : Jardin partagé',
+  'Nous lançons un nouveau projet de jardin partagé ! Si vous êtes intéressé(e) pour participer à cette belle initiative, n''hésitez pas à nous contacter. Première réunion de planification prévue la semaine prochaine.',
+  'project',
+  (SELECT id FROM auth.users LIMIT 1),
+  ARRAY['member'],
+  ARRAY[]::text[],
+  NOW(),
+  NOW() + INTERVAL '60 days',
+  false,
+  50,
+  false,
+  NOW(),
+  NOW()
+);
+
+-- Vérifier que les annonces ont été créées
+SELECT 
+  id,
+  title,
+  category,
+  is_pinned,
+  priority,
+  publish_date,
+  expire_date
+FROM evscatala_announcements 
+ORDER BY priority DESC, publish_date DESC; 

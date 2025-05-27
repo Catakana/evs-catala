@@ -13,12 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../ui/switch';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Badge } from '../ui/badge';
-import { Calendar, Save, X, AlertCircle, Paperclip, Upload } from 'lucide-react';
+import { Calendar, Save, X, AlertCircle, Paperclip, Upload, AlertTriangle, LogIn } from 'lucide-react';
 import { useAnnouncementActions } from '../../hooks/useAnnouncements';
 import type { Announcement, AnnouncementCategory } from '../../types/announcement';
 import type { CreateAnnouncementData, UpdateAnnouncementData } from '../../lib/announcementService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AnnouncementFormProps {
   announcement?: Announcement; // Si fourni, mode édition
@@ -45,6 +46,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
   onCancel
 }) => {
   const { createAnnouncement, updateAnnouncement, loading, error } = useAnnouncementActions();
+  const { user } = useAuth();
   
   // État du formulaire
   const [formData, setFormData] = useState({
@@ -360,8 +362,36 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
             {/* Erreur générale */}
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <p>{error}</p>
+                    {(error.includes('connecté') || error.includes('session') || error.includes('permission')) && (
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.location.href = '/login'}
+                          className="flex items-center gap-2"
+                        >
+                          <LogIn className="h-4 w-4" />
+                          Se reconnecter
+                        </Button>
+                        {!user && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.location.reload()}
+                          >
+                            Actualiser la page
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </AlertDescription>
               </Alert>
             )}
 
