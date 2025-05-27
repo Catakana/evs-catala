@@ -123,6 +123,14 @@ Ce document détaille le plan de développement du projet EVS-catala, en défini
 - ✅ **Boutons multiples** : Retour connexion + retour accueil
 - ✅ **Cohérence navigation** : Liens de retour sur toutes les pages d'auth
 
+#### Améliorations navigation ✅ TERMINÉ (27/05/2025)
+- ✅ **Suppression bouton Notes** : Retrait du bouton de prise de note bleu du BottomNav
+- ✅ **Titre responsive** : Masquage du titre "Portail EVS CATALA" en affichage mobile
+- ✅ **Logo cliquable** : Ajout du clic sur le logo EVS pour retourner à l'accueil
+- ✅ **Suppression bouton flottant** : Retrait du QuickNoteButton du layout principal
+- ✅ **Optimisation mobile** : Amélioration de l'affichage sur petits écrans
+- ✅ **Remise Notes dans navigation** : Ajout de l'item "Notes" dans Organisation (sans bouton flottant)
+
 #### Améliorations gestion d'erreurs ✅ TERMINÉ (27/05/2025)
 - ✅ **Messages d'erreur clairs** : Amélioration des messages d'authentification
 - ✅ **Gestion erreurs spécifiques** : Permissions, session expirée, JWT invalide

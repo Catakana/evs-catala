@@ -35,7 +35,11 @@ const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-xl text-evs-blue">
+        <div 
+          className="flex items-center gap-2 font-bold text-xl text-evs-blue cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => navigate('/')}
+          title="Retour à l'accueil"
+        >
           <img 
             src="/logo-evs-catala.svg" 
             alt="EVS CATALA Logo" 
@@ -45,7 +49,7 @@ const Header: React.FC = () => {
               e.currentTarget.style.display = 'none';
             }}
           />
-          <span>Portail EVS CATALA</span>
+          <span className="hidden md:inline">Portail EVS CATALA</span>
         </div>
         
         <div className="flex items-center gap-2">
