@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { EventData } from '@/components/agenda/EventForm';
+import { parseAsLocalDateTime, formatLocalDate, formatLocalTime } from './dateUtils';
 
 // Type pour l'événement complet dans la base de données
 export interface Event {
@@ -414,17 +415,17 @@ export const eventService = {
 
   // Convertir un événement du format DB au format du formulaire
   convertToFormData(event: Event): EventData {
-    const startDateTime = new Date(event.start_datetime);
-    const endDateTime = new Date(event.end_datetime);
+    const startDateTime = parseAsLocalDateTime(event.start_datetime);
+    const endDateTime = parseAsLocalDateTime(event.end_datetime);
 
     return {
       id: event.id,
       title: event.title,
       description: event.description || '',
-      start_date: startDateTime.toISOString().split('T')[0],
-      start_time: startDateTime.toISOString().split('T')[1].substring(0, 5),
-      end_date: endDateTime.toISOString().split('T')[0],
-      end_time: endDateTime.toISOString().split('T')[1].substring(0, 5),
+      start_date: formatLocalDate(startDateTime),
+      start_time: formatLocalTime(startDateTime),
+      end_date: formatLocalDate(endDateTime),
+      end_time: formatLocalTime(endDateTime),
       category: event.category,
       location: event.location
     };

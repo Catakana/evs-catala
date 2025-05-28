@@ -1,9 +1,10 @@
 import React from 'react';
-import { format, parseISO, eachDayOfInterval, startOfWeek, endOfWeek, isSameDay, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { CalendarEvent } from './AgendaCalendar';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface AgendaWeekViewProps {
   selectedDate: Date;
@@ -23,8 +24,8 @@ const AgendaWeekView: React.FC<AgendaWeekViewProps> = ({ selectedDate, events, o
   // Function to get events for a specific day and time slot
   const getEventsForSlot = (day: Date, hour: number): CalendarEvent[] => {
     return events.filter(event => {
-      const eventStart = parseISO(event.start);
-      const eventEnd = parseISO(event.end);
+      const eventStart = parseAsLocalDateTime(event.start);
+      const eventEnd = parseAsLocalDateTime(event.end);
       
       return (
         isSameDay(eventStart, day) && 
@@ -85,9 +86,9 @@ const AgendaWeekView: React.FC<AgendaWeekViewProps> = ({ selectedDate, events, o
                         )}
                       >
                         {/* If event starts at this hour, show the time */}
-                        {parseISO(event.start).getHours() === hour && (
+                        {parseAsLocalDateTime(event.start).getHours() === hour && (
                           <span className="font-medium">
-                            {format(parseISO(event.start), 'HH:mm')} - {' '}
+                            {format(parseAsLocalDateTime(event.start), 'HH:mm')} - {' '}
                           </span>
                         )}
                         {event.title}

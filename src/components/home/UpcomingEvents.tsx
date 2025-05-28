@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { format, parseISO, isToday, isTomorrow, isThisWeek } from 'date-fns';
+import { format, isToday, isTomorrow, isThisWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, Clock, MapPin, Users, ChevronRight, AlertCircle, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { eventService } from '@/lib/eventService';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface Event {
   id: string;
@@ -64,7 +65,7 @@ const UpcomingEvents: React.FC = () => {
   };
 
   const formatEventDate = (dateString: string) => {
-    const date = parseISO(dateString);
+    const date = parseAsLocalDateTime(dateString);
     
     if (isToday(date)) {
       return `Aujourd'hui à ${format(date, 'HH:mm')}`;
@@ -242,7 +243,7 @@ const UpcomingEvents: React.FC = () => {
         <div className="space-y-4">
           {events.map((event, index) => {
             const categoryInfo = getCategoryBadge(event.category);
-            const isUrgent = isToday(parseISO(event.start_datetime)) || isTomorrow(parseISO(event.start_datetime));
+            const isUrgent = isToday(parseAsLocalDateTime(event.start_datetime)) || isTomorrow(parseAsLocalDateTime(event.start_datetime));
             
             return (
               <motion.div

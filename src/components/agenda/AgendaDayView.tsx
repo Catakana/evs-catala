@@ -1,9 +1,10 @@
 import React from 'react';
-import { format, parseISO, eachHourOfInterval, startOfDay, endOfDay, isSameDay } from 'date-fns';
+import { format, eachHourOfInterval, startOfDay, endOfDay, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { CalendarEvent } from './AgendaCalendar';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface AgendaDayViewProps {
   selectedDate: Date;
@@ -20,13 +21,13 @@ const AgendaDayView: React.FC<AgendaDayViewProps> = ({ selectedDate, events, onE
 
   // Filter events for the selected day
   const dayEvents = events.filter(event => {
-    const eventDate = parseISO(event.start);
+    const eventDate = parseAsLocalDateTime(event.start);
     return isSameDay(eventDate, selectedDate);
   });
 
   // Sort events by start time
   dayEvents.sort((a, b) => {
-    return parseISO(a.start).getTime() - parseISO(b.start).getTime();
+    return parseAsLocalDateTime(a.start).getTime() - parseAsLocalDateTime(b.start).getTime();
   });
   
   return (
@@ -51,7 +52,7 @@ const AgendaDayView: React.FC<AgendaDayViewProps> = ({ selectedDate, events, onE
             <div className="relative">
               {dayEvents
                 .filter(event => {
-                  const eventHour = parseISO(event.start).getHours();
+                  const eventHour = parseAsLocalDateTime(event.start).getHours();
                   return eventHour === hour.getHours();
                 })
                 .map(event => (
@@ -68,7 +69,7 @@ const AgendaDayView: React.FC<AgendaDayViewProps> = ({ selectedDate, events, onE
                     )}
                   >
                     <div className="font-medium">
-                      {format(parseISO(event.start), 'HH:mm')} - {format(parseISO(event.end), 'HH:mm')}
+                      {format(parseAsLocalDateTime(event.start), 'HH:mm')} - {format(parseAsLocalDateTime(event.end), 'HH:mm')}
                     </div>
                     <div>{event.title}</div>
                     {event.location && (
@@ -96,7 +97,7 @@ const AgendaDayView: React.FC<AgendaDayViewProps> = ({ selectedDate, events, onE
                   onClick={() => onEventClick(event)}
                   className="text-sm p-2 rounded hover:bg-muted cursor-pointer"
                 >
-                  <span className="font-medium">{format(parseISO(event.start), 'HH:mm')}</span> - {event.title}
+                  <span className="font-medium">{format(parseAsLocalDateTime(event.start), 'HH:mm')}</span> - {event.title}
                 </li>
               ))}
             </ul>

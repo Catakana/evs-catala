@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
+import { format, isToday, isTomorrow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Calendar, Clock, MapPin, Users, UserPlus, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, UserPlus, ArrowRight, ChevronRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { eventService, Event } from '@/lib/eventService';
 import { authService } from '@/lib/supabase';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface UpcomingEventsProps {
   maxEvents?: number;
@@ -135,7 +136,7 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({
   };
 
   const formatEventDate = (dateString: string) => {
-    const date = parseISO(dateString);
+    const date = parseAsLocalDateTime(dateString);
     
     if (isToday(date)) {
       return "Aujourd'hui";
@@ -147,8 +148,8 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({
   };
 
   const formatEventTime = (startString: string, endString: string) => {
-    const start = parseISO(startString);
-    const end = parseISO(endString);
+    const start = parseAsLocalDateTime(startString);
+    const end = parseAsLocalDateTime(endString);
     return `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`;
   };
 

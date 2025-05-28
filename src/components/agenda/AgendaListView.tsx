@@ -1,10 +1,11 @@
 import React from 'react';
-import { format, parseISO, isSameMonth, addMonths } from 'date-fns';
+import { format, isSameMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarEvent } from './AgendaCalendar';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface AgendaListViewProps {
   selectedDate: Date;
@@ -18,12 +19,12 @@ const AgendaListView: React.FC<AgendaListViewProps> = ({ selectedDate, events, o
   
   // Sort events by date
   const sortedEvents = [...events].sort((a, b) => 
-    parseISO(a.start).getTime() - parseISO(b.start).getTime()
+    parseAsLocalDateTime(a.start).getTime() - parseAsLocalDateTime(b.start).getTime()
   );
   
   // Group events by month
   sortedEvents.forEach(event => {
-    const eventDate = parseISO(event.start);
+    const eventDate = parseAsLocalDateTime(event.start);
     const monthKey = format(eventDate, 'yyyy-MM');
     
     if (!eventsByMonth[monthKey]) {
@@ -51,8 +52,8 @@ const AgendaListView: React.FC<AgendaListViewProps> = ({ selectedDate, events, o
   
   // Format dates for display
   const formatEventDate = (event: CalendarEvent) => {
-    const startDate = parseISO(event.start);
-    const endDate = parseISO(event.end);
+    const startDate = parseAsLocalDateTime(event.start);
+    const endDate = parseAsLocalDateTime(event.end);
     
     const startStr = format(startDate, 'EEEE d MMMM yyyy', { locale: fr });
     const timeStr = `${format(startDate, 'HH:mm')} - ${format(endDate, 'HH:mm')}`;
@@ -77,7 +78,7 @@ const AgendaListView: React.FC<AgendaListViewProps> = ({ selectedDate, events, o
     <div className="space-y-8">
       {Object.keys(eventsByMonth).sort().map(monthKey => {
         const monthEvents = eventsByMonth[monthKey];
-        const monthDate = parseISO(`${monthKey}-01`);
+        const monthDate = parseAsLocalDateTime(`${monthKey}-01`);
         const isCurrentMonth = isSameMonth(monthDate, selectedDate);
         
         return (

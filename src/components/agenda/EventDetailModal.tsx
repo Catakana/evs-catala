@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
   Calendar, 
@@ -10,7 +10,8 @@ import {
   UserMinus, 
   Edit,
   Trash2,
-  X
+  X,
+  AlertCircle
 } from 'lucide-react';
 
 import {
@@ -28,6 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { eventService, Event, EventParticipant } from '@/lib/eventService';
 import { authService } from '@/lib/supabase';
+import { parseAsLocalDateTime } from '@/lib/dateUtils';
 
 interface EventDetailModalProps {
   isOpen: boolean;
@@ -194,8 +196,8 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
     return null;
   }
 
-  const startDate = parseISO(event.start_datetime);
-  const endDate = parseISO(event.end_datetime);
+  const startDate = parseAsLocalDateTime(event.start_datetime);
+  const endDate = parseAsLocalDateTime(event.end_datetime);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -295,7 +297,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                         {participant.user?.firstname} {participant.user?.lastname}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Inscrit le {format(parseISO(participant.registered_at), 'dd/MM/yyyy', { locale: fr })}
+                        Inscrit le {format(parseAsLocalDateTime(participant.registered_at), 'dd/MM/yyyy', { locale: fr })}
                       </p>
                     </div>
                     <Badge variant="outline" className="text-xs">
